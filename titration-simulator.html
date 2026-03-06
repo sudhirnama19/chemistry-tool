@@ -296,18 +296,6 @@ function drawGraph(acidType, Ca, Va, Cb, Ka1, Ka2) {
 window.onload = update;
 </script>
 
-<div id="footer-container"></div>
-<script>
-fetch("footer.html")
-.then(res => res.text())
-.then(data => {
-    document.getElementById("footer-container").innerHTML = data;
-})
-.catch(err => console.log("Footer not found, ignoring."));
-</script>
-
-    
-
     <div class="container" style="background:none; box-shadow:none; backdrop-filter:none; margin-bottom:0; padding-bottom:0;">
     <section id="theory-section">
         <h2 style="text-align:left; color: var(--accent);">Acid-Base Titration Theory</h2>
@@ -374,5 +362,16 @@ fetch("footer.html")
         </div>
     </div>
 </div>
+
+    <div id="footer-container"></div>
+<script>
+fetch("footer.html")
+.then(res => res.text())
+.then(data => {
+    document.getElementById("footer-container").innerHTML = data;
+})
+.catch(err => console.log("Footer not found, ignoring."));
+</script>
+    
 </body>
 </html>
