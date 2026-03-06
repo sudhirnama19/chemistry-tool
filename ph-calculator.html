@@ -236,7 +236,10 @@
     <div id="footer-container"></div>
 
     <script>
-        // --- PASTE THIS AT THE TOP OF ANY CALCULATE FUNCTION ---
+        let myChart = null;
+
+        function runCalculation() {
+            // --- PASTE THIS AT THE TOP OF ANY CALCULATE FUNCTION ---
 const inputs = document.querySelectorAll('input');
 inputs.forEach(input => {
     if(input.value.includes('^') || input.value.includes('e')) {
@@ -245,9 +248,6 @@ inputs.forEach(input => {
     }
 });
 // -------------------------------------------------------
-        let myChart = null;
-
-        function runCalculation() {
             const type = document.getElementById('type').value;
             const strength = document.getElementById('strength').value;
             const C = window.smartParse(document.getElementById('conc').value);
