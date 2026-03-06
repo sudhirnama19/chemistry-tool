@@ -110,45 +110,36 @@
 
 
 <script>
-    /**
-     * This script runs globally on every page that loads the footer.
-     * It transforms standard numeric inputs into "Smart Scientific" inputs.
+    /** * THE UNIVERSAL INTERCEPTOR 
+     * This makes every "parseFloat" in your calculators understand 10^-20
      */
-    function applyUniversalFix() {
-        const inputs = document.querySelectorAll('input[type="number"]');
-        
-        inputs.forEach(input => {
-            // 1. Change type to 'text' to unlock the full keyboard on mobile (for - and e)
-            input.type = "text"; 
-            // 2. Suggest a decimal keyboard for convenience
-            input.inputMode = "decimal"; 
-            // 3. Add a helpful placeholder hint
-            if (!input.placeholder.includes("1e-5")) {
-                input.placeholder += " (e.g. 10^-5 or 1.8e-5)";
-            }
-        });
-
-        // 4. Create the Smart Parser globally
+    (function() {
+        // Step 1: Create the Smart Parser
         window.smartParse = function(val) {
-            if (!val || val.trim() === "") return NaN;
+            if (!val || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
-
-            // Handle power notation like 10^-20
+            
+            // Handle 10^-5 or 2^10 formats
             if (str.includes("^")) {
                 let parts = str.split("^");
-                let base = parseFloat(parts[0]);
-                let exponent = parseFloat(parts[1]);
-                return Math.pow(base, exponent);
+                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
             }
-            
-            // Handle standard notation like 1.8e-5 or 0.001
             return parseFloat(str);
         };
-    }
 
-    // Run the fix immediately when footer is injected
-    applyUniversalFix();
-    
-    // Also run it after a short delay to ensure all DOM elements are ready
-    setTimeout(applyUniversalFix, 100);
+        // Step 2: Fix UI - Unlock mobile keyboards for all calculators
+        function unlockInputs() {
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.type = "text"; 
+                input.inputMode = "decimal";
+                if (!input.placeholder.includes("^")) {
+                    input.placeholder += " (e.g. 1e-5 or 10^-14)";
+                }
+            });
+        }
+
+        // Run UI fix on load
+        window.addEventListener('DOMContentLoaded', unlockInputs);
+        setTimeout(unlockInputs, 500); // Backup for slow loading
+    })();
 </script>
