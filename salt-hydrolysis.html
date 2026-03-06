@@ -140,20 +140,20 @@
 
                 <div>
                     <label>Salt Concentration (M)</label>
-                    <input id="conc" type="number" step="any" placeholder="e.g. 0.1">
+                    <input id="conc" type="text" placeholder="e.g. 0.1 or 1e-1">
                 </div>
                 <div>
                     <label>System Temp (°C)</label>
-                    <input id="temp" type="number" step="any" value="25">
+                    <input id="temp" type="text" value="25">
                 </div>
 
                 <div id="ka_input" style="display:none;">
                     <label>Dissociation Constant ($K_a$)</label>
-                    <input id="Ka" type="number" step="any" placeholder="e.g. 1.8e-5">
+                    <input id="Ka" type="text" placeholder="e.g. 1.8e-5 or 10^-5">
                 </div>
                 <div id="kb_input" style="display:none;">
                     <label>Dissociation Constant ($K_b$)</label>
-                    <input id="Kb" type="number" step="any" placeholder="e.g. 1.8e-5">
+                    <input id="Kb" type="text" placeholder="e.g. 1.8e-5">
                 </div>
             </div>
 
@@ -185,6 +185,17 @@
     <script>
         let chart = null;
 
+        // LOCAL SMART PARSER: Corrects scientific notation like 10^-5
+        function smartParser(val) {
+            if (!val || val.toString().trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+            if (str.includes("^")) {
+                let parts = str.split("^");
+                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+            }
+            return parseFloat(str);
+        }
+
         function updateSaltUI() {
             const type = document.getElementById("saltType").value;
             const hint = document.getElementById("saltExample");
@@ -205,10 +216,10 @@
 
         function calculateSalt() {
             let type = document.getElementById("saltType").value;
-            let C = parseFloat(document.getElementById("conc").value);
-            let Ka = parseFloat(document.getElementById("Ka").value);
-            let Kb = parseFloat(document.getElementById("Kb").value);
-            let T = parseFloat(document.getElementById("temp").value) || 25;
+            let C = smartParser(document.getElementById("conc").value);
+            let Ka = smartParser(document.getElementById("Ka").value);
+            let Kb = smartParser(document.getElementById("Kb").value);
+            let T = smartParser(document.getElementById("temp").value) || 25;
 
             if (isNaN(C) && type !== "ss" && type !== "ww") { 
                 alert("Please enter Concentration (Molarity)"); return; 
