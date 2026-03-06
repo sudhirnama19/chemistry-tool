@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* Global Fix: Prevents elements from leaking out of layout */
+/* Global Fix */
 *{ box-sizing: border-box; }
 
 body{
@@ -15,82 +14,20 @@ body{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
     color:white;
-    padding:15px; /* Reduced padding for mobile */
+    padding: 0; 
     overflow-x: hidden;
 }
 
-.container{
-    max-width:1100px;
-    margin:auto;
-    background:rgba(255,255,255,0.07);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 0 40px rgba(0,0,0,0.6);
-}
-
-h2{ text-align:center; margin-bottom:20px; font-size: 1.5rem; }
-
-.grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:20px;
-}
-
-label { display: block; margin-top: 10px; font-size: 0.9rem; color: #00ffd5; }
-
-input, select{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border: 1px solid rgba(255,255,255,0.2);
-    margin:5px 0;
-    background: rgba(0,0,0,0.3);
-    color: white;
-}
-
-.slider{ width:100%; cursor: pointer; }
-
-.result{
-    margin-top: 15px;
-    padding: 15px;
-    border-radius: 15px;
-    background: rgba(0,0,0,0.4);
-    border-left: 4px solid #00ffd5;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-/* FIX: Responsive Graph Layout */
-.graph-wrapper {
-    width: 100%;
-    background: white;
-    border-radius: 15px;
-    margin-top: 25px;
-    overflow: hidden; /* Clips the canvas to radius */
-}
-
-canvas{
-    display: block;
-    width: 100% !important; /* Forces canvas to stay inside wrapper */
-    height: auto !important; /* Maintains aspect ratio */
-}
-
-@media(max-width:800px){
-    .grid{ grid-template-columns: 1fr; }
-    h2 { font-size: 1.2rem; }
-}
-    /* Header Styles - Matches index.html */
+/* Fixed Header Fix */
 .navbar {
-    background: rgba(15, 23, 42, 0.8) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     height: 70px;
     display: flex;
     align-items: center;
-    position: fixed;
+    position: sticky; /* Changed from fixed to sticky for better flow */
     top: 0;
     width: 100%;
     z-index: 1000;
@@ -99,21 +36,85 @@ canvas{
 
 .brand-text {
     font-weight: 800;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     background: linear-gradient(45deg, #007bff, #00ffd5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-decoration: none;
 }
 
-/* Adjust wrapper to not hide under fixed header */
-.wrapper, .container {
-    margin-top: 80px !important;
+.container{
+    max-width:1100px;
+    margin: 20px auto; /* Removed the forced !important margin */
+    background:rgba(255,255,255,0.07);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 0 40px rgba(0,0,0,0.6);
+}
+
+h2{ text-align:center; margin-bottom:25px; font-size: 1.8rem; color: #fff; }
+
+.grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:20px;
+}
+
+label { display: block; margin-top: 12px; font-size: 0.9rem; color: #00ffd5; font-weight: 600; }
+
+input, select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    margin:5px 0;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    font-size: 1rem;
+}
+
+.slider{ width:100%; cursor: pointer; margin-top: 10px; }
+
+.result{
+    height: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(0,0,0,0.5);
+    border-left: 5px solid #00ffd5;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+/* Responsive Graph */
+.graph-wrapper {
+    width: 100%;
+    background: #fdfdfd; /* Light background for contrast */
+    border-radius: 15px;
+    margin-top: 30px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+canvas{
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+}
+
+@media(max-width:800px){
+    .grid{ grid-template-columns: 1fr; }
+    h2 { font-size: 1.4rem; }
+    .container { margin: 10px; padding: 15px; }
+    .navbar { height: 60px; }
+    .brand-text { font-size: 1.1rem; }
 }
 </style>
 </head>
 <body>
-    <nav class="navbar">
+
+<nav class="navbar">
     <a class="brand-text" href="index.html">Chemistry Spark Lab</a>
 </nav>
 
@@ -121,35 +122,45 @@ canvas{
     <h2>🧪 Titration Simulator 2.0</h2>
 
     <div class="grid">
-        <div>
+        <div class="controls">
             <label>Mode</label>
-            <select id="mode">
+            <select id="mode" onchange="update()">
                 <option value="ph">pH Titration</option>
                 <option value="cond">Conductometric</option>
             </select>
 
             <label>Acid Type</label>
-            <select id="acidType">
+            <select id="acidType" onchange="update()">
                 <option value="mono">Monoprotic</option>
                 <option value="di">Diprotic (H₂A)</option>
             </select>
 
-            <label>Acid Concentration (M)</label>
-            <input type="number" id="Ca" value="0.1" step="0.01">
-
-            <label>Acid Volume (mL)</label>
-            <input type="number" id="Va" value="50">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1">
+                    <label>Acid Conc (M)</label>
+                    <input type="number" id="Ca" value="0.1" step="0.01" oninput="update()">
+                </div>
+                <div style="flex:1">
+                    <label>Acid Vol (mL)</label>
+                    <input type="number" id="Va" value="50" oninput="update()">
+                </div>
+            </div>
 
             <label>Base Concentration (M)</label>
-            <input type="number" id="Cb" value="0.1" step="0.01">
+            <input type="number" id="Cb" value="0.1" step="0.01" oninput="update()">
 
-            <label>Ka₁</label>
-            <input type="number" id="Ka1" value="0.00001">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1">
+                    <label>Ka₁</label>
+                    <input type="number" id="Ka1" value="0.00001" oninput="update()">
+                </div>
+                <div style="flex:1">
+                    <label>Ka₂</label>
+                    <input type="number" id="Ka2" value="0.000000001" oninput="update()">
+                </div>
+            </div>
 
-            <label>Ka₂ (if diprotic)</label>
-            <input type="number" id="Ka2" value="0.000000001">
-
-            <label>Added Base Volume: <span id="displayV" style="color:#00ffd5">0 mL</span></label>
+            <label>Added Base Volume: <span id="displayV" style="color:#00ffd5; font-weight:bold;">0 mL</span></label>
             <input type="range" min="0" max="150" step="0.5" id="Vb" class="slider" oninput="update()">
         </div>
 
@@ -168,14 +179,16 @@ canvas{
 <script>
 function update() {
     let acidType = document.getElementById("acidType").value;
-    let Ca = parseFloat(document.getElementById("Ca").value);
-    let Va = parseFloat(document.getElementById("Va").value) / 1000;
-    let Cb = parseFloat(document.getElementById("Cb").value);
-    let Ka1 = parseFloat(document.getElementById("Ka1").value);
-    let Ka2 = parseFloat(document.getElementById("Ka2").value);
-    let Vb_val = parseFloat(document.getElementById("Vb").value) / 1000;
+    let Ca = parseFloat(document.getElementById("Ca").value) || 0;
+    let Va_ml = parseFloat(document.getElementById("Va").value) || 0;
+    let Va = Va_ml / 1000;
+    let Cb = parseFloat(document.getElementById("Cb").value) || 0;
+    let Ka1 = parseFloat(document.getElementById("Ka1").value) || 0;
+    let Ka2 = parseFloat(document.getElementById("Ka2").value) || 0;
+    let Vb_slider = parseFloat(document.getElementById("Vb").value);
+    let Vb_val = Vb_slider / 1000;
 
-    document.getElementById("displayV").innerText = (Vb_val * 1000).toFixed(1) + " mL";
+    document.getElementById("displayV").innerText = Vb_slider.toFixed(1) + " mL";
 
     let molesA = Ca * Va;
     let molesB = Cb * Vb_val;
@@ -184,32 +197,32 @@ function update() {
     let Veq1 = molesA / Cb;
     let Veq2 = (acidType == "di") ? 2 * molesA / Cb : Veq1;
 
-    // Simplified pH Logic
     if (acidType == "mono") {
         if (Vb_val < Veq1) {
             let ratio = molesB / (molesA - molesB);
-            pH = -Math.log10(Ka1) + Math.log10(ratio || 0.000001);
+            pH = -Math.log10(Ka1) + Math.log10(ratio || 1e-10);
         } else {
             let excess = (molesB - molesA) / totalVol;
-            pH = 14 + Math.log10(excess || 0.000001);
+            pH = 14 + Math.log10(excess || 1e-10);
         }
     } else {
         if (Vb_val < Veq1) {
             let ratio = molesB / (molesA - molesB);
-            pH = -Math.log10(Ka1) + Math.log10(ratio || 0.000001);
+            pH = -Math.log10(Ka1) + Math.log10(ratio || 1e-10);
         } else if (Vb_val < Veq2) {
             let ratio = (molesB - molesA) / (2 * molesA - molesB);
-            pH = -Math.log10(Ka2) + Math.log10(ratio || 0.000001);
+            pH = -Math.log10(Ka2) + Math.log10(ratio || 1e-10);
         } else {
             let excess = (molesB - 2 * molesA) / totalVol;
-            pH = 14 + Math.log10(excess || 0.000001);
+            pH = 14 + Math.log10(excess || 1e-10);
         }
     }
 
     pH = Math.max(0, Math.min(14, pH));
 
     document.getElementById("result").innerHTML = 
-        "<b>Current pH:</b> " + pH.toFixed(3) + "<br>" +
+        "<h3 style='margin-top:0; color:#00ffd5'>Live Data</h3>" +
+        "<b>Current pH:</b> <span style='font-size:1.4rem'>" + pH.toFixed(3) + "</span><br><br>" +
         "<b>Equivalence Point 1:</b> " + (Veq1 * 1000).toFixed(2) + " mL<br>" +
         (acidType == "di" ? "<b>Equivalence Point 2:</b> " + (Veq2 * 1000).toFixed(2) + " mL" : "");
 
@@ -222,11 +235,14 @@ function drawGraph(acidType, Ca, Va, Cb, Ka1, Ka2) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw Grid
-    ctx.strokeStyle = "#eee";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#ddd";
+    ctx.lineWidth = 0.5;
+    ctx.font = "12px Arial";
+    ctx.fillStyle = "#666";
     for(let i=0; i<=14; i++) {
-        let y = canvas.height - (i/14) * canvas.height;
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        let y = canvas.height - (i/14) * (canvas.height - 40) - 20;
+        ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        ctx.fillText(i, 10, y + 5);
     }
 
     ctx.beginPath();
@@ -234,26 +250,26 @@ function drawGraph(acidType, Ca, Va, Cb, Ka1, Ka2) {
     ctx.lineWidth = 4;
 
     let molesA = Ca * Va;
-    let limit = (acidType == "di") ? (2 * molesA / Cb) * 1.5 : (molesA / Cb) * 1.5;
+    let maxV = 150 / 1000; 
 
-    for (let v = 0; v <= limit; v += limit / 100) {
+    for (let v = 0; v <= maxV; v += maxV / 200) {
         let volB = v;
         let p = 7;
         let vEq1 = molesA / Cb;
         let vEq2 = (acidType == "di") ? 2 * molesA / Cb : vEq1;
 
         if (acidType == "mono") {
-            if (volB < vEq1) p = -Math.log10(Ka1) + Math.log10((Cb * volB) / (molesA - Cb * volB) || 0.0001);
-            else p = 14 + Math.log10((Cb * volB - molesA) / (Va + volB) || 0.0001);
+            if (volB < vEq1) p = -Math.log10(Ka1) + Math.log10((Cb * volB) / (molesA - Cb * volB) || 1e-7);
+            else p = 14 + Math.log10((Cb * volB - molesA) / (Va + volB) || 1e-7);
         } else {
-            if (volB < vEq1) p = -Math.log10(Ka1) + Math.log10((Cb * volB) / (molesA - Cb * volB) || 0.0001);
-            else if (volB < vEq2) p = -Math.log10(Ka2) + Math.log10((Cb * volB - molesA) / (2 * molesA - Cb * volB) || 0.0001);
-            else p = 14 + Math.log10((Cb * volB - 2 * molesA) / (Va + volB) || 0.0001);
+            if (volB < vEq1) p = -Math.log10(Ka1) + Math.log10((Cb * volB) / (molesA - Cb * volB) || 1e-7);
+            else if (volB < vEq2) p = -Math.log10(Ka2) + Math.log10((Cb * volB - molesA) / (2 * molesA - Cb * volB) || 1e-7);
+            else p = 14 + Math.log10((Cb * volB - 2 * molesA) / (Va + volB) || 1e-7);
         }
 
         p = Math.max(0, Math.min(14, p));
-        let x = (v / limit) * canvas.width;
-        let y = canvas.height - (p / 14) * canvas.height;
+        let x = 40 + (v / maxV) * (canvas.width - 60);
+        let y = canvas.height - (p / 14) * (canvas.height - 40) - 20;
 
         if (v == 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
@@ -261,18 +277,87 @@ function drawGraph(acidType, Ca, Va, Cb, Ka1, Ka2) {
     ctx.stroke();
 }
 
-// Initial Call
-update();
+// Ensure the first load works
+window.onload = update;
 </script>
 
-    <div id="footer-container"></div>
-
+<div id="footer-container"></div>
 <script>
 fetch("footer.html")
 .then(res => res.text())
 .then(data => {
-document.getElementById("footer-container").innerHTML = data;
-});
+    document.getElementById("footer-container").innerHTML = data;
+})
+.catch(err => console.log("Footer not found, ignoring."));
 </script>
+
+    
+
+    <div class="container" style="background:none; box-shadow:none; backdrop-filter:none; margin-bottom:0; padding-bottom:0;">
+    <section id="theory-section">
+        <h2 style="text-align:left; color: var(--accent);">Acid-Base Titration Theory</h2>
+        <p>Titration is a quantitative analytical technique used to determine the unknown concentration of an analyte by reacting it with a standard solution (titrant) of known concentration.</p>
+        
+        <div class="result" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); margin: 20px 0;">
+            <strong style="color:var(--accent)">Key Equations:</strong>
+            <ul style="margin-top:10px;">
+                <li><strong>Equivalence Point:</strong> $N_1V_1 = N_2V_2$ (or $n_1M_1V_1 = n_2M_2V_2$)</li>
+                <li><strong>Henderson-Hasselbalch (Buffer Region):</strong> $pH = pK_a + \log \frac{[\text{Salt}]}{[\text{Acid}]}$</li>
+                <li><strong>At Half-Equivalence:</strong> $pH = pK_a$</li>
+            </ul>
+        </div>
+
+        <div class="result" style="background: rgba(0, 255, 213, 0.05); border-left: 4px solid #007bff;">
+            <strong>Example:</strong> Titrating $50\text{ mL}$ of $0.1\text{ M } HCl$ with $0.1\text{ M } NaOH$.
+            <br>The equivalence point occurs at exactly $50\text{ mL}$ of $NaOH$ added, where the $pH$ jumps from roughly $3$ to $11$ in a single drop.
+        </div>
+    </section>
+</div>
+
+<div class="container" id="faq-section">
+    <h3 style="color: var(--accent); border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Expert FAQ & Concepts</h3>
+    
+    <div class="result" style="border:none; background:transparent;">
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">1. Why does the pH change so rapidly near the equivalence point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Near the equivalence point, the analyte is almost exhausted. Even a fractional drop of titrant causes a massive logarithmic shift in $[H^+]$ concentration.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">2. What is the difference between End Point and Equivalence Point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">The <strong>Equivalence Point</strong> is the theoretical stoichiometric completion. The <strong>End Point</strong> is where the indicator actually changes color.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">3. Which indicator is best for Weak Acid vs Strong Base?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Phenolphthalein is ideal because its color change interval (pH 8.2–10) matches the basic pH found at the equivalence point of weak acids.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">4. Why does a diprotic acid show two "steps"?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">It has two separate protons with different $K_a$ values. The base neutralizes the first $H^+$ completely before moving to the second, provided $K_{a1} \gg K_{a2}$.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">5. What is the "Half-Equivalence" point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">This occurs when volume added $V = V_{eq}/2$. Here, $[Acid] = [Salt]$, so $pH = pK_a$. This is the point of maximum buffering capacity.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">6. Can very weak acids ($K_a < 10^{-7}$) be titrated?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Standard indicators fail because the pH jump is too small. Conductometric titration or pH meters (like this simulator) are required.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">7. How does concentration affect the titration curve?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Higher concentrations result in a longer vertical "inflection" region, making the end point much easier to detect accurately.</p>
+        </div>
+
+        <div>
+            <strong style="color:var(--accent)">8. What is Back Titration?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Used for slow reactions or insoluble solids. An excess reagent is added, and the remaining unreacted portion is titrated.</p>
+        </div>
+    </div>
+</div>
 </body>
 </html>
