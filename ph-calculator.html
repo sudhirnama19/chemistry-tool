@@ -250,8 +250,8 @@ inputs.forEach(input => {
         function runCalculation() {
             const type = document.getElementById('type').value;
             const strength = document.getElementById('strength').value;
-            const C = parseFloat(document.getElementById('conc').value);
-            const K = parseFloat(document.getElementById('kv').value);
+            const C = window.smartParse(document.getElementById('conc').value);
+            const K = window.smartParse(document.getElementById('kv').value);
             
             if (isNaN(C) || C <= 0) { alert("Please enter valid Molarity"); return; }
 
