@@ -1,37 +1,104 @@
-<footer class="mt-5 pt-5 pb-4 text-center chemistry-footer">
-<hr style="opacity:1;">
+<footer class="chemistry-footer">
+    <div class="footer-content">
+        <hr class="footer-divider">
+        
+        <div itemscope itemtype="https://schema.org/Organization">
+            <p class="footer-text">
+                &copy; 2023-<span id="currentYear">2026</span> 
+                <span itemprop="name">Chemistry Spark Publication</span>. 
+                All rights reserved.
+            </p>
+        </div>
 
-<p class="footer-text">
-© 2023-2026 Chemistry Spark Publication. All rights reserved.<br>
+        <p class="footer-dev">
+            <span class="dev-label">Engineering & Design:</span>
+            <a href="https://sudhirnama.in" target="_blank" class="footer-link" itemprop="url">
+                Sudhir Nama
+            </a>
+        </p>
 
-<a href="https://sudhirnama.in" target="_blank" class="footer-link">
-Developed by Sudhir Nama
-</a>
-</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a> • 
+            <a href="molarity-calculator.html">Molarity</a> • 
+            <a href="molality-calculator.html">Molality</a> • 
+            <a href="titration-calculator.html">Titration</a>
+        </div>
+    </div>
 </footer>
 
 <style>
-.chemistry-footer{
-margin-top:40px;
-padding-top:40px;
-padding-bottom:20px;
-text-align:center;
-color:#eef6fb;
+.chemistry-footer {
+    margin-top: 60px;
+    padding: 40px 20px 30px;
+    text-align: center;
+    background: transparent; /* Blends with your body gradient */
 }
 
-.footer-text{
-font-size:14px;
-color:#cfe6f5;
-line-height:1.6;
+.footer-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0, 255, 213, 0.3), transparent);
+    margin-bottom: 30px;
 }
 
-.footer-link{
-color:#00ffd5;
-text-decoration:none;
-font-weight:600;
+.footer-text {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
 }
 
-.footer-link:hover{
-text-decoration:underline;
+.footer-dev {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.dev-label {
+    opacity: 0.8;
+}
+
+.footer-link {
+    color: #00ffd5;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    padding: 2px 5px;
+}
+
+.footer-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 213, 0.5);
+}
+
+.footer-links {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.footer-links a {
+    color: #64748b;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-links a:hover {
+    color: #00ffd5;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .chemistry-footer {
+        margin-top: 40px;
+        padding: 30px 15px;
+    }
+    .footer-text {
+        font-size: 0.85rem;
+    }
 }
 </style>
+
+<script>
+    // Automatically keep the year updated
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
