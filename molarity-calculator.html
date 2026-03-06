@@ -172,34 +172,8 @@
     </div>
     <p class="small text-secondary mt-2 text-center">Converts automatically as you type.</p>
 </div>
-
-<div class="solver-card">
-    <h3 class="text-center mb-4">Dilution Solver ($M_1V_1 = M_2V_2$)</h3>
-    <p class="small text-center text-secondary">Leave <b>exactly one</b> field blank to solve for it.</p>
-    <div class="row g-2">
-        <div class="col-6">
-            <label class="form-label">Initial $M_1$</label>
-            <input type="number" id="m1" class="form-control" placeholder="Molarity">
-        </div>
-        <div class="col-6">
-            <label class="form-label">Initial $V_1$</label>
-            <input type="number" id="v1" class="form-control" placeholder="Volume">
-        </div>
-        <div class="col-6">
-            <label class="form-label">Final $M_2$</label>
-            <input type="number" id="m2" class="form-control" placeholder="Molarity">
-        </div>
-        <div class="col-6">
-            <label class="form-label">Final $V_2$</label>
-            <input type="number" id="v2" class="form-control" placeholder="Volume">
-        </div>
     </div>
-    <button onclick="calculateDilution()" class="btn btn-solve">SOLVE DILUTION</button>
-    <div id="dilution_results" class="result-display">
-        <span id="dilution_res" class="fw-bold text-info"></span>
-    </div>
-</div>
-
+        
         <section id="faq" class="mt-5">
             <h3>FAQ</h3>
             <p><strong>Q: Why is Molarity temperature dependent?</strong><br>
