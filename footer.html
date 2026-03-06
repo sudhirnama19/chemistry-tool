@@ -102,3 +102,53 @@
     // Automatically keep the year updated
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 </script>
+
+
+
+
+
+
+
+<script>
+    /**
+     * This script runs globally on every page that loads the footer.
+     * It transforms standard numeric inputs into "Smart Scientific" inputs.
+     */
+    function applyUniversalFix() {
+        const inputs = document.querySelectorAll('input[type="number"]');
+        
+        inputs.forEach(input => {
+            // 1. Change type to 'text' to unlock the full keyboard on mobile (for - and e)
+            input.type = "text"; 
+            // 2. Suggest a decimal keyboard for convenience
+            input.inputMode = "decimal"; 
+            // 3. Add a helpful placeholder hint
+            if (!input.placeholder.includes("1e-5")) {
+                input.placeholder += " (e.g. 10^-5 or 1.8e-5)";
+            }
+        });
+
+        // 4. Create the Smart Parser globally
+        window.smartParse = function(val) {
+            if (!val || val.trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+
+            // Handle power notation like 10^-20
+            if (str.includes("^")) {
+                let parts = str.split("^");
+                let base = parseFloat(parts[0]);
+                let exponent = parseFloat(parts[1]);
+                return Math.pow(base, exponent);
+            }
+            
+            // Handle standard notation like 1.8e-5 or 0.001
+            return parseFloat(str);
+        };
+    }
+
+    // Run the fix immediately when footer is injected
+    applyUniversalFix();
+    
+    // Also run it after a short delay to ensure all DOM elements are ready
+    setTimeout(applyUniversalFix, 100);
+</script>
