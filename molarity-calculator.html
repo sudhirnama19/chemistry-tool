@@ -4,141 +4,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Molarity Calculator | JEE, GATE, CSIR-NET Chemistry</title>
-    <meta name="description" content="Free high-level Molarity calculator for JEE Advanced and GATE. Calculate concentration from density, mass percentage, and moles with step-by-step examples.">
+    <title>Advanced Molarity Calculator | Chemistry Spark</title>
+    <meta name="description" content="Calculate Molarity for JEE, GATE, and CSIR-NET. Includes definitions, density-based formulas, and step-by-step examples.">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --text-dim: #94a3b8; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; line-height: 1.6; }
-        .content-section { max-width: 850px; margin: 40px auto; padding: 20px; }
-        .solver-card { background: var(--card); border-radius: 16px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .form-label { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
-        .form-control { background: #0f172a !important; color: #fff !important; border: 1px solid #334155 !important; padding: 12px; }
-        .btn-solve { background: linear-gradient(45deg, #007bff, var(--accent)); color: #0f172a; font-weight: 800; border: none; padding: 15px; border-radius: 10px; width: 100%; transition: 0.3s; }
-        .btn-solve:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,255,213,0.3); }
-        .result-display { display: none; margin-top: 25px; padding: 20px; background: rgba(0,0,0,0.2); border-left: 4px solid var(--accent); border-radius: 8px; }
-        .example-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed var(--text-dim); }
-        h1, h2, h3 { color: var(--accent); }
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; }
+        body { background-color: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        /* HEADER FIX: Home Redirect */
+        .main-header {
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .content-section { max-width: 800px; margin: auto; padding: 20px; }
+        
+        /* VISIBILITY FIX: Ensuring input text is white */
+        .solver-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .form-label { color: var(--accent); font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background-color: #0f172a !important;
+            color: #ffffff !important; /* STRICT WHITE TEXT */
+            border: 1px solid #334155 !important;
+        }
+        .form-control::placeholder { color: #64748b; }
+        
+        .btn-solve {
+            background: linear-gradient(135deg, #007bff, var(--accent));
+            color: #0f172a;
+            font-weight: 800;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .example-box { 
+            background: rgba(255,255,255,0.05); 
+            padding: 15px; border-radius: 10px; 
+            margin: 20px 0; border-left: 4px solid var(--accent);
+        }
     </style>
 </head>
 <body>
 
-<div class="content-section">
-    <header class="text-center mb-5">
-        <h1>Molarity (M) Concentration Solver</h1>
-        <p class="text-secondary">Advanced Chemical Calculation Engine for Competitive Exams</p>
+    <header class="main-header">
+        <a href="index.html">CHEMISTRY SPARK LAB</a>
     </header>
 
-    <section id="description">
-        <h2>What is Molarity?</h2>
-        <p>Molarity, also known as molar concentration, is a measure of the concentration of a chemical species, in particular of a solute in a solution, in terms of amount of substance per unit volume of solution. In competitive chemistry (GATE/CSIR-NET), Molarity is crucial because it relates the volume of a solution directly to the stoichiometry of a reaction.</p>
-        
-        <div class="alert alert-info bg-dark text-light border-secondary">
-            <strong>Pro Tip:</strong> Molarity is temperature-dependent because liquid volume changes with temperature, whereas Molality ($m$) remains constant.
-        </div>
-
-        <h3>Definition</h3>
-        <p>Molarity is defined as the number of <strong>moles of solute</strong> dissolved in exactly <strong>one liter ($1\text{ L}$)</strong> of the solution. The standard unit is moles per liter ($mol/L$), often denoted by the capital letter <strong>M</strong>.</p>
-    </section>
-
-    <hr class="my-5 border-secondary">
-
-    <section id="examples">
-        <h3>Calculated Examples (JEE/GATE Level)</h3>
-        
-        <div class="example-box">
-            <strong>Example 1: Basic NEET Level</strong><br>
-            Calculate the molarity of a solution containing $4\text{ g}$ of $NaOH$ in $250\text{ mL}$ of solution.<br>
-            <em>Solution:</em> Moles of $NaOH = 4/40 = 0.1$. Volume $= 0.25\text{ L}$. $M = 0.1 / 0.25 = \mathbf{0.4\text{ M}}$.
-        </div>
-
-        <div class="example-box">
-            <strong>Example 2: Advanced Density-Based</strong><br>
-            A sample of $H_2SO_4$ is $98\%$ by mass with a density of $1.84\text{ g/mL}$. Find its molarity.<br>
-            <em>Formula:</em> $M = \frac{\% \times d \times 10}{M_{solute}} = \frac{98 \times 1.84 \times 10}{98} = \mathbf{18.4\text{ M}}$.
-        </div>
-    </section>
-
-    <section class="solver-card my-5">
-        <h3 class="text-center mb-4">Molarity Ultra-Calculator</h3>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Mass of Solute (grams)</label>
-                <input type="number" id="mass" class="form-control" placeholder="e.g., 5.85">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Molar Mass of Solute (g/mol)</label>
-                <input type="number" id="molar_mass" class="form-control" placeholder="e.g., 58.5">
-            </div>
-            <div class="col-md-12">
-                <label class="form-label">Volume of Solution (Liters)</label>
-                <input type="number" id="volume" class="form-control" placeholder="e.g., 0.5">
-            </div>
+    <div class="content-section">
+        <section id="theory">
+            <h2>Molarity (M) Definition</h2>
+            <p>Molarity is the number of moles of solute dissolved in one liter of solution. It is a temperature-dependent concentration unit.</p>
             
-            <div class="col-12"><hr class="border-secondary"> <small class="text-secondary">Optional: For Density/Mass % Problems</small></div>
+            <div class="example-box">
+                <strong>Advanced Example:</strong> For a sample of $H_2SO_4$ that is $98\%$ by mass with a density of $1.84\text{ g/mL}$, the formula is:
+                $$M = \frac{\% \times \text{Density} \times 10}{M_{\text{solute}}}$$
+                Result: $\mathbf{18.4\text{ M}}$.
+            </div>
+        </section>
+
+        <div class="solver-card">
+            <h3 class="text-center mb-4">Molarity Ultra-Calculator</h3>
             
-            <div class="col-md-6">
-                <label class="form-label">Density (g/mL)</label>
-                <input type="number" id="density" class="form-control" step="0.001">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Mass of Solute (g)</label>
+                    <input type="number" id="mass" class="form-control" placeholder="e.g., 5.85">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Molar Mass (g/mol)</label>
+                    <input type="number" id="m_mass" class="form-control" placeholder="e.g., 58.5">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Volume of Solution (L)</label>
+                    <input type="number" id="vol" class="form-control" placeholder="e.g., 0.5">
+                </div>
+                
+                <div class="col-12 mt-4 text-secondary small">Optional: For Density Problems</div>
+                
+                <div class="col-6">
+                    <label class="form-label">Density (g/mL)</label>
+                    <input type="number" id="dens" class="form-control" step="0.001">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Mass %</label>
+                    <input type="number" id="perc" class="form-control">
+                </div>
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Mass Percentage (%)</label>
-                <input type="number" id="mass_percent" class="form-control">
+
+            <button onclick="calculateMolarity()" class="btn btn-solve">CALCULATE NOW</button>
+
+            <div id="results" class="mt-4 p-3 rounded" style="display:none; background: rgba(0,0,0,0.3);">
+                <p>Moles: <span id="out_n" class="text-white fw-bold"></span></p>
+                <p>Molarity (M): <span id="out_m" class="text-info fw-bold"></span></p>
             </div>
-            
-            <button onclick="solveMolarity()" class="btn btn-solve">CALCULATE NOW</button>
         </div>
 
-        <div id="result-area" class="result-display">
-            <h4 class="mb-3">Results:</h4>
-            <div class="d-flex justify-content-between"><span>Total Moles:</span> <span id="out_moles" class="fw-bold">--</span></div>
-            <div class="d-flex justify-content-between"><span>Molarity (M):</span> <span id="out_molarity" class="fw-bold text-info">--</span></div>
-            <p class="mt-3 small text-secondary">Calculation Method: Standard Volumetric or Density-Mass Ratio.</p>
-        </div>
-    </section>
+        <section id="faq" class="mt-5">
+            <h3>FAQ</h3>
+            <p><strong>Q: Why is Molarity temperature dependent?</strong><br>
+            A: Because volume changes with temperature, affecting the concentration.</p>
+        </section>
+    </div>
 
-    <section id="faq">
-        <h2 class="mb-4">Frequently Asked Questions (FAQ)</h2>
-        <div class="accordion accordion-flush" id="faqAccordion">
-            <div class="accordion-item bg-transparent text-light border-secondary">
-                <h2 class="accordion-header"><button class="accordion-button bg-transparent text-info collapsed" data-bs-toggle="collapse" data-bs-target="#q1">How does temperature affect molarity?</button></h2>
-                <div id="q1" class="accordion-collapse collapse"><div class="accordion-body">Since molarity is based on the volume of the solution and volume increases with temperature, the molarity of a solution decreases as temperature increases.</div></div>
-            </div>
-            <div class="accordion-item bg-transparent text-light border-secondary">
-                <h2 class="accordion-header"><button class="accordion-button bg-transparent text-info collapsed" data-bs-toggle="collapse" data-bs-target="#q2">Is molarity the same as molality?</button></h2>
-                <div id="q2" class="accordion-collapse collapse"><div class="accordion-body">No. Molarity is moles per liter of <strong>solution</strong>, while molality is moles per kilogram of <strong>solvent</strong>.</div></div>
-            </div>
-        </div>
-    </section>
-</div>
-
-<script>
-function solveMolarity() {
-    const mass = parseFloat(document.getElementById('mass').value) || 0;
-    const mm = parseFloat(document.getElementById('molar_mass').value) || 1;
-    const vol = parseFloat(document.getElementById('volume').value) || 0;
-    const dens = parseFloat(document.getElementById('density').value) || 0;
-    const perc = parseFloat(document.getElementById('mass_percent').value) || 0;
-
-    let moles = mass / mm;
-    let molarity = 0;
-
-    // Advanced Logic for Density/Percent
-    if (dens > 0 && perc > 0) {
-        molarity = (perc * dens * 10) / mm;
-    } else if (vol > 0) {
-        molarity = moles / vol;
-    }
-
-    document.getElementById('out_moles').innerText = moles.toFixed(4);
-    document.getElementById('out_molarity').innerText = molarity.toFixed(4) + " mol/L";
-    document.getElementById('result-area').style.display = 'block';
-}
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/molarity-solver.js"></script>
 </body>
 </html>
