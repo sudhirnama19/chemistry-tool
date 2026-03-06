@@ -1,283 +1,300 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Salt Hydrolysis Calculator | Chemistry Spark</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Salt Hydrolysis Calculator | Chemistry Spark Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate the pH, degree of hydrolysis, and nature of various salt solutions. Includes dynamic salt examples and professional formulas.">
 
-<style>
-:root{
---bg1:#0f2027; --bg2:#203a43; --bg3:#2c5364;
---card:rgba(255,255,255,0.08); --text:#ffffff; --accent:#00ffd5;
-}
-
-/* FIX 1: Prevent horizontal scroll and layout overflow */
-*{ box-sizing: border-box; }
-
-body{
-margin:0; font-family: 'Segoe UI', Roboto, sans-serif;
-background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
-color:var(--text); overflow-x: hidden;
-}
-
-.wrapper{
-min-height:100vh; display:flex; justify-content:center;
-align-items:center; padding:15px;
-}
-
-.card{
-width:100%; max-width:600px; background:var(--card);
-padding:25px; border-radius:20px;
-box-shadow:0 20px 60px rgba(0,0,0,0.6);
-backdrop-filter:blur(15px); border: 1px solid rgba(255,255,255,0.1);
-}
-
-h2{text-align:center; margin-bottom:20px; color: var(--accent); font-size: 1.5rem;}
-
-label{ display: block; margin-bottom: 5px; font-size: 0.85rem; color: #ccc; }
-
-input, select{
-width:100%; padding:12px; margin-bottom:15px;
-border-radius:10px; border:1px solid rgba(255,255,255,0.2);
-background:rgba(0,0,0,0.2); color:white; outline: none;
-}
-
-input:focus{ border-color: var(--accent); }
-
-button{
-width:100%; padding:14px; border:none; border-radius:12px;
-background:linear-gradient(180deg,#00ffd5,#00a8ff);
-font-weight:bold; color: #000; cursor:pointer;
-text-transform: uppercase; transition: 0.3s;
-}
-
-button:hover{ transform: scale(1.02); }
-
-.result-box{
-margin-top:20px; text-align:center;
-background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px;
-display: none;
-}
-
-.result-box.show{ display: block; }
-
-#resultText{ font-size: 24px; color: var(--accent); font-weight: bold; }
-
-.nature-tag { 
-    display: inline-block; padding: 4px 12px; border-radius: 50px; 
-    font-size: 0.8rem; margin-top: 5px; font-weight: bold;
-}
-
-.steps{
-margin-top:15px; font-size:13px; line-height: 1.6;
-white-space:pre-wrap; background:rgba(0,0,0,0.4);
-padding:15px; border-radius:10px; border-left: 3px solid var(--accent);
-}
-
-/* FIX 2: Responsive Chart Container */
-.chart-container {
-    position: relative; height: 200px; width: 100%; margin-top: 15px;
-}
-    /* Header Styles - Matches index.html */
-.navbar {
-    background: rgba(15, 23, 42, 0.8) !important;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    height: 70px;
-    display: flex;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 0 20px;
-}
-
-.brand-text {
-    font-weight: 800;
-    font-size: 1.2rem;
-    background: linear-gradient(45deg, #007bff, #00ffd5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-decoration: none;
-}
-
-/* Adjust wrapper to not hide under fixed header */
-.wrapper, .container {
-    margin-top: 80px !important;
-}
-</style>
-</head>
-
-<body>
-    <nav class="navbar">
-    <a class="brand-text" href="index.html">Chemistry Spark Lab</a>
-</nav>
-<div class="wrapper">
-<div class="card">
-<h2>Salt Hydrolysis Pro</h2>
-
-<label>Type of Salt</label>
-<select id="saltType" onchange="toggleInputs()">
-<option value="ss">Strong Acid + Strong Base (e.g. NaCl)</option>
-<option value="ws">Weak Acid + Strong Base (e.g. CH₃COONa)</option>
-<option value="sw">Strong Acid + Weak Base (e.g. NH₄Cl)</option>
-<option value="ww">Weak Acid + Weak Base (e.g. CH₃COONH₄)</option>
-</select>
-
-<label>Concentration of Salt (M)</label>
-<input type="number" id="conc" placeholder="e.g. 0.1">
-
-<div id="ka_input" style="display:none;">
-    <label>Dissociation Constant (Ka)</label>
-    <input type="number" id="Ka" placeholder="e.g. 1.8e-5">
-</div>
-
-<div id="kb_input" style="display:none;">
-    <label>Dissociation Constant (Kb)</label>
-    <input type="number" id="Kb" placeholder="e.g. 1.8e-5">
-</div>
-
-<label>Temperature (°C)</label>
-<input type="number" id="temp" value="25">
-
-<button onclick="calculateSalt()">Calculate pH & Steps</button>
-
-<div id="resultBox" class="result-box">
-    <div id="resultText"></div>
-    <div id="natureTag" class="nature-tag"></div>
-    <div id="steps" class="steps"></div>
-    <div class="chart-container">
-        <canvas id="graph"></canvas>
-    </div>
-</div>
-
-</div>
-</div>
-
-<script>
-let chart=null;
-
-function toggleInputs() {
-    const type = document.getElementById("saltType").value;
-    document.getElementById("ka_input").style.display = (type === "ws" || type === "ww") ? "block" : "none";
-    document.getElementById("kb_input").style.display = (type === "sw" || type === "ww") ? "block" : "none";
-}
-
-function KwTemp(T){
-    // Precise Kw calculation based on temp
-    return 1e-14 * Math.exp(-0.01 * (T - 25)); 
-}
-
-function calculateSalt(){
-    let type=document.getElementById("saltType").value;
-    let C=parseFloat(document.getElementById("conc").value);
-    let Ka=parseFloat(document.getElementById("Ka").value);
-    let Kb=parseFloat(document.getElementById("Kb").value);
-    let T=parseFloat(document.getElementById("temp").value) || 25;
-
-    if(!C && type !== "ss"){alert("Please enter Concentration"); return;}
-
-    let Kw=KwTemp(T);
-    let pH, h, nature, steps = "";
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: { enableMenu: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
-    steps += `At Temp: ${T}°C, Kw = ${Kw.toExponential(2)}\n`;
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    if(type==="ss"){
-        pH=7; nature="Neutral";
-        steps += "• Nature: SA + SB Salt (No Hydrolysis)\n• pH is independent of Concentration.\n• pH = -log√(Kw) = 7.00";
-    }
-    else if(type==="ws"){
-        let Kh = Kw/Ka;
-        h = Math.sqrt(Kh/C);
-        pH = 7 + 0.5*(Math.log10(Ka)) + 0.5*(Math.log10(C)); // Simplified pH formula
-        pH = 14 + Math.log10(h*C); // Recalculated for accuracy
-        // Standard formula: pH = 7 + 1/2 pKa + 1/2 log C
-        let pKa = -Math.log10(Ka);
-        pH = 7 + 0.5*pKa + 0.5*Math.log10(C);
-        nature="Basic";
-        steps += `• Nature: WA + SB (Anionic Hydrolysis)\n`;
-        steps += `• Kh (Kw/Ka) = ${Kh.toExponential(3)}\n`;
-        steps += `• Degree of Hydrolysis (h) = ${h.toExponential(3)}\n`;
-        steps += `• Formula: pH = 7 + ½pKa + ½logC`;
-    }
-    else if(type==="sw"){
-        let Kh = Kw/Kb;
-        h = Math.sqrt(Kh/C);
-        let pKb = -Math.log10(Kb);
-        pH = 7 - 0.5*pKb - 0.5*Math.log10(C);
-        nature="Acidic";
-        steps += `• Nature: SA + WB (Cationic Hydrolysis)\n`;
-        steps += `• Kh (Kw/Kb) = ${Kh.toExponential(3)}\n`;
-        steps += `• Degree of Hydrolysis (h) = ${h.toExponential(3)}\n`;
-        steps += `• Formula: pH = 7 - ½pKb - ½logC`;
-    }
-    else {
-        let pKa = -Math.log10(Ka);
-        let pKb = -Math.log10(Kb);
-        pH = 7 + 0.5*pKa - 0.5*pKb;
-        nature = (pH > 7.1) ? "Basic" : (pH < 6.9 ? "Acidic" : "Neutral");
-        steps += `• Nature: WA + WB (Both Hydrolyze)\n`;
-        steps += `• Degree (h) is concentration independent.\n`;
-        steps += `• Formula: pH = 7 + ½pKa - ½pKb`;
-    }
-
-    // UI Updates
-    document.getElementById("resultBox").classList.add("show");
-    document.getElementById("resultText").innerText = "pH = " + pH.toFixed(2);
-    document.getElementById("steps").innerText = steps;
-    
-    const tag = document.getElementById("natureTag");
-    tag.innerText = nature;
-    tag.style.background = nature === "Acidic" ? "#ff4d4d" : (nature === "Basic" ? "#4d79ff" : "#444");
-
-    drawGraph(pH);
-}
-
-function drawGraph(pH){
-    let ctx=document.getElementById("graph").getContext("2d");
-    if(chart){chart.destroy();}
-
-    // Color bar based on pH
-    let barColor = pH < 7 ? "rgba(255, 77, 77, 0.8)" : "rgba(77, 121, 255, 0.8)";
-    if(Math.abs(pH-7) < 0.2) barColor = "rgba(0, 255, 213, 0.8)";
-
-    chart=new Chart(ctx,{
-        type:"bar",
-        data:{
-            labels:["pH Scale"],
-            datasets:[{
-                data:[pH],
-                backgroundColor: barColor,
-                borderRadius: 10
-            }]
-        },
-        options:{
-            indexAxis:"y",
-            maintainAspectRatio: false,
-            plugins:{legend:{display:false}},
-            scales:{
-                x:{min:0,max:14,ticks:{color:"#ccc"}, grid:{color:"rgba(255,255,255,0.1)"}},
-                y:{display: false}
-            }
+    <style>
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            margin: 0; 
+            overflow-x: hidden; 
         }
-    });
-}
 
-// Initialize view
-toggleInputs();
-</script>
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .brand-text {
+            font-weight: 800; font-size: 1.4rem;
+            background: linear-gradient(45deg, #007bff, #00ffd5);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .content-container { max-width: 850px; margin: 100px auto 40px; padding: 0 20px; box-sizing: border-box; }
+
+        .solver-card {
+            background: var(--card); border-radius: 20px; padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .full-row { grid-column: span 2; }
+
+        label { color: var(--accent); font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; display: block; }
+        input, select {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155;
+            background: #0f172a; color: white; font-size: 14px; outline: none; box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); }
+
+        .example-hint {
+            font-size: 0.75rem; color: #94a3b8; margin-top: -10px; margin-bottom: 15px; font-style: italic;
+        }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #007bff, var(--accent));
+            color: #0f172a; font-weight: 800; width: 100%; padding: 16px;
+            border-radius: 12px; border: none; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s ease;
+        }
+        .btn-solve:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 255, 213, 0.3); }
+
+        .result-box {
+            display: none; margin-top: 25px; padding: 20px;
+            background: rgba(0,0,0,0.25); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .nature-badge {
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        }
+
+        .chart-box {
+            margin-top: 25px; background: rgba(15, 23, 42, 0.7);
+            border-radius: 15px; padding: 15px; height: 140px; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .theory-section { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; margin-bottom: 30px; }
+
+        @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .full-row { grid-column: span 1; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="brand-text" href="index.html">Chemistry Spark Lab</a>
+    </nav>
+
+    <div class="content-container">
+        <section class="theory-section">
+            <h2 style="color: var(--accent);">Salt Hydrolysis Definition</h2>
+            <p><strong>Salt Hydrolysis</strong> is the interaction of salt ions with water to produce either acidic or basic solutions. It is effectively the chemical opposite of a neutralization reaction.</p>
+            <p>The extent of this reaction is called the <strong>Degree of Hydrolysis</strong> ($h$), and the equilibrium constant is the <strong>Hydrolysis Constant</strong> ($K_h$).</p>
+            
+            <h3 style="color: var(--accent);">Mathematical Foundations</h3>
+            <p>Weak Acid & Strong Base Salt:</p>
+            <p style="text-align: center;">$$\text{pH} = 7 + \frac{1}{2}(pK_a + \log C)$$</p>
+            <p>Strong Acid & Weak Base Salt:</p>
+            <p style="text-align: center;">$$\text{pH} = 7 - \frac{1}{2}(pK_b + \log C)$$</p>
+        </section>
+
+        <div class="solver-card">
+            <h2 style="text-align: center; margin-bottom: 25px;">Salt Hydrolysis Solver</h2>
+            <div class="input-grid">
+                <div class="full-row">
+                    <label>Salt Type</label>
+                    <select id="saltType" onchange="updateSaltUI()">
+                        <option value="ss">Strong Acid + Strong Base</option>
+                        <option value="ws">Weak Acid + Strong Base</option>
+                        <option value="sw">Strong Acid + Weak Base</option>
+                        <option value="ww">Weak Acid + Weak Base</option>
+                    </select>
+                </div>
+                <div class="full-row example-hint" id="saltExample">Example: NaCl, KNO₃, Na₂SO₄</div>
+
+                <div>
+                    <label>Salt Concentration (M)</label>
+                    <input id="conc" type="number" step="any" placeholder="e.g. 0.1">
+                </div>
+                <div>
+                    <label>System Temp (°C)</label>
+                    <input id="temp" type="number" step="any" value="25">
+                </div>
+
+                <div id="ka_input" style="display:none;">
+                    <label>Dissociation Constant ($K_a$)</label>
+                    <input id="Ka" type="number" step="any" placeholder="e.g. 1.8e-5">
+                </div>
+                <div id="kb_input" style="display:none;">
+                    <label>Dissociation Constant ($K_b$)</label>
+                    <input id="Kb" type="number" step="any" placeholder="e.g. 1.8e-5">
+                </div>
+            </div>
+
+            <button class="btn-solve" onclick="calculateSalt()">Calculate Final pH</button>
+
+            <div id="resultBox" class="result-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 id="phVal" style="margin: 0;" class="accent-text"></h2>
+                    <span id="natureBadge" class="nature-badge">Neutral</span>
+                </div>
+                <div id="steps" style="font-size: 0.85rem; color: #cbd5e1; white-space: pre-line; background: rgba(0,0,0,0.25); padding: 15px; border-radius: 10px; line-height: 1.6;"></div>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="phChart"></canvas>
+            </div>
+        </div>
+
+        <section class="theory-section" style="margin-top: 40px;">
+            <h2 style="color: var(--accent);">Expert FAQ</h2>
+            <p><strong>1. Why is the pH of NaCl exactly 7.0?</strong><br>Ions from strong acids and bases (like $Na^+$ and $Cl^-$) do not hydrolyze because they are extremely weak conjugate partners.</p>
+            <p><strong>2. Does concentration affect Weak Acid + Weak Base salts?</strong><br>No. The pH of WA/WB salts depends only on their respective $pK_a$ and $pK_b$ values, not the molarity.</p>
+            <p><strong>3. What happens if I increase the temperature?</strong><br>Since hydrolysis is endothermic, the degree of hydrolysis ($h$) increases, and the neutral point (usually 7.0) shifts downward slightly.</p>
+        </section>
+    </div>
 
     <div id="footer-container"></div>
 
-<script>
-fetch("footer.html")
-.then(res => res.text())
-.then(data => {
-document.getElementById("footer-container").innerHTML = data;
-});
-</script>
+    <script>
+        let chart = null;
+
+        function updateSaltUI() {
+            const type = document.getElementById("saltType").value;
+            const hint = document.getElementById("saltExample");
+            
+            // Toggle Inputs
+            document.getElementById("ka_input").style.display = (type === "ws" || type === "ww") ? "block" : "none";
+            document.getElementById("kb_input").style.display = (type === "sw" || type === "ww") ? "block" : "none";
+
+            // Update Examples
+            const examples = {
+                "ss": "Example: NaCl, KNO₃, Na₂SO₄ (Neutral)",
+                "ws": "Example: CH₃COONa, NaCN, Na₂CO₃ (Basic)",
+                "sw": "Example: NH₄Cl, CuSO₄, AlCl₃ (Acidic)",
+                "ww": "Example: CH₃COONH₄, NH₄CN (Varies)"
+            };
+            hint.innerText = examples[type];
+        }
+
+        function calculateSalt() {
+            let type = document.getElementById("saltType").value;
+            let C = parseFloat(document.getElementById("conc").value);
+            let Ka = parseFloat(document.getElementById("Ka").value);
+            let Kb = parseFloat(document.getElementById("Kb").value);
+            let T = parseFloat(document.getElementById("temp").value) || 25;
+
+            if (isNaN(C) && type !== "ss" && type !== "ww") { 
+                alert("Please enter Concentration (Molarity)"); return; 
+            }
+
+            // Kw adjustment for Temperature
+            let Kw = 1e-14 * Math.exp(-0.01 * (T - 25)); 
+            let pH, nature, steps = "";
+
+            if (type === "ss") {
+                pH = -Math.log10(Math.sqrt(Kw));
+                nature = "Neutral";
+                steps = "• Strong Acid + Strong Base Salt\n• Result: No Hydrolysis\n• [H⁺] = [OH⁻] = √Kw\n• pH = " + pH.toFixed(2);
+            } else if (type === "ws") {
+                if(isNaN(Ka)) { alert("Ka value required for weak acid salt"); return; }
+                let pKa = -Math.log10(Ka);
+                let pKw = -Math.log10(Kw);
+                pH = 0.5 * (pKw + pKa + Math.log10(C));
+                nature = "Basic";
+                steps = `• Weak Acid + Strong Base Salt\n• Kh (Kw/Ka) = ${(Kw/Ka).toExponential(2)}\n• pKa = ${pKa.toFixed(2)}\n• pH = 7 + ½pKa + ½logC (approx)`;
+            } else if (type === "sw") {
+                if(isNaN(Kb)) { alert("Kb value required for weak base salt"); return; }
+                let pKb = -Math.log10(Kb);
+                let pKw = -Math.log10(Kw);
+                pH = 0.5 * (pKw - pKb - Math.log10(C));
+                nature = "Acidic";
+                steps = `• Strong Acid + Weak Base Salt\n• Kh (Kw/Kb) = ${(Kw/Kb).toExponential(2)}\n• pKb = ${pKb.toFixed(2)}\n• pH = 7 - ½pKb - ½logC (approx)`;
+            } else {
+                if(isNaN(Ka) || isNaN(Kb)) { alert("Both Ka and Kb are required"); return; }
+                let pKa = -Math.log10(Ka);
+                let pKb = -Math.log10(Kb);
+                let pKw = -Math.log10(Kw);
+                pH = 0.5 * (pKw + pKa - pKb);
+                nature = pH > 7.1 ? "Basic" : (pH < 6.9 ? "Acidic" : "Neutral");
+                steps = `• Weak Acid + Weak Base Salt\n• pH is concentration independent\n• Formula: pH = ½(pKw + pKa - pKb)\n• pH = ${pH.toFixed(2)}`;
+            }
+
+            updateResults(pH, nature, steps);
+        }
+
+        function updateResults(pH, nature, steps) {
+            document.getElementById("resultBox").style.display = "block";
+            document.getElementById("phVal").innerText = `Resulting pH: ${pH.toFixed(2)}`;
+            document.getElementById("steps").innerText = steps;
+            
+            const badge = document.getElementById("natureBadge");
+            badge.innerText = nature;
+            let color = nature === "Acidic" ? "#ff4d4d" : (nature === "Basic" ? "#4d79ff" : "#00ffd5");
+            badge.style.backgroundColor = `${color}22`;
+            badge.style.color = color;
+            badge.style.border = `1px solid ${color}50`;
+
+            renderChart(pH, color);
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function renderChart(val, color) {
+            const ctx = document.getElementById("phChart").getContext("2d");
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [''],
+                    datasets: [{
+                        data: [val],
+                        backgroundColor: color,
+                        borderRadius: 15,
+                        barThickness: 35
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { min: 0, max: 14, ticks: { color: "#94a3b8" }, grid: { display: false } },
+                        y: { display: false }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        window.onload = () => {
+            fetch("footer.html").then(r => r.text()).then(d => document.getElementById("footer-container").innerHTML = d);
+            updateSaltUI();
+            renderChart(7, "#00ffd5");
+        };
+    </script>
 </body>
 </html>
