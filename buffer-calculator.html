@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +85,6 @@
             background: rgba(0,0,0,0.25); border-radius: 15px; border-left: 5px solid var(--accent);
         }
 
-        /* Capacity Gauge Styles */
         .capacity-container { margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; }
         .gauge-track { width: 100%; height: 10px; background: #334155; border-radius: 5px; margin-top: 8px; overflow: hidden; }
         .gauge-fill { height: 100%; width: 100%; background: var(--accent); transition: width 0.5s ease, background-color 0.5s ease; }
@@ -117,19 +117,19 @@
             <div class="input-grid">
                 <div>
                     <label>Weak Acid Conc. (M)</label>
-                    <input id="acidConc" type="number" step="any" placeholder="e.g. 0.1">
+                    <input id="acidConc" type="text" placeholder="e.g. 0.1 or 1e-1">
                 </div>
                 <div>
                     <label>Conjugate Base Conc. (M)</label>
-                    <input id="baseConc" type="number" step="any" placeholder="e.g. 0.1">
+                    <input id="baseConc" type="text" placeholder="e.g. 0.1 or 10^-1">
                 </div>
                 <div class="full-row">
                     <label>$pK_a$ Value</label>
-                    <input id="pKa" type="number" step="any" placeholder="e.g. 4.74">
+                    <input id="pKa" type="text" placeholder="e.g. 4.74">
                 </div>
                 <div class="full-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                     <label>Add Strong Reagent (moles)</label>
-                    <input id="addStrong" type="number" step="any" placeholder="Optional: 0.01">
+                    <input id="addStrong" type="text" placeholder="Optional: 0.01">
                 </div>
                 <div>
                     <label>Reagent Type</label>
@@ -140,7 +140,7 @@
                 </div>
                 <div>
                     <label>Total Volume (L)</label>
-                    <input id="volume" type="number" step="any" value="1">
+                    <input id="volume" type="text" value="1">
                 </div>
             </div>
 
@@ -178,13 +178,25 @@
     <script>
         let chart = null;
 
+        // LOCAL SMART PARSER: Corrects scientific notation like 10^-5
+        function smartParser(val) {
+            if (!val || val.toString().trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+            if (str.includes("^")) {
+                let parts = str.split("^");
+                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+            }
+            return parseFloat(str);
+        }
+
         function calculateBuffer() {
-            let HA_init = parseFloat(document.getElementById("acidConc").value);
-            let A_init = parseFloat(document.getElementById("baseConc").value);
-            let pKa = parseFloat(document.getElementById("pKa").value);
-            let added = parseFloat(document.getElementById("addStrong").value) || 0;
+            // Use smartParser for all numeric fields
+            let HA_init = smartParser(document.getElementById("acidConc").value);
+            let A_init = smartParser(document.getElementById("baseConc").value);
+            let pKa = smartParser(document.getElementById("pKa").value);
+            let added = smartParser(document.getElementById("addStrong").value) || 0;
             let type = document.getElementById("type").value;
-            let V = parseFloat(document.getElementById("volume").value);
+            let V = smartParser(document.getElementById("volume").value);
 
             if (isNaN(HA_init) || isNaN(A_init) || isNaN(pKa) || isNaN(V)) {
                 alert("Please enter all required concentration and pKa values.");
@@ -206,13 +218,13 @@
             // Failure Logic
             if (molesA <= 0 || molesHA <= 0) {
                 alert("Buffer Failed! Added reagent exceeded neutralization capacity.");
-                updateUI(pKa, initialPH, (type === "acid" ? 1 : 13), 0);
+                updateUI(pKa, initialPH, (type === "acid" ? 1 : 13), 0, 0, 0);
                 return;
             }
 
             let finalPH = pKa + Math.log10(molesA / molesHA);
             
-            // Capacity Percentage (Which component is closer to zero?)
+            // Capacity Percentage
             let remainingPercent = (Math.min(molesA, molesHA) / (totalMoles / 2)) * 100;
             
             updateUI(pKa, initialPH, finalPH, remainingPercent, molesA, molesHA);
@@ -222,10 +234,8 @@
             document.getElementById("resultBox").style.display = "block";
             document.getElementById("phVal").innerText = `Final pH: ${final.toFixed(3)}`;
             
-            // Steps
             document.getElementById("steps").innerText = `Initial pH: ${initial.toFixed(3)}\nRemaining Base: ${mA ? mA.toFixed(4) : 0} moles\nRemaining Acid: ${mHA ? mHA.toFixed(4) : 0} moles`;
 
-            // Gauge Update
             const fill = document.getElementById("gaugeFill");
             const label = document.getElementById("capacityLabel");
             fill.style.width = percent + "%";
