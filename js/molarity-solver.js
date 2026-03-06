@@ -1,68 +1,49 @@
 
 /**
- * Chemistry Spark Lab - Advanced Thermo Solver
- * Fixed: Input ID Mapping & Calculus Integration
+ * Advanced Molarity Solver - JEE/GATE/NET Edition
+ * Logic: Standard Volumetric + Density-Mass % Shortcut
  */
 
-const R = 8.314; // J/mol·K
+function calculateMolarity() {
+    // 1. Capture Inputs using the IDs from your HTML
+    const mass = parseFloat(document.getElementById('mass').value);
+    const mm = parseFloat(document.getElementById('m_mass').value);
+    const vol = parseFloat(document.getElementById('vol').value);
+    const dens = parseFloat(document.getElementById('dens').value);
+    const perc = parseFloat(document.getElementById('perc').value);
 
-function analyzeProcess() {
-    console.log("Analysis Started..."); // Debugging check
+    // 2. Initialize Result Variables
+    let moles = 0;
+    let molarity = 0;
 
-    try {
-        // 1. Get Inputs (Using exact IDs from your screenshots)
-        const n = parseFloat(document.getElementById('n').value);
-        const T1 = parseFloat(document.getElementById('t1').value);
-        const T2 = parseFloat(document.getElementById('t2').value);
-        const V1 = parseFloat(document.getElementById('v1').value);
-        const V2 = parseFloat(document.getElementById('v2').value);
-        const x = parseFloat(document.getElementById('poly_x').value);
-        const a = parseFloat(document.getElementById('cv_a').value); // Cv Constant
-        const b = parseFloat(document.getElementById('cv_b').value); // Cv Slope
-
-        // Validation: Prevent crash if empty
-        if (isNaN(n) || isNaN(T1)) {
-            alert("Please fill in all numerical values.");
-            return;
-        }
-
-        // 2. ADVANCED LOGIC: Internal Energy (ΔU) via Integration
-        // ΔU = n * [a(T2 - T1) + 0.5 * b * (T2^2 - T1^2)]
-        const deltaU = n * (a * (T2 - T1) + 0.5 * b * (Math.pow(T2, 2) - Math.pow(T1, 2)));
-
-        // 3. ADVANCED LOGIC: Work (W)
-        let work = 0;
-        if (Math.abs(x - 1) < 0.001) {
-            // Reversible Isothermal Expansion: W = -2.303 nRT log(V2/V1)
-            work = -2.303 * n * R * T1 * Math.log10(V2 / V1);
-        } else {
-            // Polytropic Process: W = nR(T2 - T1) / (1 - x)
-            work = (n * R * (T2 - T1)) / (1 - x);
-        }
-
-        // 4. First Law: Heat (Q) = ΔU - W (IUPAC Chemistry)
-        const q = deltaU - work;
-
-        // 5. Entropy (ΔS) - Multi-variable formula
-        const dS = (2.303 * n * a * Math.log10(T2 / T1)) + (2.303 * n * R * Math.log10(V2 / V1));
-
-        // Update UI
-        document.getElementById('res_u').innerText = deltaU.toFixed(2) + " J";
-        document.getElementById('res_w').innerText = work.toFixed(2) + " J";
-        document.getElementById('res_q').innerText = q.toFixed(2) + " J";
-        document.getElementById('res_s').innerText = dS.toFixed(3) + " J/K";
+    // 3. JEE Advanced / GATE Specific Logic
+    // CASE A: Density and Mass % are provided (High-level shortcut)
+    if (!isNaN(dens) && !isNaN(perc) && dens > 0 && perc > 0) {
+        // Formula: M = (% * d * 10) / Molar Mass
+        molarity = (perc * dens * 10) / mm;
         
-        // Make result area visible
-        document.getElementById('result-area').style.display = 'block';
+        // Back-calculate moles if mass is provided
+        if (!isNaN(mass)) {
+            moles = mass / mm;
+        }
+    } 
+    // CASE B: Standard Mass and Volume are provided
+    else if (!isNaN(mass) && !isNaN(vol) && vol > 0) {
+        moles = mass / mm;
+        molarity = moles / vol;
+    } 
+    else {
+        alert("Please enter either (Mass + Volume) or (Density + Mass %)");
+        return;
+    }
 
-    } catch (error) {
-        console.error("Calculation Error:", error);
-        alert("Error: Check your input units or values.");
+    // 4. Update UI with High Precision
+    const resultArea = document.getElementById('results');
+    if (resultArea) {
+        document.getElementById('out_n').innerText = moles.toFixed(4);
+        document.getElementById('out_m').innerText = molarity.toFixed(4) + " mol/L";
+        resultArea.style.display = 'block'; // Make results visible
     }
 }
 
-// Ensure the button in HTML has: id="analyze-btn"
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('analyze-btn');
-    if(btn) btn.onclick = analyzeProcess;
-});
+// Ensure the button in your HTML calls this function: onclick="calculateMolarity()"
