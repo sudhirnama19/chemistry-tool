@@ -4,179 +4,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Pro Normality Solver | GATE & CSIR-NET</title>
+    <title>Normality Pro | Advanced Stoichiometry & Mixing Solver</title>
     
-    <meta name="description" content="Advanced Normality Calculator with n-factor logic and redox reference for JEE Advanced and CSIR-NET.">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script>
-      window.MathJax = { tex: { inlineMath: [['$', '$']], processEscapes: true } };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    
     <style>
         :root {
             --bg: #020617;
-            --glass: rgba(255, 255, 255, 0.05);
+            --glass: rgba(255, 255, 255, 0.07);
             --accent: #22d3ee;
-            --warning: #fbbf24;
+            --text-bright: #f8fafc;
+            --text-muted: #94a3b8;
         }
+
         body {
             background: radial-gradient(circle at top, #0f172a, var(--bg));
-            color: white;
-            font-family: 'Inter', sans-serif;
+            color: var(--text-bright);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            padding: 40px 20px;
+            padding-top: 80px;
         }
+
+        /* Fixed Visibility & Modern Glass */
         .calc-card {
             background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 650px;
-            margin: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 28px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
         }
-        .form-label { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+
+        .form-label { color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+        
+        /* High Contrast Inputs */
         .form-control, .form-select {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff !important; /* Forces white text */
             border-radius: 12px;
             padding: 12px;
         }
-        .form-control:focus, .form-select:focus {
-            background: rgba(0,0,0,0.3);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
-        }
-        .result-box {
-            background: rgba(34, 211, 238, 0.1);
-            border-radius: 15px;
+
+        .form-control::placeholder { color: #64748b; }
+        
+        .nav-pills .nav-link { color: var(--text-muted); border-radius: 12px; margin-right: 10px; }
+        .nav-pills .nav-link.active { background: var(--accent); color: var(--bg); font-weight: 800; }
+
+        .result-display {
+            background: rgba(34, 211, 238, 0.15);
+            border-radius: 18px;
             padding: 20px;
-            margin-top: 25px;
-            border-left: 4px solid var(--accent);
+            border: 1px solid var(--accent);
+            margin-top: 20px;
             display: none;
         }
-        .ref-tag {
-            font-size: 0.75rem;
-            color: var(--warning);
-            cursor: pointer;
-            text-decoration: underline;
-        }
+
+        header, footer { background: rgba(2, 6, 23, 0.9); border-block: 1px solid rgba(255,255,255,0.1); padding: 20px 0; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="calc-card">
-        <h1 class="h4 text-center mb-4" style="color:var(--accent)">Normality ($N$) & Equivalents Solver</h1>
-        
-        <div class="mb-4">
-            <label class="form-label">Quick n-factor Reference (CSIR-NET/GATE Level)</label>
-            <select class="form-select mb-2" id="nFactorRef" onchange="injectNFactor()">
-                <option value="">-- Select Redox/Acid-Base Scenario --</option>
-                <option value="5">KMnO4 (Acidic Media) - n=5</option>
-                <option value="1">KMnO4 (Strong Basic) - n=1</option>
-                <option value="3">KMnO4 (Neutral/Weak Basic) - n=3</option>
-                <option value="6">K2Cr2O7 (Acidic Media) - n=6</option>
-                <option value="2">Oxalic Acid (H2C2O4.2H2O) - n=2</option>
-                <option value="1">Mohr's Salt - n=1</option>
-                <option value="2">H2SO4 - n=2</option>
-                <option value="3">H3PO4 (Complete Neutralization) - n=3</option>
-            </select>
-            <small class="text-muted">Selecting an option will auto-fill the n-factor field.</small>
-        </div>
+<header class="fixed-top">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h1 class="h4 mb-0 fw-bold" style="color:var(--accent)">CHEMISTRY SPARK</h1>
+        <nav><a href="index.html" class="text-decoration-none text-light small">← Back to Lab</a></nav>
+    </div>
+</header>
 
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Mass of Solute (g)</label>
-                <input type="text" id="mass" class="form-control" placeholder="e.g. 4.9 or 10^-1">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Molar Mass (g/mol)</label>
-                <input type="text" id="molarMass" class="form-control" placeholder="e.g. 158 for KMnO4">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Volume of Solution (mL)</label>
-                <input type="text" id="volume" class="form-control" placeholder="e.g. 5*10^2">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">n-factor (Valency)</label>
-                <input type="text" id="nFactor" class="form-control" placeholder="Valency factor">
-            </div>
-        </div>
-
-        <button onclick="calculateNormality()" class="btn btn-info w-100 mt-4 fw-bold" style="background:var(--accent); border:none;">
-            Analyze Stoichiometry
-        </button>
-
-        <div id="result" class="result-box">
-            <h5 class="mb-2">Calculation Results:</h5>
-            <div id="output"></div>
-        </div>
+<main class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Normality ($N$) Expert Solver</h2>
+        <p class="text-muted">High-precision tools for Dilutions, Mixing, and Equivalence Calculations.</p>
     </div>
 
-    <div class="mt-5 text-center text-secondary small" style="max-width: 800px; margin: auto;">
-        <p>This advanced tool calculates Normality ($N$) by evaluating equivalents ($Eq = \frac{Mass}{Molar Mass / n\text{-factor}}$). It supports scientific notation and complex mathematical expressions via <strong>SmartParser</strong> logic.</p>
+    <ul class="nav nav-pills justify-content-center mb-4" id="pills-tab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#standard">General $N$</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#dilution">Dilution ($N_1V_1$)</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#mixing">Resultant $N_R$</button></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="standard">
+            <div class="calc-card">
+                <h3 class="h5 mb-4">Weight/Molarity to Normality</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Mass (g)</label>
+                        <input type="text" id="m_mass" class="form-control" placeholder="Optional if Molarity used">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Molar Mass (g/mol)</label>
+                        <input type="text" id="m_mm" class="form-control" placeholder="e.g. 98">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Volume (mL)</label>
+                        <input type="text" id="m_vol" class="form-control" placeholder="e.g. 500">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">n-factor (Basicity/Acidity)</label>
+                        <input type="text" id="m_nf" class="form-control" placeholder="e.g. 2">
+                    </div>
+                </div>
+                <button onclick="calcGeneral()" class="btn btn-info w-100 mt-4 fw-bold">Calculate Normality</button>
+                <div id="res_gen" class="result-display"></div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="dilution">
+            <div class="calc-card">
+                <h3 class="h5 mb-4">Dilution Equation: $N_1V_1 = N_2V_2$</h3>
+                <div class="row g-3">
+                    <div class="col-md-3"><label class="form-label">$N_1$</label><input type="text" id="d_n1" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label">$V_1$ (mL)</label><input type="text" id="d_v1" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label">$N_2$</label><input type="text" id="d_n2" class="form-control"></div>
+                    <div class="col-md-3"><label class="form-label">$V_2$ (mL)</label><input type="text" id="d_v2" class="form-control"></div>
+                </div>
+                <p class="small text-muted mt-3">*Leave the value you want to find empty.</p>
+                <button onclick="calcDilution()" class="btn btn-info w-100 mt-2 fw-bold">Solve for Missing Value</button>
+                <div id="res_dil" class="result-display"></div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="mixing">
+            <div class="calc-card">
+                <h3 class="h5 mb-4">Mixing Multiple Solutions ($N_R$)</h3>
+                <div id="mixing-rows">
+                    <div class="row g-2 mb-2">
+                        <div class="col-5"><input type="text" class="form-control m-norm" placeholder="Normality (N)"></div>
+                        <div class="col-5"><input type="text" class="form-control m-vol" placeholder="Volume (mL)"></div>
+                    </div>
+                </div>
+                <button onclick="addMixingRow()" class="btn btn-outline-light btn-sm mt-2">+ Add Solution</button>
+                <button onclick="calcMixing()" class="btn btn-info w-100 mt-4 fw-bold">Calculate Resultant Normality</button>
+                <div id="res_mix" class="result-display"></div>
+            </div>
+        </div>
     </div>
-</div>
+</main>
+
+<footer class="mt-auto">
+    <div class="container text-center">
+        <p class="text-muted small mb-0">© 2026 Chemistry Spark Lab | Designed for Excellence by Sudhir Nama</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Injects n-factor from the dropdown into the text input
-    function injectNFactor() {
-        const select = document.getElementById('nFactorRef');
-        if (select.value) {
-            document.getElementById('nFactor').value = select.value;
+// --- SmartParser Logic ---
+function smartParser(input) {
+    if (!input || input.trim() === "") return null;
+    let sanitized = input.replace(/x/g, '*').replace(/\^/g, '**');
+    try {
+        return Function('"use strict"; return (' + sanitized + ')')();
+    } catch (e) { return null; }
+}
+
+// 1. General Calculation
+function calcGeneral() {
+    const w = smartParser(document.getElementById('m_mass').value);
+    const mm = smartParser(document.getElementById('m_mm').value);
+    const v = smartParser(document.getElementById('m_vol').value);
+    const nf = smartParser(document.getElementById('m_nf').value);
+    const res = document.getElementById('res_gen');
+
+    if (mm && v && nf) {
+        const volumeL = v / 1000;
+        let normality;
+        if (w !== null) {
+            // N = W / (EqWt * V_L)
+            const eqWt = mm / nf;
+            normality = w / (eqWt * volumeL);
+        }
+        res.innerHTML = `<strong>Resultant Normality:</strong> ${normality.toFixed(5)} N`;
+        res.style.display = 'block';
+    } else {
+        alert("Please enter Molar Mass, Volume, and n-factor.");
+    }
+}
+
+// 2. Dilution Logic
+function calcDilution() {
+    const n1 = smartParser(document.getElementById('d_n1').value);
+    const v1 = smartParser(document.getElementById('d_v1').value);
+    const n2 = smartParser(document.getElementById('d_n2').value);
+    const v2 = smartParser(document.getElementById('d_v2').value);
+    const res = document.getElementById('res_dil');
+
+    let finalVal;
+    if (!n1) finalVal = (n2 * v2) / v1;
+    else if (!v1) finalVal = (n2 * v2) / n1;
+    else if (!n2) finalVal = (n1 * v1) / v2;
+    else if (!v2) finalVal = (n1 * v1) / n2;
+
+    res.innerHTML = `<strong>Solved Value:</strong> ${finalVal.toFixed(4)}`;
+    res.style.display = 'block';
+}
+
+// 3. Mixing Logic
+function addMixingRow() {
+    const container = document.getElementById('mixing-rows');
+    const div = document.createElement('div');
+    div.className = 'row g-2 mb-2';
+    div.innerHTML = `<div class="col-5"><input type="text" class="form-control m-norm" placeholder="Normality (N)"></div>
+                     <div class="col-5"><input type="text" class="form-control m-vol" placeholder="Volume (mL)"></div>`;
+    container.appendChild(div);
+}
+
+function calcMixing() {
+    const norms = document.getElementsByClassName('m-norm');
+    const vols = document.getElementsByClassName('m-vol');
+    let sumNV = 0;
+    let sumV = 0;
+
+    for (let i = 0; i < norms.length; i++) {
+        let n = smartParser(norms[i].value);
+        let v = smartParser(vols[i].value);
+        if (n && v) {
+            sumNV += (n * v);
+            sumV += v;
         }
     }
-
-    /**
-     * smartParser: Correctly interprets strings with ^, *, e, -, and +
-     */
-    function smartParser(input) {
-        if (!input || input.trim() === "") return NaN;
-        // Logic for ^, *, and scientific notation
-        let sanitized = input.replace(/x/g, '*').replace(/\^/g, '**');
-        try {
-            return Function('"use strict"; return (' + sanitized + ')')();
-        } catch (e) {
-            console.error("Parsing error:", e);
-            return NaN;
-        }
-    }
-
-    function calculateNormality() {
-        const m = smartParser(document.getElementById('mass').value);
-        const mm = smartParser(document.getElementById('molarMass').value);
-        const v_ml = smartParser(document.getElementById('volume').value);
-        const nf = smartParser(document.getElementById('nFactor').value);
-
-        const resBox = document.getElementById('result');
-        const output = document.getElementById('output');
-
-        if (isNaN(m) || isNaN(mm) || isNaN(v_ml) || isNaN(nf) || v_ml === 0) {
-            alert("Input Error: Please ensure all fields are valid numbers or expressions (e.g. 1e-2).");
-            return;
-        }
-
-        const eqWeight = mm / nf;
-        const equivalents = m / eqWeight;
-        const volumeL = v_ml / 1000;
-        const normality = equivalents / volumeL;
-        const molarity = normality / nf;
-
-        resBox.style.display = 'block';
-        output.innerHTML = `
-            <p class="mb-1"><strong>Normality (N):</strong> ${normality.toFixed(5)} eq/L</p>
-            <p class="mb-1"><strong>Molarity (M):</strong> ${molarity.toFixed(5)} mol/L</p>
-            <p class="mb-1"><strong>Equivalent Weight:</strong> ${eqWeight.toFixed(3)} g/eq</p>
-            <p class="mb-0"><strong>Total Equivalents:</strong> ${equivalents.toExponential(4)}</p>
-        `;
-    }
+    const nr = sumNV / sumV;
+    const res = document.getElementById('res_mix');
+    res.innerHTML = `<strong>Resultant Normality ($N_R$):</strong> ${nr.toFixed(5)} N <br> Total Volume: ${sumV} mL`;
+    res.style.display = 'block';
+}
 </script>
-
 </body>
 </html>
