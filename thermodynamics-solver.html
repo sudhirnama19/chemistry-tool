@@ -117,6 +117,39 @@
         .theory-section h1 { font-size: 1.3rem; margin-bottom: 15px; }
         .theory-section p { font-size: 0.8rem; line-height: 1.4; color: rgba(255, 255, 255, 0.9); }
         .theory-section h3 { font-size: 1.0rem; margin-top: 20px; }
+
+        /* Modern Card Based Sections */
+.info-section { margin-top: 40px; }
+.info-section h3 { 
+    margin-bottom: 25px; 
+    border-left: 5px solid var(--accent); 
+    padding-left: 15px;
+    font-weight: 800;
+}
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+.info-card { 
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s ease;
+}
+.info-card:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+.card-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; }
+.card-q::before { content: "•"; margin-right: 10px; color: var(--accent); font-size: 1.5rem; }
+.card-a { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 0; }
+
+.tech-list { list-style: none; padding: 0; margin: 0; }
+.tech-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+.tech-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
     </style>
 </head>
 <body>
@@ -183,7 +216,127 @@
                 <div>$\Delta G = \Delta H - T\Delta S$</div>
             </div>
         </section>
-    </div>
+
+    <div class="content-section">
+    <section class="info-section">
+        <h3>Thermochemistry: Heat & Energy</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Enthalpy of Formation ($\Delta H_f^\circ$)</div>
+                <p class="card-a">The heat change when **one mole** of a substance is formed from its elements in their most stable states under standard conditions. By convention, $\Delta H_f^\circ$ for pure elements is zero.</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-q">Enthalpy of Combustion ($\Delta H_c^\circ$)</div>
+                <p class="card-a">The energy released when **one mole** of a substance is completely burned in excess oxygen. These values are always exothermic (negative).</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Calculation Example (Gibbs Free Energy)</h3>
+        <div class="info-card">
+            <p class="card-a"><strong>Problem:</strong> Determine if a reaction is spontaneous at $298\text{ K}$ if $\Delta H = -100\text{ kJ}$ and $\Delta S = -200\text{ J/K}$.</p>
+            <div class="example-box mt-3">
+                <strong>Formula:</strong> $\Delta G = \Delta H - T\Delta S$
+                <br><br>
+                <strong>Steps:</strong>
+                <ul class="tech-list">
+                    <li>Convert $\Delta S$ to kJ: $-200 / 1000 = -0.2\text{ kJ/K}$</li>
+                    <li>$\Delta G = -100 - (298 \times -0.2)$</li>
+                    <li>$\Delta G = -100 + 59.6 = \mathbf{-40.4\text{ kJ}}$</li>
+                    <li><strong>Result:</strong> Spontaneous (since $\Delta G < 0$)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Entropy & Gibbs Energy Types</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Entropy ($S$)</div>
+                <p class="card-a">A measure of the thermal energy per unit temperature that is unavailable for doing useful work. It is often described as the degree of "disorder" or "randomness" in a system.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Standard vs. Non-Standard $G$</div>
+                <p class="card-a"><strong>$\Delta G^\circ$:</strong> Change under standard states ($1\text{ atm}, 1\text{ M}$).<br>
+                <strong>$\Delta G$:</strong> Real-time change calculated using $\Delta G = \Delta G^\circ + RT \ln Q$.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Research & Analytical Techniques</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Isothermal Titration Calorimetry (ITC)</div>
+                <p class="card-a">Used in drug discovery to measure the heat of binding between a drug and a protein, providing direct values for $\Delta H$, $\Delta S$, and $K_a$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Differential Scanning Calorimetry (DSC)</div>
+                <p class="card-a">Measures how a sample's heat capacity changes with temperature, essential for determining the melting points and stability of polymers and proteins.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Unique Thermodynamic Facts</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <p class="card-a"><strong>The Third Law:</strong> As a system approaches absolute zero ($0\text{ K}$), the entropy of a perfect crystal becomes exactly zero. It is the only absolute thermodynamic value.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Heat Death:</strong> Some cosmologists suggest the universe will eventually reach a state of maximum entropy, where no more energy is available to sustain life or movement.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Biological Efficiency:</strong> Despite the 2nd Law, life maintains low internal entropy by constantly exporting high entropy (heat) to its surroundings.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="info-section">
+        <h3>Expert FAQ: Thermodynamics</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is the difference between $\Delta H$ and $\Delta U$?</div>
+                <p class="card-a">$\Delta H$ is heat at constant pressure, while $\Delta U$ is heat at constant volume. Relationship: $\Delta H = \Delta U + \Delta n_g RT$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Can a reaction be spontaneous if $\Delta H$ is positive?</div>
+                <p class="card-a">Yes, if the entropy increase ($T\Delta S$) is large enough to outweigh the positive enthalpy (endothermic spontaneity).</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is Hess's Law?</div>
+                <p class="card-a">The total enthalpy change of a reaction is the same regardless of the path taken, because enthalpy is a **state function**.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Why is $\Delta G = 0$ at equilibrium?</div>
+                <p class="card-a">At equilibrium, the system is at its lowest possible energy state; there is no driving force to move in either direction.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How does $K_{eq}$ relate to $\Delta G^\circ$?</div>
+                <p class="card-a">The connection is: $\Delta G^\circ = -RT \ln K_{eq}$. A large negative $\Delta G^\circ$ means a very large equilibrium constant.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is Bond Enthalpy?</div>
+                <p class="card-a">The energy required to break one mole of a specific bond in the gaseous state. It is used to estimate reaction $\Delta H$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Is Entropy always increasing?</div>
+                <p class="card-a">According to the 2nd Law, the entropy of the **entire universe** (system + surroundings) must increase for any spontaneous process.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What are Intensive vs. Extensive properties?</div>
+                <p class="card-a">Temperature is intensive (doesn't depend on amount), while Enthalpy and Entropy are extensive (increase with mass).</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the "Clausius Inequality"?</div>
+                <p class="card-a">It states that for any real-world (irreversible) process, the entropy change is always greater than the heat exchanged divided by temperature.</p>
+            </div>
+        </div>
+    </section>
+</div>
 
     <div id="footer-container"></div>
 
