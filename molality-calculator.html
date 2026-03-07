@@ -82,10 +82,39 @@
             padding: 15px; border-radius: 10px; 
             margin: 20px 0; border-left: 4px solid var(--accent);
         }
-        #faq { margin-top: 50px; padding: 10px 5px; }
-        .faq-item { margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .faq-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; }
-        .faq-a { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; }
+
+        /* Modern Card Based Sections */
+        .info-section { margin-top: 40px; }
+        .info-section h3 { 
+            margin-bottom: 25px; 
+            border-left: 5px solid var(--accent); 
+            padding-left: 15px;
+            font-weight: 800;
+        }
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .info-card { 
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            transition: 0.3s ease;
+        }
+        .info-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        .card-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; }
+        .card-q::before { content: "•"; margin-right: 10px; color: var(--accent); font-size: 1.5rem; }
+        .card-a { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 0; }
+        
+        .tech-list { list-style: none; padding: 0; margin: 0; }
+        .tech-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+        .tech-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
     </style>
 </head>
 <body>
@@ -109,6 +138,7 @@
                 <br>Result: $\mathbf{1.0\text{ m}}$.
             </div>
         </section>
+
         <div class="solver-card">
             <h3 class="text-center mb-4">Molality Ultra-Calculator</h3>
             <div class="row g-3">
@@ -131,6 +161,7 @@
                 <p class="small text-secondary">Formula: $m = \frac{w \times 1000}{M_w \times W}$</p>
             </div>
         </div>
+
         <div class="solver-card">
             <h3 class="text-center mb-4">Mole Fraction Solver ($\chi$)</h3>
             <div class="row g-3">
@@ -149,6 +180,7 @@
                 <p>$\chi_{\text{solvent}}$: <span id="out_chi_b" class="text-white fw-bold"></span></p>
             </div>
         </div>
+
         <div class="solver-card">
             <h3 class="text-center">Quick Unit Converter</h3>
             <div class="row g-2">
@@ -162,50 +194,58 @@
                 </div>
             </div>
         </div>
-        <section>
+
+        <section class="info-section">
             <h3>Techniques & Interconversions</h3>
-            <p>For high-level exams like GATE, you must master the density interconversion. If you are given a percentage by weight (w/w), the mass of the solvent is $(100 - \text{weight}\%)$.</p>
-            <ul>
-                <li><strong>Temperature Independence:</strong> Molality does not change with temperature as it is mass-based.</li>
-                <li><strong>Molarity to Molality:</strong> $m = \frac{1000M}{1000d - MM_s}$.</li>
-            </ul>
+            <div class="info-card">
+                <p class="card-a">For high-level exams like GATE, you must master the density interconversion. If you are given a percentage by weight (w/w), the mass of the solvent is $(100 - \text{weight}\%)$.</p>
+                <hr style="border-color: rgba(255,255,255,0.1);">
+                <ul class="tech-list">
+                    <li><strong>Temperature Independence:</strong> Molality does not change with temperature as it is mass-based.</li>
+                    <li><strong>Molarity to Molality:</strong> $m = \frac{1000M}{1000d - MM_s}$</li>
+                </ul>
+            </div>
         </section>
-        <section id="faq">
+
+        <section id="faq" class="info-section">
             <h3>Expert FAQ</h3>
-            <div class="faq-item">
-                <div class="faq-q">1. Why is molality preferred in colligative properties?</div>
-                <div class="faq-a">Colligative properties like boiling point elevation depend on the ratio of solute to solvent molecules. Since molality doesn't change with temperature, it provides a stable reference.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">2. Can molality be less than molarity?</div>
-                <div class="faq-a">Yes, if the density of the solution is significantly less than $1\text{ g/mL}$, but for most aqueous solutions, molality is slightly higher.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">3. What is the mole fraction of a pure substance?</div>
-                <div class="faq-a">The mole fraction of a pure substance is always $1$ because there are no other components.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">4. How do I find molality from mass percent?</div>
-                <div class="faq-a">Use: $m = \frac{\% \text{ by mass} \times 1000}{(100 - \%) \times M_{\text{solute}}}$.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">5. Does adding solvent change the mole fraction?</div>
-                <div class="faq-a">Yes. Adding solvent increases the total moles ($n_A + n_B$), which decreases the mole fraction of the solute.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">6. What is the unit of mole fraction?</div>
-                <div class="faq-a">Mole fraction is a dimensionless quantity (it has no units) because it is a ratio of similar units.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">7. Is molality used for concentrated solutions?</div>
-                <div class="faq-a">Molality is useful for all concentrations, but it is especially important in high-precision thermodynamic calculations where volume changes are significant.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-q">8. Relationship between $\chi$ and $m$?</div>
-                <div class="faq-a">The relationship is: $m = \frac{\chi_A \times 1000}{\chi_B \times M_B}$.</div>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <div class="card-q">Why is molality preferred in colligative properties?</div>
+                    <p class="card-a">Colligative properties like boiling point elevation depend on the ratio of solute to solvent molecules. Since molality doesn't change with temperature, it provides a stable reference.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Can molality be less than molarity?</div>
+                    <p class="card-a">Yes, if the density of the solution is significantly less than $1\text{ g/mL}$, but for most aqueous solutions, molality is slightly higher.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">What is the mole fraction of a pure substance?</div>
+                    <p class="card-a">The mole fraction of a pure substance is always $1$ because there are no other components to dilute the ratio.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">How do I find molality from mass percent?</div>
+                    <p class="card-a">Use the shortcut: $m = \frac{\% \text{ by mass} \times 1000}{(100 - \%) \times M_{\text{solute}}}$.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Does adding solvent change the mole fraction?</div>
+                    <p class="card-a">Yes. Adding solvent increases the total moles ($n_A + n_B$), which decreases the mole fraction of the solute ($\chi_A$).</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">What is the unit of mole fraction?</div>
+                    <p class="card-a">Mole fraction is a dimensionless quantity (it has no units) because it is a ratio of similar units that cancel out.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Is molality used for concentrated solutions?</div>
+                    <p class="card-a">Yes, it is especially important in high-precision thermodynamic calculations where volume changes due to concentration would make Molarity inaccurate.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Relationship between $\chi$ and $m$?</div>
+                    <p class="card-a">The formula is: $m = \frac{\chi_A \times 1000}{\chi_B \times M_B}$. This is a common conversion in physical chemistry.</p>
+                </div>
             </div>
         </section>
     </div>
+
     <div id="footer-container"></div>
     <script>
         /**
@@ -229,7 +269,6 @@
             } catch (e) { return NaN; }
         }
 
-        // Molality Engine
         function solveMolality() {
             const ms = smartParser(document.getElementById('mass_s').value);
             const mm = smartParser(document.getElementById('mm_s').value);
@@ -245,7 +284,6 @@
             document.getElementById('mol_res').style.display = 'block';
         }
 
-        // Mole Fraction Engine
         function solveMoleFraction() {
             const nA = smartParser(document.getElementById('moles_a').value);
             const nB = smartParser(document.getElementById('moles_b').value);
@@ -258,7 +296,6 @@
             document.getElementById('chi_res').style.display = 'block';
         }
 
-        // Unit Converter Engine
         function convertWeight(type) {
             const g = document.getElementById('input_g');
             const kg = document.getElementById('input_kg');
@@ -271,7 +308,6 @@
             }
         }
 
-        // Load Footer
         fetch("footer.html")
             .then(res => res.text())
             .then(data => {
