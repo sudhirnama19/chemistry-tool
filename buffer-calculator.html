@@ -97,6 +97,40 @@
         .theory-section { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; margin-bottom: 30px; }
 
         @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .full-row { grid-column: span 1; } }
+
+        /* Modern Card Based Sections */
+.info-section { margin-top: 40px; }
+.info-section h3 { 
+    margin-bottom: 25px; 
+    border-left: 5px solid var(--accent); 
+    padding-left: 15px;
+    font-weight: 800;
+}
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+.info-card { 
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s ease;
+}
+.info-card:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+.card-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; }
+.card-q::before { content: "•"; margin-right: 10px; color: var(--accent); font-size: 1.5rem; }
+.card-a { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 0; }
+
+.tech-list { list-style: none; padding: 0; margin: 0; }
+.tech-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+.tech-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+        
     </style>
 </head>
 <body>
@@ -165,14 +199,110 @@
             </div>
         </div>
 
-        <section class="theory-section" style="margin-top: 40px;">
-            <h2 style="color: var(--accent);">Expert FAQ</h2>
-            <p><strong>1. What is Buffer Capacity?</strong><br>It is the amount of acid or base a buffer can neutralize before the pH changes significantly.</p>
-            <p><strong>2. When is a buffer most effective?</strong><br>Effectiveness peaks when $[Acid] = [Base]$, making $\text{pH} = pK_a$.</p>
-            <p><strong>3. Can a buffer handle any amount of acid?</strong><br>No. Once the conjugate base or acid is completely consumed, the buffer fails and the pH will spike or crash.</p>
-        </section>
-    </div>
+        <div class="content-section">
+    <section class="info-section">
+        <h3>Buffer Solutions: Theory & Types</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is a Buffer?</div>
+                <p class="card-a">A buffer solution is a mixture of a weak acid and its conjugate base (or a weak base and its conjugate acid). Its primary function is to resist changes in pH when small amounts of strong acid or base are added.</p>
+            </div>
 
+            <div class="info-card">
+                <div class="card-q">Two Main Types</div>
+                <ul class="tech-list">
+                    <li><strong>Acidic Buffers:</strong> Weak acid + its salt with a strong base (e.g., $CH_3COOH + CH_3COONa$). pH < 7.</li>
+                    <li><strong>Basic Buffers:</strong> Weak base + its salt with a strong acid (e.g., $NH_4OH + NH_4Cl$). pH > 7.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Calculation Example (Henderson-Hasselbalch)</h3>
+        <div class="info-card">
+            <p class="card-a"><strong>Problem:</strong> Calculate the pH of a buffer containing $0.1\text{ M}$ Acetic acid ($pK_a = 4.76$) and $0.2\text{ M}$ Sodium Acetate.</p>
+            <div class="example-box mt-3">
+                <strong>Formula:</strong> $pH = pK_a + \log\left(\frac{[\text{Salt}]}{[\text{Acid}]}\right)$
+                <br><br>
+                <strong>Steps:</strong>
+                <ul class="tech-list">
+                    <li>$pH = 4.76 + \log(0.2 / 0.1)$</li>
+                    <li>$pH = 4.76 + \log(2)$</li>
+                    <li>$pH = 4.76 + 0.301 = \mathbf{5.061}$</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Modern Research Techniques</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Dynamic Buffer Mapping</div>
+                <p class="card-a">In pharmaceutical research, scientists use <strong>High-Throughput Screening (HTS)</strong> to test how drugs behave across 96 different buffer variations simultaneously to ensure stability.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Zwitterionic Buffers</div>
+                <p class="card-a"><strong>Good's Buffers</strong> (like HEPES or MES) are used in biological research because they don't interfere with cellular membranes or light absorption in spectroscopy.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Unique Buffer Facts</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <p class="card-a"><strong>Oceanic Buffer:</strong> The Earth's oceans are buffered by a $CO_2/HCO_3^-$ system, maintaining a pH of around 8.1, crucial for coral reef survival.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Blood Precision:</strong> Human blood is buffered by carbonic acid and bicarbonate. If your blood pH shifts by more than 0.4 units, it is usually fatal.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="info-section">
+        <h3>Expert FAQ: Buffer Equilibrium</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is Buffer Capacity?</div>
+                <p class="card-a">The amount of acid or base a buffer can neutralize before the pH begins to change significantly. It is highest when $[\text{Salt}] = [\text{Acid}]$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">When is a buffer most effective?</div>
+                <p class="card-a">A buffer is most effective within a range of $\pm 1$ unit of its $pK_a$. This is the "Maximum Buffer Range."</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Does diluting a buffer change its pH?</div>
+                <p class="card-a">Theoretically, no. Since pH depends on the <strong>ratio</strong> of salt to acid, adding water doesn't change the ratio. However, buffer capacity decreases.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the "Common Ion Effect" in buffers?</div>
+                <p class="card-a">The presence of the salt suppresses the ionization of the weak acid, which is the fundamental mechanism that allows a buffer to work.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Can a buffer have two $pK_a$ values?</div>
+                <p class="card-a">Yes. Polyprotic buffers like Phosphate ($H_3PO_4$) have three $pK_a$ values and can buffer at pH 2.1, 7.2, and 12.3.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How does temperature affect buffers?</div>
+                <p class="card-a">Temperature changes the dissociation constant ($K_a$). Tris buffers, for example, are extremely sensitive to temperature changes.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the pH of a neutral buffer?</div>
+                <p class="card-a">A neutral buffer usually refers to a system like Phosphate Buffered Saline (PBS) with a pH of 7.4, mimicking human physiological conditions.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Why not use strong acids as buffers?</div>
+                <p class="card-a">Strong acids ionize completely; they have no equilibrium to "absorb" extra $H^+$ ions, so they cannot function as buffers.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How to choose the right buffer?</div>
+                <p class="card-a">Pick a weak acid whose $pK_a$ is closest to your target pH. This ensures maximum buffering power for your experiment.</p>
+            </div>
+        </div>
+    </section>
+</div>
     <div id="footer-container"></div>
 
     <script>
