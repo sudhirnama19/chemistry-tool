@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,7 +51,7 @@
         .form-label { color: var(--accent); font-weight: 600; margin-top: 10px; }
         .form-control {
             background-color: #0f172a !important;
-            color: #ffffff !important; /* FIXED: Visible white text */
+            color: #ffffff !important;
             border: 1px solid #334155 !important;
         }
         .form-control::placeholder { color: #64748b; }
@@ -81,38 +82,16 @@
             margin: 20px 0; border-left: 4px solid var(--accent);
         }
 
-        /* FAQ Section Spacing Fix */
-#faq {
-    margin-top: 50px;
-    padding: 20px 15px; /* Adds internal space from edges */
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: 12px;
-}
-
-#faq h3 {
-    margin-bottom: 25px;
-    border-bottom: 2px solid var(--accent);
-    display: inline-block;
-}
-
-.faq-item {
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 15px;
-}
-
-.faq-question {
-    color: var(--accent);
-    font-weight: 700;
-    font-size: 1rem;
-    margin-bottom: 8px;
-}
-
-.faq-answer {
-    color: #cbd5e1;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
+        #faq {
+            margin-top: 50px;
+            padding: 20px 15px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+        }
+        #faq h3 { margin-bottom: 25px; border-bottom: 2px solid var(--accent); display: inline-block; }
+        .faq-item { margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; }
+        .faq-question { color: var(--accent); font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+        .faq-answer { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -137,24 +116,24 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Mass of Solute (g)</label>
-                    <input type="number" id="mass" class="form-control" placeholder="e.g., 5.85">
+                    <input type="text" id="mass" class="form-control" placeholder="e.g., 5.85">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Molar Mass (g/mol)</label>
-                    <input type="number" id="m_mass" class="form-control" placeholder="e.g., 58.5">
+                    <input type="text" id="m_mass" class="form-control" placeholder="e.g., 58.5">
                 </div>
                 <div class="col-12">
                     <label class="form-label">Volume of Solution (L)</label>
-                    <input type="number" id="vol" class="form-control" placeholder="e.g., 0.5">
+                    <input type="text" id="vol" class="form-control" placeholder="e.g., 0.5">
                 </div>
                 <div class="col-12 mt-3 text-secondary small text-center">--- OR USE DENSITY/PERCENT ---</div>
                 <div class="col-6">
                     <label class="form-label">Density (g/mL)</label>
-                    <input type="number" id="dens" class="form-control" step="0.001">
+                    <input type="text" id="dens" class="form-control" placeholder="1.2">
                 </div>
                 <div class="col-6">
                     <label class="form-label">Mass %</label>
-                    <input type="number" id="perc" class="form-control">
+                    <input type="text" id="perc" class="form-control" placeholder="10">
                 </div>
             </div>
             <button onclick="calculateMolarity()" class="btn btn-solve">CALCULATE MOLARITY</button>
@@ -165,24 +144,51 @@
         </div>
 
         <div class="solver-card">
+            <h3 class="text-center mb-4">Mixture Molarity ($M_{mix}$)</h3>
+            <p class="small text-center text-secondary">Formula: $M_{mix} = \frac{M_1V_1 + M_2V_2}{V_1 + V_2}$</p>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">$M_1$ (Sol 1)</label>
+                    <input type="text" id="mix_m1" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">$V_1$ (Sol 1)</label>
+                    <input type="text" id="mix_v1" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">$M_2$ (Sol 2)</label>
+                    <input type="text" id="mix_m2" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">$V_2$ (Sol 2)</label>
+                    <input type="text" id="mix_v2" class="form-control">
+                </div>
+            </div>
+            <button onclick="calculateMixture()" class="btn btn-solve">CALCULATE MIXTURE MOLARITY</button>
+            <div id="mix_results" class="result-display">
+                <span id="mix_res_val" class="fw-bold text-info"></span>
+            </div>
+        </div>
+
+        <div class="solver-card">
             <h3 class="text-center mb-4">Dilution Solver ($M_1V_1 = M_2V_2$)</h3>
             <p class="small text-center text-secondary">Leave one field blank to solve for it</p>
             <div class="row g-2">
                 <div class="col-6">
                     <label class="form-label">Initial $M_1$</label>
-                    <input type="number" id="m1" class="form-control">
+                    <input type="text" id="m1" class="form-control">
                 </div>
                 <div class="col-6">
                     <label class="form-label">Initial $V_1$</label>
-                    <input type="number" id="v1" class="form-control">
+                    <input type="text" id="v1" class="form-control">
                 </div>
                 <div class="col-6">
                     <label class="form-label">Final $M_2$</label>
-                    <input type="number" id="m2" class="form-control">
+                    <input type="text" id="m2" class="form-control">
                 </div>
                 <div class="col-6">
                     <label class="form-label">Final $V_2$</label>
-                    <input type="number" id="v2" class="form-control">
+                    <input type="text" id="v2" class="form-control">
                 </div>
             </div>
             <button onclick="calculateDilution()" class="btn btn-solve">SOLVE DILUTION</button>
@@ -192,87 +198,124 @@
         </div>
 
         <div class="solver-card">
-    <h3 class="text-center" style="color: var(--accent);">Quick Unit Converter</h3>
-    <div class="row g-2">
-        <div class="col-6">
-            <label class="form-label">Milliliters (mL)</label>
-            <input type="number" id="input_ml" class="form-control" oninput="convertUnits('ml')" placeholder="500">
+            <h3 class="text-center" style="color: var(--accent);">Quick Unit Converter</h3>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Milliliters (mL)</label>
+                    <input type="text" id="input_ml" class="form-control" oninput="convertUnits('ml')" placeholder="500">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Liters (L)</label>
+                    <input type="text" id="input_l" class="form-control" oninput="convertUnits('l')" placeholder="0.5">
+                </div>
+            </div>
         </div>
-        <div class="col-6">
-            <label class="form-label">Liters (L)</label>
-            <input type="number" id="input_l" class="form-control" oninput="convertUnits('l')" placeholder="0.5">
-        </div>
-    </div>
-    <p class="small text-secondary mt-2 text-center">Converts automatically as you type.</p>
-</div>
-    </div>
-        
-        <section id="faq">
-    <h3>Expert FAQ: Concentration & Dilution</h3>
-
-    <div class="faq-item">
-        <p class="faq-question">1. Does molarity change if I add more solute without changing the volume?</p>
-        <p class="faq-answer">Yes. Molarity is directly proportional to the number of moles ($n$). If you add solute, $n$ increases while $V$ remains constant, leading to a higher molarity.</p>
     </div>
 
-    <div class="faq-item">
-        <p class="faq-question">2. How do I calculate the molarity of a mixture of two solutions?</p>
-        <p class="faq-answer">Use the formula: $M_{mix} = \frac{M_1V_1 + M_2V_2}{V_1 + V_2}$. This is commonly tested in JEE Advanced for non-reacting solutes.</p>
-    </div>
+    <script>
+        /**
+         * Smart Parser [2026-03-06]
+         * Correctly interprets ^, e, and * in text inputs.
+         */
+        function smartParser(val) {
+            if (val === null || val === undefined || val.toString().trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+            
+            try {
+                // Handle scientific notation e (e.g. 1e-3)
+                if (str.includes("e")) return parseFloat(str);
 
-    <div class="faq-item">
-        <p class="faq-question">3. What is the relation between Molarity (M) and Molality (m)?</p>
-        <p class="faq-answer">The relationship is: $m = \frac{1000M}{1000d - M \times M_{solute}}$, where $d$ is density in g/mL. Molality is often preferred because it is temperature-independent.</p>
-    </div>
+                // Handle multiplication (e.g. 2 * 10^3)
+                if (str.includes("*")) {
+                    let factors = str.split("*");
+                    return factors.reduce((acc, part) => acc * smartParser(part), 1);
+                }
 
-    <div class="faq-item">
-        <p class="faq-question">4. Why is molarity of pure water considered 55.5 M?</p>
-        <p class="faq-answer">Pure water has a density of $1000\text{ g/L}$. Since the molar mass of water is $18.02\text{ g/mol}$, the calculation is $1000 / 18.02 = 55.505\text{ mol/L}$.</p>
-    </div>
+                // Handle exponentiation (e.g. 10^3)
+                if (str.includes("^")) {
+                    let parts = str.split("^");
+                    return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+                }
+                
+                return parseFloat(str);
+            } catch (e) { return NaN; }
+        }
 
-    <div class="faq-item">
-        <p class="faq-question">5. Can Molarity be used for gases?</p>
-        <p class="faq-answer">Yes, though partial pressure is more common. For an ideal gas, $M = n/V = P/RT$. This links thermodynamics directly to concentration.</p>
-    </div>
+        function calculateMolarity() {
+            const mass = smartParser(document.getElementById('mass').value);
+            const mw = smartParser(document.getElementById('m_mass').value);
+            const vol = smartParser(document.getElementById('vol').value);
+            const dens = smartParser(document.getElementById('dens').value);
+            const perc = smartParser(document.getElementById('perc').value);
 
-    <div class="faq-item">
-        <p class="faq-question">6. What happens to molarity during a volume contraction?</p>
-        <p class="faq-answer">If the final volume is less than the sum of individual volumes (common in ethanol-water mixes), the molarity will be higher than the theoretically calculated value.</p>
-    </div>
+            let molarity, moles;
 
-    <div class="faq-item">
-        <p class="faq-question">7. Is molarity the same as Formality?</p>
-        <p class="faq-answer">Formality is used specifically for ionic compounds (like NaCl) where "moles" refers to formula units, but numerically they are usually identical in standard chemistry problems.</p>
-    </div>
+            if (!isNaN(dens) && !isNaN(perc) && !isNaN(mw)) {
+                molarity = (perc * dens * 10) / mw;
+                moles = "Derived from Density";
+            } else if (!isNaN(mass) && !isNaN(mw) && !isNaN(vol)) {
+                moles = mass / mw;
+                molarity = moles / vol;
+            } else {
+                alert("Please fill necessary fields (Scientific notation allowed).");
+                return;
+            }
 
-    <div class="faq-item">
-        <p class="faq-question">8. How does M1V1 = M2V2 handle stoichiometry?</p>
-        <p class="faq-answer">The dilution law assumes moles remain constant ($n_1 = n_2$). If a reaction occurs (like titration), you must use $n_1M_1V_1 = n_2M_2V_2$ where $n$ is the valency factor.</p>
-    </div>
+            document.getElementById('out_n').innerText = isNaN(moles) ? moles : moles.toExponential(4);
+            document.getElementById('out_m').innerText = molarity.toFixed(4) + " M";
+            document.getElementById('results').style.display = "block";
+        }
 
-    <div class="faq-item">
-        <p class="faq-question">9. What is the difference between "Molar" and "Molar concentration"?</p>
-        <p class="faq-answer">They are the same. "Molar" (M) is the unit, while "Molar concentration" is the property being measured.</p>
-    </div>
+        function calculateMixture() {
+            const m1 = smartParser(document.getElementById('mix_m1').value);
+            const v1 = smartParser(document.getElementById('mix_v1').value);
+            const m2 = smartParser(document.getElementById('mix_m2').value);
+            const v2 = smartParser(document.getElementById('mix_v2').value);
 
-    <div class="faq-item">
-        <p class="faq-question">10. Can Molarity be zero or negative?</p>
-        <p class="faq-answer">Molarity must be positive. A zero molarity indicates a pure solvent with no solute present.</p>
-    </div>
-</section>
-    </div>
+            if (isNaN(m1) || isNaN(v1) || isNaN(m2) || isNaN(v2)) {
+                alert("Please fill all mixture fields.");
+                return;
+            }
 
-    <script src="js/molarity-solver.js"></script>
+            const mMix = (m1 * v1 + m2 * v2) / (v1 + v2);
+            document.getElementById('mix_res_val').innerText = `Resulting Molarity (Mmix): ${mMix.toFixed(4)} M`;
+            document.getElementById('mix_results').style.display = "block";
+        }
 
-    <div id="footer-container"></div>
+        function calculateDilution() {
+            const m1 = smartParser(document.getElementById('m1').value);
+            const v1 = smartParser(document.getElementById('v1').value);
+            const m2 = smartParser(document.getElementById('m2').value);
+            const v2 = smartParser(document.getElementById('v2').value);
 
-<script>
-fetch("footer.html")
-.then(res => res.text())
-.then(data => {
-document.getElementById("footer-container").innerHTML = data;
-});
-</script>
-    
+            let res = "";
+            let count = [m1, v1, m2, v2].filter(x => !isNaN(x)).length;
+
+            if (count !== 3) {
+                alert("Leave exactly ONE field blank to solve.");
+                return;
+            }
+
+            if (isNaN(m1)) res = `M1 = ${(m2 * v2) / v1} M`;
+            else if (isNaN(v1)) res = `V1 = ${(m2 * v2) / m1}`;
+            else if (isNaN(m2)) res = `M2 = ${(m1 * v1) / v2} M`;
+            else if (isNaN(v2)) res = `V2 = ${(m1 * v1) / m2}`;
+            
+            document.getElementById('dilution_res').innerText = res;
+            document.getElementById('dilution_results').style.display = "block";
+        }
+
+        function convertUnits(type) {
+            const mlInput = document.getElementById('input_ml');
+            const lInput = document.getElementById('input_l');
+            if (type === 'ml') {
+                const val = smartParser(mlInput.value);
+                lInput.value = isNaN(val) ? "" : val / 1000;
+            } else {
+                const val = smartParser(lInput.value);
+                mlInput.value = isNaN(val) ? "" : val * 1000;
+            }
+        }
+    </script>
 </body>
 </html>
