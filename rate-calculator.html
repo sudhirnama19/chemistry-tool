@@ -142,6 +142,14 @@
                         <div class="col-4"><div class="stat-card"><small>Result</small><h4 id="res_main" style="color:var(--accent-cyan)">-</h4></div></div>
                         <div class="col-4"><div class="stat-card"><small>Eₐ (kJ/mol)</small><h4 id="res_ea">-</h4></div></div>
                     </div>
+
+                    <div class="calc-card mt-3">
+    <label class="form-label">Maxwell-Boltzmann Distribution (Energy vs. Temp)</label>
+    <canvas id="boltzmannChart" style="max-height: 200px;"></canvas>
+    <div class="mt-2 text-center">
+        <small style="color:var(--accent-cyan)">Area beyond dashed line = Effective Collisions ($E > E_a$)</small>
+    </div>
+</div>
                     <canvas id="kineticsChart" style="max-height: 220px;"></canvas>
                     <div class="mt-4">
                         <label class="form-label">Molecular Collision Simulation</label>
@@ -325,5 +333,100 @@
 
         window.onload = () => { toggleInputs(); initCollision(); solveKinetics(); };
     </script>
+
+
+
+
+
+
+    
+
+<script>
+// Add this function to your existing <script> section
+function updateBoltzmann(Ea_input) {
+    const ctx = document.getElementById('boltzmannChart').getContext('2d');
+    const Ea = Ea_input || 50; // kJ/mol
+    const R = 8.314;
+    const T = 298; // Standard Temp for visualization
+    
+    const labels = [];
+    const data = [];
+    const thresholdIdx = Math.floor(Ea);
+
+    for (let e = 0; e <= 150; e += 2) {
+        // Boltzmann distribution formula: f(E) = (1/RT) * exp(-E/RT)
+        let fE = (1 / (R * T / 1000)) * Math.exp(-e / (R * T / 1000));
+        labels.push(e);
+        data.push(fE);
+    }
+
+    if (window.boltzChartInstance) window.boltzChartInstance.destroy();
+
+    window.boltzChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Fraction of Molecules',
+                data: data,
+                borderColor: '#3b82f6',
+                fill: true,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const {ctx, chartArea} = chart;
+                    if (!chartArea) return null;
+                    // Color the area beyond Ea differently to show effective collisions
+                    const gradient = ctx.createLinearGradient(0, 0, chartArea.right, 0);
+                    const stop = Ea / 150;
+                    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+                    gradient.addColorStop(stop, 'rgba(59, 130, 246, 0.1)');
+                    gradient.addColorStop(stop, 'rgba(0, 255, 213, 0.4)');
+                    gradient.addColorStop(1, 'rgba(0, 255, 213, 0.4)');
+                    return gradient;
+                },
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            plugins: { 
+                legend: { display: false },
+                annotation: { // Vertical line for Ea
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            xMin: Ea,
+                            xMax: Ea,
+                            borderColor: '#00ffd5',
+                            borderWidth: 2,
+                            borderDash: [6, 6]
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Energy (kJ/mol)', color: '#94a3b8' } },
+                y: { display: false }
+            }
+        }
+    });
+}
+
+// Modify your solveArrhenius to call this:
+function solveArrhenius() {
+    const k1 = smartParser(document.getElementById('arr_k1').value);
+    const t1 = smartParser(document.getElementById('arr_t1').value);
+    const k2 = smartParser(document.getElementById('arr_k2').value);
+    const t2 = smartParser(document.getElementById('arr_t2').value);
+    const R = 8.314;
+
+    if (!isNaN(k1) && !isNaN(k2)) {
+        const ea = (R * Math.log(k2/k1)) / ((1/t1) - (1/t2));
+        const ea_kj = ea / 1000;
+        document.getElementById('res_ea').innerText = ea_kj.toFixed(2);
+        updateBoltzmann(ea_kj); // Update visual distribution
+    }
+}
+</script>
 </body>
 </html>
