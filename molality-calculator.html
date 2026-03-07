@@ -266,6 +266,14 @@
             if(type === 'g') kg.value = (parseFloat(g.value) / 1000) || "";
             else g.value = (parseFloat(kg.value) * 1000) || "";
         }
+
+
+        // Load Footer
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            });
     </script>
 </body>
 </html>
