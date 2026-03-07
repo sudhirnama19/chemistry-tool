@@ -89,7 +89,7 @@
 <body>
 
     <nav class="navbar">
-        <a class="brand-text" href="index.html">Chemistry Spark Lab <span class="badge">PRO</span></a>
+        <a class="brand-text" href="index.html">Chemistry Spark Lab<span class="badge">PRO</span></a>
     </nav>
 
     <div class="content-container">
@@ -162,6 +162,73 @@
             <p>Where $\lambda$ represents the molar ionic conductivity (limiting) of species like $H^+$ ($349.6$), $OH^-$ ($199.1$), and $Na^+$ ($50.1$). Unlike basic simulators, we factor in the <strong>Dilution Effect</strong>—as the burette adds liquid, the total volume increases, causing the conductivity slopes to curve realistically.</p>
         </section>
     </div>
+
+    <div class="container" style="background:none; box-shadow:none; backdrop-filter:none; margin-bottom:0; padding-bottom:0;">
+    <section id="theory-section">
+        <h2 style="text-align:left; color: var(--accent);">Acid-Base Titration Theory</h2>
+        <p>Titration is a quantitative analytical technique used to determine the unknown concentration of an analyte by reacting it with a standard solution (titrant) of known concentration.</p>
+        
+        <div class="result" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); margin: 20px 0;">
+            <strong style="color:var(--accent)">Key Equations:</strong>
+            <ul style="margin-top:10px;">
+                <li><strong>Equivalence Point:</strong> $N_1V_1 = N_2V_2$ (or $n_1M_1V_1 = n_2M_2V_2$)</li>
+                <li><strong>Henderson-Hasselbalch (Buffer Region):</strong> $pH = pK_a + \log \frac{[\text{Salt}]}{[\text{Acid}]}$</li>
+                <li><strong>At Half-Equivalence:</strong> $pH = pK_a$</li>
+            </ul>
+        </div>
+
+        <div class="result" style="background: rgba(0, 255, 213, 0.05); border-left: 4px solid #007bff;">
+            <strong>Example:</strong> Titrating $50\text{ mL}$ of $0.1\text{ M } HCl$ with $0.1\text{ M } NaOH$.
+            <br>The equivalence point occurs at exactly $50\text{ mL}$ of $NaOH$ added, where the $pH$ jumps from roughly $3$ to $11$ in a single drop.
+        </div>
+    </section>
+</div>
+
+<div class="container" id="faq-section">
+    <h3 style="color: var(--accent); border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Expert FAQ & Concepts</h3>
+    
+    <div class="result" style="border:none; background:transparent;">
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">1. Why does the pH change so rapidly near the equivalence point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Near the equivalence point, the analyte is almost exhausted. Even a fractional drop of titrant causes a massive logarithmic shift in $[H^+]$ concentration.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">2. What is the difference between End Point and Equivalence Point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">The <strong>Equivalence Point</strong> is the theoretical stoichiometric completion. The <strong>End Point</strong> is where the indicator actually changes color.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">3. Which indicator is best for Weak Acid vs Strong Base?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Phenolphthalein is ideal because its color change interval (pH 8.2–10) matches the basic pH found at the equivalence point of weak acids.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">4. Why does a diprotic acid show two "steps"?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">It has two separate protons with different $K_a$ values. The base neutralizes the first $H^+$ completely before moving to the second, provided $K_{a1} \gg K_{a2}$.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">5. What is the "Half-Equivalence" point?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">This occurs when volume added $V = V_{eq}/2$. Here, $[Acid] = [Salt]$, so $pH = pK_a$. This is the point of maximum buffering capacity.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">6. Can very weak acids ($K_a < 10^{-7}$) be titrated?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Standard indicators fail because the pH jump is too small. Conductometric titration or pH meters (like this simulator) are required.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong style="color:var(--accent)">7. How does concentration affect the titration curve?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Higher concentrations result in a longer vertical "inflection" region, making the end point much easier to detect accurately.</p>
+        </div>
+
+        <div>
+            <strong style="color:var(--accent)">8. What is Back Titration?</strong>
+            <p style="font-size:0.9rem; opacity:0.9;">Used for slow reactions or insoluble solids. An excess reagent is added, and the remaining unreacted portion is titrated.</p>
+        </div>
+    </div>
+</div>
 
     <div id="footer-container"></div>
 
