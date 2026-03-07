@@ -193,7 +193,7 @@
                 </div>
                 <div class="full-row">
                     <label>Concentration (Molarity)</label>
-                    <input id="conc" type="text" placeholder="e.g. 0.05 or 10^-5">
+                    <input id="conc" type="text" placeholder="e.g. 1*10^-7 or 2*25">
                 </div>
                 <div>
                     <label>$K_a$ or $K_b$ (for Weak)</label>
@@ -232,14 +232,29 @@
     <script>
         let myChart = null;
 
-        // LOCAL SMART PARSER: Corrects scientific notation like 10^-20
+        /**
+         * LATEST SMART PARSER [cite: 2026-03-06]
+         * Handles multiplication (*), powers (^), and negative exponents.
+         */
         function smartParser(val) {
             if (!val || val.toString().trim() === "") return NaN;
+            
+            // Clean string: lower case, remove spaces [cite: 2026-03-06]
             let str = val.toString().toLowerCase().replace(/\s/g, "");
+
+            // Handle Multiplication (e.g. 1*25) [cite: 2026-03-06]
+            if (str.includes('*')) {
+                let parts = str.split('*');
+                return smartParser(parts[0]) * smartParser(parts[1]);
+            }
+
+            // Handle Exponents (e.g. 10^-7) [cite: 2026-03-06]
             if (str.includes("^")) {
                 let parts = str.split("^");
                 return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
             }
+
+            // Standard parseFloat for digits and scientific e-notation [cite: 2026-03-06]
             return parseFloat(str);
         }
 
@@ -247,12 +262,12 @@
             const type = document.getElementById('type').value;
             const strength = document.getElementById('strength').value;
             
-            // Using the smart parser for calculations
+            // Using the smart parser to process text inputs [cite: 2026-03-06]
             const C = smartParser(document.getElementById('conc').value);
             const K = smartParser(document.getElementById('kv').value);
             
             if (isNaN(C) || C <= 0) { 
-                alert("Please enter a valid concentration (e.g. 0.05 or 10^-5)"); 
+                alert("Please enter a valid concentration (e.g. 1*10^-7)"); 
                 return; 
             }
 
@@ -293,7 +308,9 @@
         }
 
         function updateVisuals(val) {
-            const ctx = document.getElementById('phChart').getContext('2d');
+            const canvas = document.getElementById('phChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             const badge = document.getElementById('phBadge');
             
             let color, label, gradEnd;
@@ -343,7 +360,7 @@
             updateVisuals(7);
             fetch("footer.html").then(r => r.text()).then(d => {
                 document.getElementById("footer-container").innerHTML = d;
-            });
+            }).catch(err => console.log("Footer load error"));
         };
     </script>
 </body>
