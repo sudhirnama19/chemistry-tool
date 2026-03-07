@@ -82,16 +82,53 @@
             margin: 20px 0; border-left: 4px solid var(--accent);
         }
 
+        /* Modern FAQ Layout */
         #faq {
             margin-top: 50px;
-            padding: 20px 15px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
+            padding-bottom: 50px;
         }
-        #faq h3 { margin-bottom: 25px; border-bottom: 2px solid var(--accent); display: inline-block; }
-        .faq-item { margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; }
-        .faq-question { color: var(--accent); font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
-        .faq-answer { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; }
+        #faq h3 { 
+            margin-bottom: 30px; 
+            border-left: 5px solid var(--accent); 
+            padding-left: 15px;
+            font-weight: 800;
+        }
+        .faq-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .faq-item { 
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+        .faq-item:hover {
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--accent);
+        }
+        .faq-question { 
+            color: var(--accent); 
+            font-weight: 700; 
+            font-size: 1.05rem; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .faq-question::before {
+            content: "Q.";
+            margin-right: 10px;
+            opacity: 0.6;
+        }
+        .faq-answer { 
+            color: #cbd5e1; 
+            font-size: 0.95rem; 
+            line-height: 1.6; 
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -210,18 +247,55 @@
                 </div>
             </div>
         </div>
+
+        <section id="faq">
+            <h3>Expert FAQ: Concentration & Dilution</h3>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <p class="faq-question">Does molarity change if I add more solute?</p>
+                    <p class="faq-answer">Yes. Molarity is defined as $n/V$. By adding more solute, you increase the number of moles ($n$), which directly increases the molarity of the solution.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Is molarity temperature-dependent?</p>
+                    <p class="faq-answer">Yes. Since volume ($V$) expands or contracts with temperature changes, the molarity ($M = n/V$) will change slightly as the temperature varies.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">What happens to molarity during dilution?</p>
+                    <p class="faq-answer">During dilution, you add solvent but the moles of solute remain constant. Therefore, the volume increases and the molarity decreases ($M_1V_1 = M_2V_2$).</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Can molarity be greater than 10?</p>
+                    <p class="faq-answer">Yes, highly concentrated acids like sulfuric acid ($H_2SO_4$) have a molarity of approximately $18\text{ M}$, though most laboratory reagents are much lower.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Why use Molarity instead of Molality?</p>
+                    <p class="faq-answer">Molarity is much easier to use in a lab setting because it involves measuring volumes of liquid with glassware (flasks, pipettes) rather than weighing the solvent on a scale.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">What is a 'Standard Solution'?</p>
+                    <p class="faq-answer">A standard solution is one whose molarity is precisely known. These are often prepared by dissolving a primary standard solute in a volumetric flask.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">How does Density affect Molarity?</p>
+                    <p class="faq-answer">Density relates the mass of the solution to its volume. If you know the mass percentage and density, you can find how much solute is in a specific volume of solution.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">What is the unit of Molarity?</p>
+                    <p class="faq-answer">The SI unit is $mol/m^3$, but in chemistry, we almost exclusively use $mol/L$, also denoted as $\text{M}$ (molar).</p>
+                </div>
+            </div>
+        </section>
     </div>
 
-
-    <section id="faq" class="content-section">
-        <h3>Expert FAQ: Concentration & Dilution</h3>
-        <div class="faq-item">
-            <p class="faq-question">1. Does molarity change if I add more solute?</p>
-            <p class="faq-answer">Yes. Molarity is $n/V$. Increasing moles ($n$) increases the molarity.</p>
-        </div>
-        </section>
-
     <div id="footer-container"></div>
+    
     <script>
         /**
          * Smart Parser [2026-03-06]
@@ -232,16 +306,13 @@
             let str = val.toString().toLowerCase().replace(/\s/g, "");
             
             try {
-                // Handle scientific notation e (e.g. 1e-3)
                 if (str.includes("e")) return parseFloat(str);
 
-                // Handle multiplication (e.g. 2 * 10^3)
                 if (str.includes("*")) {
                     let factors = str.split("*");
                     return factors.reduce((acc, part) => acc * smartParser(part), 1);
                 }
 
-                // Handle exponentiation (e.g. 10^3)
                 if (str.includes("^")) {
                     let parts = str.split("^");
                     return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
@@ -326,6 +397,13 @@
                 mlInput.value = isNaN(val) ? "" : val * 1000;
             }
         }
+
+        // Load Footer
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            });
     </script>
 </body>
 </html>
