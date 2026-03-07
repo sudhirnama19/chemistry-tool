@@ -204,6 +204,130 @@
         </section>
     </div>
 
+
+
+    <div class="content-section">
+    <section class="info-section">
+        <h3>Chemical Kinetics: Reaction Rates</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is Reaction Rate?</div>
+                <p class="card-a">The rate of reaction is the speed at which reactants are converted into products. It is expressed as the change in concentration per unit time ($mol \cdot L^{-1} \cdot s^{-1}$).</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-q">Types of Rates</div>
+                <ul class="tech-list">
+                    <li><strong>Average Rate:</strong> Measured over a large time interval ($\Delta C / \Delta t$).</li>
+                    <li><strong>Instantaneous Rate:</strong> The rate at a specific moment ($dC / dt$).</li>
+                    <li><strong>Initial Rate:</strong> The instantaneous rate at $t = 0$, before products can interfere.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Calculation Example (First Order)</h3>
+        <div class="info-card">
+            <p class="card-a"><strong>Problem:</strong> A first-order reaction has a rate constant $k = 5.0 \times 10^{-3} s^{-1}$. Calculate the rate when $[A] = 0.2\text{ M}$.</p>
+            <div class="example-box mt-3">
+                <strong>Formula:</strong> $Rate = k[A]^1$
+                <br><br>
+                <strong>Steps:</strong>
+                <ul class="tech-list">
+                    <li>$Rate = (5.0 \times 10^{-3} s^{-1}) \times (0.2\text{ M})$</li>
+                    <li>$Rate = 1.0 \times 10^{-3}\text{ M/s}$</li>
+                    <li><strong>Result:</strong> $\mathbf{0.001\text{ mol L}^{-1} s^{-1}}$</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Steady State Approximation (SSA)</h3>
+        <div class="info-card">
+            <p class="card-a">In multi-step mechanisms, SSA assumes that the concentration of a highly reactive **intermediate** remains constant throughout the reaction.</p>
+            <hr style="border-color: rgba(255,255,255,0.1);">
+            <div class="example-box">
+                <strong>Assumption:</strong> $\frac{d[\text{Intermediate}]}{dt} \approx 0$
+                <br>
+                This allows us to solve for the intermediate's concentration in terms of reactants and derive the overall rate law for complex mechanisms.
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Advanced Research Techniques</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Stopped-Flow Method</div>
+                <p class="card-a">Used for ultra-fast reactions (milliseconds). Reactants are pumped into a mixing chamber and flow is suddenly stopped, allowing spectroscopic monitoring of the rapid decay.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Flash Photolysis</div>
+                <p class="card-a">A high-intensity light pulse "flashes" the sample to create excited states or radicals, followed by a probe beam to measure kinetics on the nanosecond or femtosecond scale.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Unique Kinetics Facts</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <p class="card-a"><strong>The 10-Degree Rule:</strong> For many reactions near room temperature, the reaction rate roughly **doubles** for every $10^\circ C$ increase in temperature.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Enzyme Magic:</strong> Catalysts like Catalase can increase the rate of $H_2O_2$ decomposition by a factor of $10^7$, processing millions of molecules per second.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Zero-Order Paradox:</strong> In zero-order reactions (like ethanol metabolism in the liver), the rate is constant regardless of how much reactant is present.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="info-section">
+        <h3>Expert FAQ: Rate Laws & Mechanisms</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is the Order vs. Molecularity?</div>
+                <p class="card-a">Order is experimentally determined (can be fractional/zero). Molecularity is the number of reacting species in an elementary step (always a whole number).</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How does a catalyst work?</div>
+                <p class="card-a">It provides an alternative reaction pathway with a lower **Activation Energy ($E_a$)**, allowing more molecules to have sufficient energy to react.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Why is SSA used?</div>
+                <p class="card-a">Because intermediates are often too short-lived to measure directly, SSA provides a mathematical bridge to the experimental rate law.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Does pressure affect rate?</div>
+                <p class="card-a">Yes, for gaseous reactions. Increasing pressure increases the collision frequency, typically increasing the rate.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the Rate Determining Step (RDS)?</div>
+                <p class="card-a">The slowest step in a multi-step mechanism. The overall reaction rate cannot be faster than this "bottleneck" step.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Can the rate constant $k$ be negative?</div>
+                <p class="card-a">No. $k$ is an intrinsic property relating speed to concentration; a negative speed is physically impossible in this context.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Effect of Surface Area?</div>
+                <p class="card-a">For heterogeneous reactions, increasing surface area (like using powdered zinc instead of a strip) increases the number of available reaction sites.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is a Pseudo-First Order reaction?</div>
+                <p class="card-a">A higher-order reaction (like ester hydrolysis) where one reactant is in such large excess that its concentration remains constant, making it behave like first-order.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How to find units of $k$?</div>
+                <p class="card-a">The formula is: $units = (M)^{1-n} \cdot t^{-1}$, where $n$ is the overall order of the reaction.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
     <div id="footer-container"></div>
 
     <script>
