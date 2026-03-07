@@ -140,7 +140,7 @@
 
                 <div>
                     <label>Salt Concentration (M)</label>
-                    <input id="conc" type="text" placeholder="e.g. 0.1 or 1e-1">
+                    <input id="conc" type="text" placeholder="e.g. 1*10^-1 or 0.1">
                 </div>
                 <div>
                     <label>System Temp (°C)</label>
@@ -185,14 +185,25 @@
     <script>
         let chart = null;
 
-        // LOCAL SMART PARSER: Corrects scientific notation like 10^-5
+        /** * LATEST SMART PARSER [cite: 2026-03-06]
+         * Corrects for multiplication (1*25), powers (^), and scientific notation
+         */
         function smartParser(val) {
             if (!val || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
+
+            // Multiplication Logic
+            if (str.includes('*')) {
+                let parts = str.split('*');
+                return smartParser(parts[0]) * smartParser(parts[1]);
+            }
+
+            // Exponent Logic (e.g., 10^-5)
             if (str.includes("^")) {
                 let parts = str.split("^");
                 return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
             }
+
             return parseFloat(str);
         }
 
@@ -216,6 +227,7 @@
 
         function calculateSalt() {
             let type = document.getElementById("saltType").value;
+            // Apply smartParser to all numerical inputs [cite: 2026-03-06]
             let C = smartParser(document.getElementById("conc").value);
             let Ka = smartParser(document.getElementById("Ka").value);
             let Kb = smartParser(document.getElementById("Kb").value);
@@ -302,7 +314,9 @@
         }
 
         window.onload = () => {
-            fetch("footer.html").then(r => r.text()).then(d => document.getElementById("footer-container").innerHTML = d);
+            if(document.getElementById("footer-container")){
+                fetch("footer.html").then(r => r.text()).then(d => document.getElementById("footer-container").innerHTML = d).catch(e => console.log(e));
+            }
             updateSaltUI();
             renderChart(7, "#00ffd5");
         };
