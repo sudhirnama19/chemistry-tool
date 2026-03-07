@@ -121,7 +121,7 @@
                             <select id="solveMode" class="form-select" onchange="toggleInputs()">
                                 <option value="at">Final Conc [A]ₜ</option>
                                 <option value="t">Time (t)</option>
-                                <option value="k">Rate Constant (k)</option>
+                                <option value="k" selected>Rate Constant (k)</option>
                             </select>
                         </div>
                         <div class="col-12">
@@ -145,9 +145,9 @@
                 <div class="calc-card">
                     <h5 class="mb-3">Arrhenius Activation Solver</h5>
                     <div class="row g-2">
-                        <div class="col-6"><label class="form-label">k₁ at T₁ (K)</label><input type="text" id="arr_k1" class="form-control" value="0.02"></div>
+                        <div class="col-6"><label class="form-label">k₁ at T₁ (K)</label><input type="text" id="arr_k1" class="form-control" value="2.0e-2"></div>
                         <div class="col-6"><label class="form-label">T₁ (K)</label><input type="text" id="arr_t1" class="form-control" value="298"></div>
-                        <div class="col-6"><label class="form-label">k₂ at T₂ (K)</label><input type="text" id="arr_k2" class="form-control" value="0.08"></div>
+                        <div class="col-6"><label class="form-label">k₂ at T₂ (K)</label><input type="text" id="arr_k2" class="form-control" value="8.0e-2"></div>
                         <div class="col-6"><label class="form-label">T₂ (K)</label><input type="text" id="arr_t2" class="form-control" value="310"></div>
                         <div class="col-12 mt-3"><button onclick="solveArrhenius()" class="btn btn-calc w-100">SOLVE Eₐ & FREQUENCY</button></div>
                     </div>
@@ -216,14 +216,23 @@
         const colCanvas = document.getElementById('collisionCanvas');
         const colCtx = colCanvas.getContext('2d');
 
-        // Smart Parser Integration [cite: 2026-03-06]
+        /**
+         * Smart Parser [cite: 2026-03-06]
+         * Interprets inputs with '^' (like 10^-5) and 'e' (like 1.5e-3)
+         */
         function smartParser(val) {
-            if (!val || val.toString().trim() === "") return NaN;
+            if (val === null || val === undefined || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
+            
+            // Handle power notation (e.g., 10^-5 or 2^3)
             if (str.includes("^")) {
                 let parts = str.split("^");
-                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+                let base = parseFloat(parts[0]);
+                let exponent = parseFloat(parts[1]);
+                return Math.pow(base, exponent);
             }
+            
+            // parseFloat natively handles 'e' notation (e.g., 1.2e-4)
             return parseFloat(str);
         }
 
@@ -237,6 +246,8 @@
         function solveKinetics() {
             const mode = document.getElementById('solveMode').value;
             const order = parseInt(document.getElementById('order').value);
+            
+            // Apply smartParser to all numeric inputs
             const a0 = smartParser(document.getElementById('a0').value);
             const at_input = smartParser(document.getElementById('at').value);
             const k_input = smartParser(document.getElementById('k').value);
@@ -251,7 +262,7 @@
                     else if (order === 1) at_eff = a0 * Math.exp(-k_eff * t_eff);
                     else if (order === 2) at_eff = 1 / (k_eff * t_eff + (1/a0));
                     else if (order === 3) at_eff = Math.sqrt(1 / (2 * k_eff * t_eff + (1/(a0**2))));
-                    res = at_eff.toFixed(4) + " M";
+                    res = at_eff.toExponential(4) + " M";
                 } 
                 else if (mode === 't') {
                     k_eff = k_input; at_eff = at_input;
@@ -270,20 +281,22 @@
                     res = k_eff.toExponential(3);
                 }
 
+                // Generic Half-life Logic
                 if (order === 0) tHalf = a0 / (2 * k_eff);
-                else if (order === 1) tHalf = 0.693 / k_eff;
+                else if (order === 1) tHalf = Math.log(2) / k_eff;
                 else if (order === 2) tHalf = 1 / (k_eff * a0);
                 else if (order === 3) tHalf = 1.5 / (k_eff * (a0**2));
 
                 document.getElementById('res_main').innerText = res;
-                document.getElementById('res_half').innerText = tHalf.toFixed(2) + "s";
+                document.getElementById('res_half').innerText = (isFinite(tHalf) && tHalf > 0) ? tHalf.toFixed(2) + "s" : "N/A";
                 
                 updateGraph(order, a0, k_eff, tHalf);
                 if (window.MathJax) MathJax.typesetPromise();
-            } catch(e) { console.log(e); }
+            } catch(e) { console.error("Kinetics Error:", e); }
         }
 
         function solveArrhenius() {
+            // Apply smartParser to Arrhenius inputs
             const k1 = smartParser(document.getElementById('arr_k1').value);
             const t1 = smartParser(document.getElementById('arr_t1').value);
             const k2 = smartParser(document.getElementById('arr_k2').value);
@@ -291,6 +304,7 @@
             const R = 8.314;
 
             if (!isNaN(k1) && !isNaN(k2) && !isNaN(t1) && !isNaN(t2)) {
+                // Two-point Arrhenius: Ea = (R * ln(k2/k1)) / (1/T1 - 1/T2)
                 const ea = (R * Math.log(k2/k1)) / ((1/t1) - (1/t2));
                 const ea_kj = ea / 1000;
                 document.getElementById('res_ea').innerText = ea_kj.toFixed(2);
@@ -350,7 +364,8 @@
 
         function updateGraph(order, a0, k, tHalf) {
             const labels = [], data = [];
-            const maxT = isFinite(tHalf) ? tHalf * 3 : 50;
+            const maxT = (isFinite(tHalf) && tHalf > 0) ? tHalf * 4 : 50;
+            
             for(let i=0; i<=30; i++) {
                 let time = (maxT/30)*i;
                 let conc;
@@ -358,13 +373,34 @@
                 else if(order==1) conc = a0 * Math.exp(-k*time);
                 else if(order==2) conc = 1 / (k*time + (1/a0));
                 else conc = Math.sqrt(1 / (2*k*time + (1/a0**2)));
-                labels.push(time.toFixed(1)); data.push(conc.toFixed(3));
+                
+                labels.push(time.toFixed(1)); 
+                data.push(conc.toFixed(4));
             }
+            
             if(myChart) myChart.destroy();
             myChart = new Chart(document.getElementById('kineticsChart'), {
                 type: 'line',
-                data: { labels, datasets: [{ label: 'Concentration [A]', data, borderColor: '#00ffd5', fill: true, backgroundColor: 'rgba(0,255,213,0.1)', tension: 0.4, pointRadius: 0 }] },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { display: false } } }
+                data: { 
+                    labels, 
+                    datasets: [{ 
+                        label: 'Concentration [A]', 
+                        data, 
+                        borderColor: '#00ffd5', 
+                        fill: true, 
+                        backgroundColor: 'rgba(0,255,213,0.1)', 
+                        tension: 0.4, 
+                        pointRadius: 0 
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Conc (M)', color: '#94a3b8' } }, 
+                        x: { title: { display: true, text: 'Time (s)', color: '#94a3b8' } } 
+                    } 
+                }
             });
         }
 
