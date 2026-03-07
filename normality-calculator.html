@@ -385,6 +385,24 @@ input::-webkit-input-placeholder {
             out.style.display = "block";
             MathJax.typesetPromise();
         }
+
+        // Function to inject the external footer.html
+async function loadFooter() {
+    try {
+        const response = await fetch('footer.html');
+        if (response.ok) {
+            const data = await response.text();
+            document.getElementById('footer-container').innerHTML = data;
+        } else {
+            console.error('Footer file not found (404). Check the file name.');
+        }
+    } catch (error) {
+        console.error('Error loading footer:', error);
+    }
+}
+
+// Call the function when the window finishes loading
+window.addEventListener('DOMContentLoaded', loadFooter);
     </script>
 </body>
 </html>
