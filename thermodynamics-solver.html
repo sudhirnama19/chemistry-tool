@@ -37,7 +37,6 @@
             margin: 0;
         }
 
-        /* Glassmorphism Navbar */
         .navbar {
             background: rgba(15, 23, 42, 0.9) !important;
             backdrop-filter: blur(15px);
@@ -110,54 +109,15 @@
             margin: 20px 0;
             font-family: monospace;
             color: var(--accent-cyan);
+            overflow-x: auto;
+            scrollbar-width: thin;
         }
 
         .faq-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; margin-bottom: 15px; }
 
-        /* Fix for equations overflowing boxes on mobile */
-.formula-box {
-    overflow-x: auto; /* Adds horizontal scroll if math is too wide */
-    white-space: nowrap; /* Keeps equations on one line */
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    border-left: 4px solid var(--accent-cyan);
-    margin: 20px 0;
-    scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: var(--accent-cyan) transparent;
-}
-
-/* Custom scrollbar for Chrome/Safari to keep it looking premium */
-.formula-box::-webkit-scrollbar {
-    height: 4px;
-}
-.formula-box::-webkit-scrollbar-thumb {
-    background: var(--accent-cyan);
-    border-radius: 10px;
-}
-
-
-        /* Precise Font Control for Theory Section */
-.theory-section h1 {
-    font-size: 1.3rem; /* Main Title */
-    margin-bottom: 15px;
-}
-
-.theory-section p {
-    font-size: 0.8rem; /* Body Text */
-    line-height: 1.0;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.theory-section h3 {
-    font-size: 1.0rem; /* Sub-headings (Internal Energy, etc.) */
-    margin-top: 20px;
-}
-
-/* Ensure Math symbols within text stay proportional */
-.theory-section .mjx-chtml {
-    font-size: 105% !important;
-}
+        .theory-section h1 { font-size: 1.3rem; margin-bottom: 15px; }
+        .theory-section p { font-size: 0.8rem; line-height: 1.4; color: rgba(255, 255, 255, 0.9); }
+        .theory-section h3 { font-size: 1.0rem; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -192,14 +152,14 @@
                     <h2 class="h4 text-center mb-4 text-white">Ultra Thermodynamics Solver</h2>
                     
                     <div class="row g-3">
-    <div class="col-md-12"><label class="form-label">Moles ($n$)</label><input type="text" id="n" class="form-control" value="1"></div>
-    <div class="col-md-6"><label class="form-label">$T_1$ (K)</label><input type="text" id="t1" class="form-control" value="298"></div>
-    <div class="col-md-6"><label class="form-label">$T_2$ (K)</label><input type="text" id="t2" class="form-control" value="400"></div>
-    <div class="col-md-6"><label class="form-label">$V_1$ (L)</label><input type="text" id="v1" class="form-control" value="22.4"></div>
-    <div class="col-md-6"><label class="form-label">$V_2$ (L)</label><input type="text" id="v2" class="form-control" value="44.8"></div>
-    <div class="col-md-6"><label class="form-label">Poly Index ($x$)</label><input type="text" id="poly_x" class="form-control" value="1.4"></div>
-    <div class="col-md-6"><label class="form-label">$C_v$ Const ($a$)</label><input type="text" id="cv_a" class="form-control" value="12.47"></div>
-</div>
+                        <div class="col-md-12"><label class="form-label">Moles ($n$)</label><input type="text" id="n" class="form-control" value="1"></div>
+                        <div class="col-md-6"><label class="form-label">$T_1$ (K)</label><input type="text" id="t1" class="form-control" value="298"></div>
+                        <div class="col-md-6"><label class="form-label">$T_2$ (K)</label><input type="text" id="t2" class="form-control" value="400"></div>
+                        <div class="col-md-6"><label class="form-label">$V_1$ (L)</label><input type="text" id="v1" class="form-control" value="22.4"></div>
+                        <div class="col-md-6"><label class="form-label">$V_2$ (L)</label><input type="text" id="v2" class="form-control" value="44.8"></div>
+                        <div class="col-md-6"><label class="form-label">Poly Index ($x$)</label><input type="text" id="poly_x" class="form-control" value="1.4"></div>
+                        <div class="col-md-6"><label class="form-label">$C_v$ Const ($a$)</label><input type="text" id="cv_a" class="form-control" value="12.47"></div>
+                    </div>
 
                     <button id="analyze-btn" class="btn btn-analyze mt-4">ANALYZE PROCESS</button>
 
@@ -217,23 +177,24 @@
         </div>
 
         <section class="theory-section">
-    <h2 class="mb-4">Fundamental Thermodynamic Equations</h2>
-    <div class="formula-box">
-        <div class="mb-3">
-            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Enthalpy:</span>
-            $\Delta H = \Delta U + P\Delta V$
-        </div>
-        <div class="mb-3">
-            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Entropy Change:</span>
-            $\Delta S = nC_v\ln(T_2/T_1) + nR\ln(V_2/V_1)$
-        </div>
-        <div>
-            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Gibbs Energy:</span>
-            $\Delta G = \Delta H - T\Delta S$
-        </div>
-    </div>
-</section>
+            <h2 class="mb-4">Fundamental Thermodynamic Equations</h2>
+            <div class="formula-box">
+                <div class="mb-3">
+                    <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Enthalpy:</span>
+                    $\Delta H = \Delta U + P\Delta V$
+                </div>
+                <div class="mb-3">
+                    <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Entropy Change:</span>
+                    $\Delta S = nC_v\ln(T_2/T_1) + nR\ln(V_2/V_1)$
+                </div>
+                <div>
+                    <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Gibbs Energy:</span>
+                    $\Delta G = \Delta H - T\Delta S$
+                </div>
+            </div>
+        </section>
 
+        <section class="theory-section">
             <h2 class="mt-5">Frequently Asked Questions (FAQ)</h2>
             <div class="faq-item">
                 <strong>What is the difference between $\Delta U$ and $\Delta H$?</strong>
@@ -253,19 +214,106 @@
 
     <div id="footer-container"></div>
 
-    <script src="js/thermodynamics-solver.js"></script>
     <script>
+        /**
+         * Smart Parser Integration [cite: 2026-03-06]
+         * Handles advanced scientific notation like 10^-5 and 1.5e-3
+         */
+        function smartParser(val) {
+            if (!val || val.toString().trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+            if (str.includes("^")) {
+                let parts = str.split("^");
+                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+            }
+            return parseFloat(str);
+        }
+
+        /**
+         * Utility to format numbers into scientific or standard notation 
+         * depending on magnitude (The "Pro" Look)
+         */
+        function formatResult(num, unit) {
+            if (isNaN(num)) return "N/A";
+            const absNum = Math.abs(num);
+            if (absNum === 0) return `0 ${unit}`;
+            // Use scientific notation for very small or very large values
+            if (absNum < 0.01 || absNum > 9999) {
+                return `${num.toExponential(3)} ${unit}`;
+            }
+            return `${num.toFixed(2)} ${unit}`;
+        }
+
+        document.getElementById('analyze-btn').addEventListener('click', () => {
+            // Inputs parsed via smartParser
+            const n = smartParser(document.getElementById('n').value);
+            const t1 = smartParser(document.getElementById('t1').value);
+            const t2 = smartParser(document.getElementById('t2').value);
+            const v1 = smartParser(document.getElementById('v1').value);
+            const v2 = smartParser(document.getElementById('v2').value);
+            const x = smartParser(document.getElementById('poly_x').value);
+            const cv = smartParser(document.getElementById('cv_a').value);
+            const R = 8.314;
+
+            if (isNaN(n) || isNaN(t1) || isNaN(t2)) {
+                alert("Please check your input values.");
+                return;
+            }
+
+            // --- Calculation Logic ---
+            // 1. Internal Energy (dU = n * Cv * dT)
+            const dU = n * cv * (t2 - t1);
+            
+            // 2. Work Done (Polytropic Work = nR(T2-T1)/(1-x))
+            // Note: If x=1, it's isothermal: W = nRT ln(V2/V1)
+            let W;
+            if (Math.abs(x - 1) < 0.0001) {
+                W = n * R * t1 * Math.log(v2 / v1);
+            } else {
+                W = (n * R * (t2 - t1)) / (1 - x);
+            }
+
+            // 3. Enthalpy (dH = dU + nR*dT)
+            const dH = dU + (n * R * (t2 - t1));
+
+            // 4. Entropy (dS = nCv ln(T2/T1) + nR ln(V2/V1))
+            const dS = (n * cv * Math.log(t2 / t1)) + (n * R * Math.log(v2 / v1));
+
+            // 5. Gibbs Free Energy (dG = dH - T2*dS) - Approximated at T2
+            const dG = dH - (t2 * dS);
+
+            // --- Output Update ---
+            document.getElementById('res_u').innerText = formatResult(dU, "J");
+            document.getElementById('res_w').innerText = formatResult(W, "J");
+            document.getElementById('res_h').innerText = formatResult(dH, "J");
+            document.getElementById('res_s').innerText = formatResult(dS, "J/K");
+            document.getElementById('res_g').innerText = formatResult(dG, "J");
+
+            const spontText = document.getElementById('res_spont');
+            if (dG < 0) {
+                spontText.innerText = "SPONTANEOUS PROCESS";
+                spontText.style.color = "#00ffd5";
+            } else if (dG > 0) {
+                spontText.innerText = "NON-SPONTANEOUS";
+                spontText.style.color = "#ff4757";
+            } else {
+                spontText.innerText = "EQUILIBRIUM";
+                spontText.style.color = "#3b82f6";
+            }
+
+            document.getElementById('result-area').style.display = 'block';
+
+            // MathJax re-render
+            setTimeout(() => { if(window.MathJax) MathJax.typesetPromise(); }, 100);
+        });
+
         // Load Footer
         fetch("footer.html")
             .then(res => res.text())
             .then(data => {
-                document.getElementById("footer-container").innerHTML = data;
-            });
-            
-        // Trigger for MathJax update after calculation (Optional, depends on your JS output)
-        document.getElementById('analyze-btn').addEventListener('click', () => {
-            setTimeout(() => { if(window.MathJax) MathJax.typesetPromise(); }, 100);
-        });
+                const container = document.getElementById("footer-container");
+                if (container) container.innerHTML = data;
+            }).catch(() => {});
     </script>
 </body>
 </html>
