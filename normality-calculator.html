@@ -4,158 +4,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normality Pro Suite | Chemistry Spark Lab</title>
+    <title>Normality Pro | Chemistry Spark Lab</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <script>
         window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$']]
-            }
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --tab-bg: #334155; }
-        body { background-color: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 30px; }
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --tab-bg: #334155; --text-dim: #94a3b8; }
+        body { background-color: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; }
         
-        .main-header { padding: 15px; background: #1e293b; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .main-header a { text-decoration: none; color: var(--accent); font-size: 1.3rem; font-weight: 800; }
+        .main-header { padding: 20px; text-align: center; background: rgba(30, 41, 59, 0.5); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .main-header h1 { color: var(--accent); font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin: 0; }
 
-        /* SCROLLABLE PILL TABS */
-        .tab-wrapper {
-            overflow-x: auto;
-            white-space: nowrap;
-            display: flex;
-            gap: 10px;
-            padding: 15px 10px;
-            -webkit-overflow-scrolling: touch;
+        .container-narrow { max-width: 650px; margin: auto; padding: 15px; }
+
+        /* SUBTLE CARD DESIGN */
+        .info-card { 
+            background: var(--card); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        .tab-wrapper::-webkit-scrollbar { display: none; }
+        .section-title { color: var(--accent); font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 
-        .calc-tab {
+        /* ROUNDED PILL TABS - NO OVERLAP */
+        .tab-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 5px 5px 15px 5px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .tab-scroll-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .pill-tab {
             background: var(--tab-bg);
-            color: #cbd5e1;
+            color: var(--text-dim);
             border: none;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 50px;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.85rem;
+            white-space: nowrap;
             transition: 0.3s;
             cursor: pointer;
         }
-        .calc-tab.active { background: var(--accent); color: #0f172a; box-shadow: 0 4px 12px rgba(0,255,213,0.3); }
+        .pill-tab.active {
+            background: var(--accent);
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.3);
+        }
 
-        .content-section { max-width: 600px; margin: auto; padding: 15px; }
-        .solver-card { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .form-label { color: var(--accent); font-weight: 600; margin-top: 12px; font-size: 0.85rem; }
+        /* CALCULATOR STYLING */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
         .form-control {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            border: 1px solid #475569 !important;
+            background: #0f172a !important;
+            color: white !important;
+            border: 1px solid #334155 !important;
+            border-radius: 12px;
             padding: 12px;
-            border-radius: 10px;
+        }
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0f172a; border: none; width: 100%; padding: 14px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px;
         }
 
-        .btn-solve {
-            background: linear-gradient(135deg, #007bff, var(--accent));
-            color: #0f172a; font-weight: 800; width: 100%; padding: 14px;
-            border-radius: 12px; border: none; margin-top: 20px;
-        }
-
-        .result-box {
-            display: none; margin-top: 20px; padding: 15px;
-            background: rgba(0,255,213,0.1); border-radius: 12px; border-left: 4px solid var(--accent);
+        .result-display {
+            display: none; margin-top: 15px; padding: 15px;
+            background: rgba(0, 255, 213, 0.05);
+            border-radius: 12px; border-left: 4px solid var(--accent);
         }
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
+
+        .faq-item { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .faq-q { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+        .faq-a { font-size: 0.85rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
 
-    <header class="main-header"><a href="index.html">CHEMISTRY SPARK LAB</a></header>
+    <header class="main-header">
+        <h1>CHEMISTRY SPARK LAB</h1>
+    </header>
 
-    <div class="tab-wrapper">
-        <button class="calc-tab active" onclick="showCalc('gen', this)">General $N$</button>
-        <button class="calc-tab" onclick="showCalc('mol', this)">$M \to N$</button>
-        <button class="calc-tab" onclick="showCalc('tit', this)">Acid-Base ($N_1V_1$)</button>
-        <button class="calc-tab" onclick="showCalc('dil', this)">Dilution</button>
-        <button class="calc-tab" onclick="showCalc('mix', this)">Mixing ($N_R$)</button>
-    </div>
-
-    <div class="content-section">
+    <div class="container-narrow">
         
-        <div id="gen" class="tab-panel active">
-            <div class="solver-card">
-                <h5 class="text-center">Weight / Eq. Weight</h5>
-                <label class="form-label">Weight of Solute (g)</label>
-                <input type="text" id="w_g" class="form-control" placeholder="e.g. 4.9">
-                <label class="form-label">Equivalent Weight</label>
-                <input type="text" id="eq_w" class="form-control" placeholder="e.g. 49">
-                <label class="form-label">Volume (L)</label>
-                <input type="text" id="v_l" class="form-control" placeholder="0.5">
-                <button onclick="calcGen()" class="btn-solve">Calculate $N$</button>
-                <div id="res_gen" class="result-box"></div>
+        <div class="info-card">
+            <div class="section-title">Fundamental Normality ($N$)</div>
+            <p style="font-size: 0.9rem; color: var(--text-dim);">
+                Normality is the number of gram-equivalents of solute dissolved per liter of solution. Unlike Molarity, it accounts for the reactive capacity of the species.
+            </p>
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; font-size: 0.85rem;">
+                $N = \frac{\text{Mass (g)}}{\text{Eq. Wt} \times \text{Vol (L)}}$ <br>
+                $\text{Eq. Wt} = \frac{\text{Molar Mass}}{\text{n-factor}}$
             </div>
         </div>
 
-        <div id="mol" class="tab-panel">
-            <div class="solver-card">
-                <h5 class="text-center">$N = M \times \text{n-factor}$</h5>
-                <label class="form-label">Molarity (M)</label>
-                <input type="text" id="m_val" class="form-control">
-                <label class="form-label">n-factor (Acidity/Basicity)</label>
-                <input type="text" id="nf_val" class="form-control">
-                <button onclick="calcMol()" class="btn-solve">Convert to $N$</button>
-                <div id="res_mol" class="result-box"></div>
-            </div>
+        <div class="tab-scroll-container">
+            <button class="pill-tab active" onclick="switchCalc('gen', this)">General $N$</button>
+            <button class="pill-tab" onclick="switchCalc('mol', this)">$M \to N$</button>
+            <button class="pill-tab" onclick="switchCalc('dil', this)">Dilution</button>
+            <button class="pill-tab" onclick="switchCalc('mix', this)">Mixing ($N_R$)</button>
         </div>
 
-        <div id="tit" class="tab-panel">
-            <div class="solver-card">
-                <h5 class="text-center">Acid-Base Titration</h5>
-                <div class="row g-2">
-                    <div class="col-6"><label class="form-label">$N_{acid}$</label><input type="text" id="na" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$V_{acid}$</label><input type="text" id="va" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$N_{base}$</label><input type="text" id="nb" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$V_{base}$</label><input type="text" id="vb" class="form-control"></div>
-                </div>
-                <button onclick="calcTit()" class="btn-solve">Solve Titration</button>
-                <div id="res_tit" class="result-box"></div>
+        <div id="gen" class="tab-panel info-card active">
+            <h6 class="text-center mb-3">Weight-Based Solver</h6>
+            <label class="form-label">Mass of Solute (g)</label>
+            <input type="text" id="mass" class="form-control" placeholder="e.g. 4.9">
+            <label class="form-label">Molar Mass (g/mol)</label>
+            <input type="text" id="mw" class="form-control" placeholder="e.g. 98">
+            <div class="row">
+                <div class="col-6"><label class="form-label">Volume (mL)</label><input type="text" id="vol" class="form-control" placeholder="500"></div>
+                <div class="col-6"><label class="form-label">n-factor</label><input type="text" id="nf" class="form-control" placeholder="2"></div>
             </div>
+            <button onclick="calculateGen()" class="btn-calc">Calculate Normality</button>
+            <div id="res_gen" class="result-display"></div>
         </div>
 
-        <div id="dil" class="tab-panel">
-            <div class="solver-card">
-                <h5 class="text-center">Dilution ($N_1V_1 = N_2V_2$)</h5>
-                <div class="row g-2">
-                    <div class="col-6"><label class="form-label">$N_1$</label><input type="text" id="n1" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$V_1$</label><input type="text" id="v1" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$N_2$</label><input type="text" id="n2" class="form-control"></div>
-                    <div class="col-6"><label class="form-label">$V_2$</label><input type="text" id="v2" class="form-control"></div>
-                </div>
-                <button onclick="calcDil()" class="btn-solve">Solve Dilution</button>
-                <div id="res_dil" class="result-box"></div>
-            </div>
+        <div class="info-card">
+            <div class="section-title">Advanced Research & Exams</div>
+            <p style="font-size: 0.85rem;">
+                <strong>JEE Advanced & GATE:</strong> Focuses on "Double Titrations" and Back-Titration where $N$ simplifies calculations by using the law: $N_1V_1 = N_2V_2$ without needing balanced stoichiometric coefficients.
+            </p>
+            <p style="font-size: 0.85rem;">
+                <strong>Unique Fact:</strong> Normality is **temperature-dependent** because it is based on volume. In high-precision CSIR-NET research, Molality is preferred for thermal stability.
+            </p>
         </div>
 
-        <div id="mix" class="tab-panel">
-            <div class="solver-card">
-                <h5 class="text-center">Resultant Normality ($N_R$)</h5>
-                <div id="mix-inputs">
-                    <div class="row g-2 mb-2">
-                        <div class="col-6"><input type="text" class="form-control mn" placeholder="Normality"></div>
-                        <div class="col-6"><input type="text" class="form-control mv" placeholder="Volume (mL)"></div>
-                    </div>
-                </div>
-                <button class="btn btn-outline-info btn-sm w-100 mt-2" onclick="addMix()">+ Add Solution</button>
-                <button onclick="calcMix()" class="btn-solve">Calculate $N_R$</button>
-                <div id="res_mix" class="result-box"></div>
+        <div class="info-card">
+            <div class="section-title">Frequently Asked Questions</div>
+            <div class="faq-item">
+                <div class="faq-q">Can Normality be less than Molarity?</div>
+                <div class="faq-a">No. Since $n$-factor is $\ge 1$, $N$ is always $\ge M$.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">What is the n-factor of $KMnO_4$?</div>
+                <div class="faq-a">It depends on the medium: 5 (Acidic), 3 (Neutral), and 1 (Strongly Alkaline).</div>
             </div>
         </div>
 
@@ -168,83 +163,23 @@
             try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
         }
 
-        function showCalc(id, btn) {
+        function switchCalc(id, btn) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
             if(window.MathJax) MathJax.typeset();
         }
 
-        // Logic for Formula: N = Weight / (EqW * V)
-        function calcGen() {
-            let w = smartParser(document.getElementById('w_g').value);
-            let eq = smartParser(document.getElementById('eq_w').value);
-            let v = smartParser(document.getElementById('v_l').value);
-            let res = w / (eq * v);
-            document.getElementById('res_gen').innerHTML = `<strong>Normality:</strong> ${res.toFixed(5)} N`;
-            document.getElementById('res_gen').style.display = "block";
-        }
-
-        // Logic for Formula: N = M * n-factor
-        function calcMol() {
-            let m = smartParser(document.getElementById('m_val').value);
-            let nf = smartParser(document.getElementById('nf_val').value);
-            document.getElementById('res_mol').innerHTML = `<strong>Normality:</strong> ${(m * nf).toFixed(5)} N`;
-            document.getElementById('res_mol').style.display = "block";
-        }
-
-        // Titration Solver
-        function calcTit() {
-            let na = smartParser(document.getElementById('na').value);
-            let va = smartParser(document.getElementById('va').value);
-            let nb = smartParser(document.getElementById('nb').value);
-            let vb = smartParser(document.getElementById('vb').value);
-            let ans = "";
-            if (isNaN(na)) ans = "Acid Normality: " + (nb * vb / va).toFixed(4);
-            else if (isNaN(va)) ans = "Acid Volume: " + (nb * vb / na).toFixed(4);
-            else if (isNaN(nb)) ans = "Base Normality: " + (na * va / vb).toFixed(4);
-            else if (isNaN(vb)) ans = "Base Volume: " + (na * va / nb).toFixed(4);
-            document.getElementById('res_tit').innerText = ans;
-            document.getElementById('res_tit').style.display = "block";
-        }
-
-        // Dilution Solver
-        function calcDil() {
-            let n1 = smartParser(document.getElementById('n1').value);
-            let v1 = smartParser(document.getElementById('v1').value);
-            let n2 = smartParser(document.getElementById('n2').value);
-            let v2 = smartParser(document.getElementById('v2').value);
-            let ans = "";
-            if (isNaN(n1)) ans = "N1: " + (n2 * v2 / v1).toFixed(4);
-            else if (isNaN(v1)) ans = "V1: " + (n2 * v2 / n1).toFixed(4);
-            else if (isNaN(n2)) ans = "N2: " + (n1 * v1 / v2).toFixed(4);
-            else if (isNaN(v2)) ans = "V2: " + (n1 * v1 / n2).toFixed(4);
-            document.getElementById('res_dil').innerText = ans;
-            document.getElementById('res_dil').style.display = "block";
-        }
-
-        function addMix() {
-            let d = document.createElement('div');
-            d.className = "row g-2 mb-2";
-            d.innerHTML = `<div class="col-6"><input type="text" class="form-control mn" placeholder="N"></div>
-                           <div class="col-6"><input type="text" class="form-control mv" placeholder="Vol (mL)"></div>`;
-            document.getElementById('mix-inputs').appendChild(d);
-        }
-
-        // Formula: NR = (N1V1 + N2V2...) / (V1 + V2...)
-        function calcMix() {
-            let ns = document.getElementsByClassName('mn');
-            let vs = document.getElementsByClassName('mv');
-            let sumNV = 0, sumV = 0;
-            for(let i=0; i<ns.length; i++){
-                let n = smartParser(ns[i].value);
-                let v = smartParser(vs[i].value);
-                if(!isNaN(n) && !isNaN(v)){ sumNV += (n*v); sumV += v; }
-            }
-            document.getElementById('res_mix').innerHTML = `<strong>Resultant $N_R$:</strong> ${(sumNV/sumV).toFixed(5)} N`;
-            document.getElementById('res_mix').style.display = "block";
-            MathJax.typeset();
+        function calculateGen() {
+            let m = smartParser(document.getElementById('mass').value);
+            let mw = smartParser(document.getElementById('mw').value);
+            let v = smartParser(document.getElementById('vol').value);
+            let nf = smartParser(document.getElementById('nf').value);
+            let n = (m * 1000 * nf) / (mw * v);
+            let out = document.getElementById('res_gen');
+            out.innerHTML = `<strong>Result:</strong> ${n.toFixed(5)} N <br><small>Eq. Wt: ${(mw/nf).toFixed(2)} g/eq</small>`;
+            out.style.display = "block";
         }
     </script>
 </body>
