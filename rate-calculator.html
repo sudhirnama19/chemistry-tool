@@ -24,28 +24,24 @@
             --accent-blue: #3b82f6;
             --text-main: #f8fafc;
         }
-
         body {
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             min-height: 100vh; padding-top: 90px;
         }
-
         .navbar {
             background: rgba(15, 23, 42, 0.9) !important;
             backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             height: 70px; position: fixed; top: 0; width: 100%; z-index: 1000;
             display: flex; align-items: center; padding: 0 20px;
         }
-
         .brand-text {
             font-weight: 800; font-size: 1.4rem;
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-cyan));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-decoration: none;
         }
-
         .calc-card {
             background: var(--card-bg); backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
