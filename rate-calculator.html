@@ -56,7 +56,6 @@
             color: white; border-radius: 10px; padding: 10px;
         }
 
-        /* Fixed Stat Card Overflow */
         .stat-card {
             background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 15px;
             text-align: center; border-top: 3px solid var(--accent-cyan);
@@ -90,27 +89,27 @@
     <div class="container">
 
         <section class="calc-card">
-    <h1 style="color:var(--accent-cyan); font-weight:800;">Rate of Reaction: Definition & Dynamics</h1>
-    <p>The <strong>Rate of Reaction</strong> is the speed at which reactants are converted into products. It is expressed as the change in molar concentration per unit time ($M \cdot s^{-1}$ or $mol \cdot L^{-1}s^{-1}$).</p>
-    
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <h5>The Rate Equation</h5>
-            <div class="formula-box">
-                Rate ($r$) $= \pm \frac{1}{\nu} \frac{d[C]}{dt}$
+            <h1 style="color:var(--accent-cyan); font-weight:800;">Rate of Reaction: Definition & Dynamics</h1>
+            <p>The <strong>Rate of Reaction</strong> is the speed at which reactants are converted into products. It is expressed as the change in molar concentration per unit time ($M \cdot s^{-1}$ or $mol \cdot L^{-1}s^{-1}$).</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>The Rate Equation</h5>
+                    <div class="formula-box">
+                        Rate ($r$) $= \pm \frac{1}{\nu} \frac{d[C]}{dt}$
+                    </div>
+                    <p><small>Where $\nu$ is the stoichiometric coefficient and $[C]$ is the concentration.</small></p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Real-World Examples</h5>
+                    <ul>
+                        <li><strong>Fast:</strong> Precipitation of $AgCl$ (Instantaneous).</li>
+                        <li><strong>Moderate:</strong> Hydrolysis of cane sugar.</li>
+                        <li><strong>Slow:</strong> Rusting of iron or radioactive decay.</li>
+                    </ul>
+                </div>
             </div>
-            <p><small>Where $\nu$ is the stoichiometric coefficient and $[C]$ is the concentration.</small></p>
-        </div>
-        <div class="col-md-6">
-            <h5>Real-World Examples</h5>
-            <ul>
-                <li><strong>Fast:</strong> Precipitation of $AgCl$ (Instantaneous).</li>
-                <li><strong>Moderate:</strong> Hydrolysis of cane sugar.</li>
-                <li><strong>Slow:</strong> Rusting of iron or radioactive decay.</li>
-            </ul>
-        </div>
-    </div>
-</section>
+        </section>
         
         <div class="row g-4">
             <div class="col-lg-5">
@@ -164,12 +163,12 @@
                     </div>
 
                     <div class="calc-card mt-3">
-    <label class="form-label">Maxwell-Boltzmann Distribution (Energy vs. Temp)</label>
-    <canvas id="boltzmannChart" style="max-height: 200px;"></canvas>
-    <div class="mt-2 text-center">
-        <small style="color:var(--accent-cyan)">Area beyond dashed line = Effective Collisions ($E > E_a$)</small>
-    </div>
-</div>
+                        <label class="form-label">Maxwell-Boltzmann Distribution (Energy vs. Temp)</label>
+                        <canvas id="boltzmannChart" style="max-height: 200px;"></canvas>
+                        <div class="mt-2 text-center">
+                            <small style="color:var(--accent-cyan)">Area beyond dashed line = Effective Collisions ($E > E_a$)</small>
+                        </div>
+                    </div>
                     <canvas id="kineticsChart" style="max-height: 220px;"></canvas>
                     <div class="mt-4">
                         <label class="form-label">Molecular Collision Simulation</label>
@@ -213,9 +212,11 @@
     <script>
         let myChart = null;
         let particles = [];
+        let boltzChartInstance = null;
         const colCanvas = document.getElementById('collisionCanvas');
         const colCtx = colCanvas.getContext('2d');
 
+        // Smart Parser Integration [cite: 2026-03-06]
         function smartParser(val) {
             if (!val || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
@@ -223,7 +224,6 @@
                 let parts = str.split("^");
                 return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
             }
-            if (str.includes("e")) return parseFloat(str);
             return parseFloat(str);
         }
 
@@ -270,7 +270,6 @@
                     res = k_eff.toExponential(3);
                 }
 
-                // Half life calculation
                 if (order === 0) tHalf = a0 / (2 * k_eff);
                 else if (order === 1) tHalf = 0.693 / k_eff;
                 else if (order === 2) tHalf = 1 / (k_eff * a0);
@@ -291,10 +290,62 @@
             const t2 = smartParser(document.getElementById('arr_t2').value);
             const R = 8.314;
 
-            if (!isNaN(k1) && !isNaN(k2)) {
+            if (!isNaN(k1) && !isNaN(k2) && !isNaN(t1) && !isNaN(t2)) {
                 const ea = (R * Math.log(k2/k1)) / ((1/t1) - (1/t2));
-                document.getElementById('res_ea').innerText = (ea/1000).toFixed(2);
+                const ea_kj = ea / 1000;
+                document.getElementById('res_ea').innerText = ea_kj.toFixed(2);
+                updateBoltzmann(ea_kj);
             }
+        }
+
+        function updateBoltzmann(Ea) {
+            const ctx = document.getElementById('boltzmannChart').getContext('2d');
+            const R = 8.314;
+            const T = 298; 
+            const labels = [];
+            const data = [];
+
+            for (let e = 0; e <= 150; e += 2) {
+                let fE = (1 / (R * T / 1000)) * Math.exp(-e / (R * T / 1000));
+                labels.push(e);
+                data.push(fE);
+            }
+
+            if (boltzChartInstance) boltzChartInstance.destroy();
+
+            boltzChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Fraction of Molecules',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return null;
+                            const gradient = ctx.createLinearGradient(0, 0, chartArea.right, 0);
+                            const stop = Math.min(1, Math.max(0, Ea / 150));
+                            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+                            gradient.addColorStop(stop, 'rgba(59, 130, 246, 0.1)');
+                            gradient.addColorStop(stop, 'rgba(0, 255, 213, 0.4)');
+                            gradient.addColorStop(1, 'rgba(0, 255, 213, 0.4)');
+                            return gradient;
+                        },
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { title: { display: true, text: 'Energy (kJ/mol)', color: '#94a3b8' } },
+                        y: { display: false }
+                    }
+                }
+            });
         }
 
         function updateGraph(order, a0, k, tHalf) {
@@ -317,7 +368,6 @@
             });
         }
 
-        // --- Collision Logic ---
         class Particle {
             constructor() { this.reset(); }
             reset() {
@@ -349,104 +399,16 @@
             animate();
         }
 
-        fetch('footer.html').then(res => res.text()).then(d => document.getElementById('footer-container').innerHTML = d);
-
-        window.onload = () => { toggleInputs(); initCollision(); solveKinetics(); };
+        window.onload = () => { 
+            toggleInputs(); 
+            initCollision(); 
+            solveKinetics(); 
+            updateBoltzmann(50);
+            fetch('footer.html').then(res => res.text()).then(d => {
+                const f = document.getElementById('footer-container');
+                if(f) f.innerHTML = d;
+            }).catch(() => {});
+        };
     </script>
-
-
-
-
-
-
-    
-
-<script>
-// Add this function to your existing <script> section
-function updateBoltzmann(Ea_input) {
-    const ctx = document.getElementById('boltzmannChart').getContext('2d');
-    const Ea = Ea_input || 50; // kJ/mol
-    const R = 8.314;
-    const T = 298; // Standard Temp for visualization
-    
-    const labels = [];
-    const data = [];
-    const thresholdIdx = Math.floor(Ea);
-
-    for (let e = 0; e <= 150; e += 2) {
-        // Boltzmann distribution formula: f(E) = (1/RT) * exp(-E/RT)
-        let fE = (1 / (R * T / 1000)) * Math.exp(-e / (R * T / 1000));
-        labels.push(e);
-        data.push(fE);
-    }
-
-    if (window.boltzChartInstance) window.boltzChartInstance.destroy();
-
-    window.boltzChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Fraction of Molecules',
-                data: data,
-                borderColor: '#3b82f6',
-                fill: true,
-                backgroundColor: (context) => {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-                    if (!chartArea) return null;
-                    // Color the area beyond Ea differently to show effective collisions
-                    const gradient = ctx.createLinearGradient(0, 0, chartArea.right, 0);
-                    const stop = Ea / 150;
-                    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
-                    gradient.addColorStop(stop, 'rgba(59, 130, 246, 0.1)');
-                    gradient.addColorStop(stop, 'rgba(0, 255, 213, 0.4)');
-                    gradient.addColorStop(1, 'rgba(0, 255, 213, 0.4)');
-                    return gradient;
-                },
-                tension: 0.4,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            plugins: { 
-                legend: { display: false },
-                annotation: { // Vertical line for Ea
-                    annotations: {
-                        line1: {
-                            type: 'line',
-                            xMin: Ea,
-                            xMax: Ea,
-                            borderColor: '#00ffd5',
-                            borderWidth: 2,
-                            borderDash: [6, 6]
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: { title: { display: true, text: 'Energy (kJ/mol)', color: '#94a3b8' } },
-                y: { display: false }
-            }
-        }
-    });
-}
-
-// Modify your solveArrhenius to call this:
-function solveArrhenius() {
-    const k1 = smartParser(document.getElementById('arr_k1').value);
-    const t1 = smartParser(document.getElementById('arr_t1').value);
-    const k2 = smartParser(document.getElementById('arr_k2').value);
-    const t2 = smartParser(document.getElementById('arr_t2').value);
-    const R = 8.314;
-
-    if (!isNaN(k1) && !isNaN(k2)) {
-        const ea = (R * Math.log(k2/k1)) / ((1/t1) - (1/t2));
-        const ea_kj = ea / 1000;
-        document.getElementById('res_ea').innerText = ea_kj.toFixed(2);
-        updateBoltzmann(ea_kj); // Update visual distribution
-    }
-}
-</script>
 </body>
 </html>
