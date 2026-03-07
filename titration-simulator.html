@@ -16,6 +16,7 @@
             margin: 0; overflow-x: hidden; 
         }
 
+        /* Fixed Blue Block Issue in Header */
         .navbar {
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -30,15 +31,16 @@
             text-decoration: none;
         }
 
-        .content-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .content-container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
 
         .solver-card {
             background: var(--card); border-radius: 24px; padding: 35px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
         }
 
-        .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 30px; margin-bottom: 30px; }
 
         label { color: var(--accent); font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; display: block; }
         
@@ -61,9 +63,9 @@
         }
 
         .result-box {
-            padding: 30px; background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
-            border-radius: 20px; border: 1px solid rgba(0, 255, 213, 0.2);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+            padding: 30px; background: rgba(0,0,0,0.25);
+            border-radius: 20px; border-left: 5px solid var(--accent);
+            height: 100%;
         }
 
         .graph-wrapper {
@@ -73,10 +75,16 @@
 
         canvas { width: 100% !important; height: auto !important; }
 
-        .theory-section { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 30px; margin-top: 40px; }
-        .theory-section h2 { color: var(--accent); font-size: 1.6rem; border-left: 4px solid var(--accent); padding-left: 15px; }
-
-        .badge { background: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; vertical-align: middle; }
+        /* SEO Content Styling */
+        .theory-section { 
+            background: rgba(255,255,255,0.03); border-radius: 20px; padding: 35px; 
+            margin-top: 30px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .theory-section h2 { color: var(--accent); margin-top: 0; font-size: 1.8rem; }
+        .theory-section h3 { color: var(--primary); margin-top: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .theory-item { margin-bottom: 25px; }
+        .theory-item strong { color: var(--accent); display: block; margin-bottom: 8px; font-size: 1.05rem; }
+        .theory-item p { opacity: 0.9; font-size: 0.95rem; line-height: 1.6; margin: 0; }
 
         @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
@@ -89,12 +97,12 @@
 <body>
 
     <nav class="navbar">
-        <a class="brand-text" href="index.html">Chemistry Spark Lab<span class="badge">PRO</span></a>
+        <a class="brand-text" href="index.html">Chemistry Spark Lab</a>
     </nav>
 
     <div class="content-container">
         <div class="solver-card">
-            <h1 style="text-align: center; margin-bottom: 30px; font-weight: 900; letter-spacing: -1px;">Titration Lab Simulator <span style="color:var(--accent)">2.0</span></h1>
+            <h1 style="text-align: center; margin-bottom: 30px; font-weight: 800;">Titration Simulator 2.0</h1>
             
             <div class="grid">
                 <div class="controls">
@@ -102,47 +110,47 @@
                         <div>
                             <label>Mode</label>
                             <select id="mode" onchange="update()">
-                                <option value="ph">Potentiometric (pH)</option>
-                                <option value="cond">Conductometric (κ)</option>
+                                <option value="ph">pH Titration</option>
+                                <option value="cond">Conductometric</option>
                             </select>
                         </div>
                         <div>
-                            <label>Acid Molecule</label>
+                            <label>Acid Type</label>
                             <select id="acidType" onchange="update()">
-                                <option value="mono">Monoprotic (HCl, CH₃COOH)</option>
-                                <option value="di">Diprotic (H₂SO₄, H₂C₂O₄)</option>
+                                <option value="mono">Monoprotic</option>
+                                <option value="di">Diprotic (H₂A)</option>
                             </select>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
-                            <label>Acid Molarity (M)</label>
+                            <label>Acid Conc (M)</label>
                             <input type="text" id="Ca" value="0.1" oninput="update()">
                         </div>
                         <div>
-                            <label>Acid Volume (mL)</label>
+                            <label>Acid Vol (mL)</label>
                             <input type="text" id="Va" value="50" oninput="update()">
                         </div>
                     </div>
 
-                    <label>Titrant (NaOH) Molarity (M)</label>
+                    <label>Titrant (Base) Concentration (M)</label>
                     <input type="text" id="Cb" value="0.1" style="margin-bottom: 15px;" oninput="update()">
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
-                            <label>Dissociation $K_{a1}$</label>
-                            <input type="text" id="Ka1" value="1.8e-5" placeholder="e.g. 10^-5" oninput="update()">
+                            <label>$K_{a1}$ (Scientific)</label>
+                            <input type="text" id="Ka1" value="1.8e-5" oninput="update()">
                         </div>
                         <div>
-                            <label>Dissociation $K_{a2}$</label>
-                            <input type="text" id="Ka2" value="10^-9" placeholder="e.g. 1e-9" oninput="update()">
+                            <label>$K_{a2}$ (Scientific)</label>
+                            <input type="text" id="Ka2" value="10^-9" oninput="update()">
                         </div>
                     </div>
 
                     <div class="slider-container">
-                        <label>Volume of NaOH added: <span id="displayV" style="color:var(--accent); font-size: 1.1rem;">0.00 mL</span></label>
-                        <input type="range" min="0" max="150" step="0.1" id="Vb" class="slider" oninput="update()">
+                        <label>Added Base Volume: <span id="displayV" style="color:var(--accent); font-weight:bold;">0.0 mL</span></label>
+                        <input type="range" min="0" max="150" step="0.5" id="Vb" class="slider" oninput="update()">
                     </div>
                 </div>
 
@@ -151,84 +159,48 @@
             </div>
 
             <div class="graph-wrapper">
-                <canvas id="graph" width="1000" height="450"></canvas>
+                <canvas id="graph" width="1000" height="420"></canvas>
             </div>
         </div>
 
         <section class="theory-section">
-            <h2>Research-Grade Methodology</h2>
-            <p>This simulator utilizes <strong>Ionic Mobility Summation</strong>. Conductivity is calculated as:</p>
-            <p style="text-align:center;">$$\kappa = \sum (C_i \cdot z_i \cdot \lambda_i)$$</p>
-            <p>Where $\lambda$ represents the molar ionic conductivity (limiting) of species like $H^+$ ($349.6$), $OH^-$ ($199.1$), and $Na^+$ ($50.1$). Unlike basic simulators, we factor in the <strong>Dilution Effect</strong>—as the burette adds liquid, the total volume increases, causing the conductivity slopes to curve realistically.</p>
+            <h2>🧪 Acid-Base Titration Theory</h2>
+            <p>Titration is a fundamental quantitative analytical technique used to determine the unknown concentration of an analyte by reacting it with a standard solution (titrant) of known concentration.</p>
+            
+            <div style="background: rgba(0, 255, 213, 0.05); border-left: 4px solid var(--accent); padding: 20px; margin: 20px 0; border-radius: 0 10px 10px 0;">
+                <strong style="color:var(--accent)">Advanced Research Methodology:</strong>
+                <p style="margin-top:10px;">This simulator utilizes <strong>Ionic Mobility Summation</strong>. Conductivity is calculated as $\kappa = \sum (C_i \cdot z_i \cdot \lambda_i)$, accounting for the <strong>Dilution Effect</strong> as the total volume increases, providing research-grade accuracy unmatched by standard online tools.</p>
+            </div>
+
+            <h3>Key Equations & Principles</h3>
+            <ul style="line-height: 2; opacity: 0.9;">
+                <li><strong>Equivalence Point:</strong> $n_1M_1V_1 = n_2M_2V_2$</li>
+                <li><strong>Henderson-Hasselbalch (Buffer Region):</strong> $pH = pK_a + \log \frac{[\text{Salt}]}{[\text{Acid}]}$</li>
+                <li><strong>Half-Equivalence Point:</strong> At this volume, $pH = pK_a$ (maximum buffering capacity).</li>
+            </ul>
+
+            <h3>Expert FAQ & Concepts</h3>
+            <div class="theory-item">
+                <strong>1. Why does the pH change so rapidly near the equivalence point?</strong>
+                <p>Near the equivalence point, the analyte is almost exhausted. Even a fractional drop of titrant causes a massive logarithmic shift in $[H^+]$ concentration as the solution transitions from acidic to basic.</p>
+            </div>
+
+            <div class="theory-item">
+                <strong>2. What is the difference between End Point and Equivalence Point?</strong>
+                <p>The <strong>Equivalence Point</strong> is the theoretical stoichiometric completion of the reaction. The <strong>End Point</strong> is the physical point where the indicator actually changes color.</p>
+            </div>
+
+            <div class="theory-item">
+                <strong>3. Why use Conductometric Titration?</strong>
+                <p>It is superior for titrating very weak acids ($K_a < 10^{-7}$), turbid solutions, or colored liquids where visual indicators like Phenolphthalein are impossible to observe.</p>
+            </div>
+
+            <div class="theory-item">
+                <strong>4. How does a diprotic acid show two "steps"?</strong>
+                <p>It has two separate protons with distinct $K_a$ values. The first $H^+$ is neutralized completely before the second begins to react, provided $K_{a1} \gg K_{a2}$.</p>
+            </div>
         </section>
     </div>
-
-    <div class="container" style="background:none; box-shadow:none; backdrop-filter:none; margin-bottom:0; padding-bottom:0;">
-    <section id="theory-section">
-        <h2 style="text-align:left; color: var(--accent);">Acid-Base Titration Theory</h2>
-        <p>Titration is a quantitative analytical technique used to determine the unknown concentration of an analyte by reacting it with a standard solution (titrant) of known concentration.</p>
-        
-        <div class="result" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); margin: 20px 0;">
-            <strong style="color:var(--accent)">Key Equations:</strong>
-            <ul style="margin-top:10px;">
-                <li><strong>Equivalence Point:</strong> $N_1V_1 = N_2V_2$ (or $n_1M_1V_1 = n_2M_2V_2$)</li>
-                <li><strong>Henderson-Hasselbalch (Buffer Region):</strong> $pH = pK_a + \log \frac{[\text{Salt}]}{[\text{Acid}]}$</li>
-                <li><strong>At Half-Equivalence:</strong> $pH = pK_a$</li>
-            </ul>
-        </div>
-
-        <div class="result" style="background: rgba(0, 255, 213, 0.05); border-left: 4px solid #007bff;">
-            <strong>Example:</strong> Titrating $50\text{ mL}$ of $0.1\text{ M } HCl$ with $0.1\text{ M } NaOH$.
-            <br>The equivalence point occurs at exactly $50\text{ mL}$ of $NaOH$ added, where the $pH$ jumps from roughly $3$ to $11$ in a single drop.
-        </div>
-    </section>
-</div>
-
-<div class="container" id="faq-section">
-    <h3 style="color: var(--accent); border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Expert FAQ & Concepts</h3>
-    
-    <div class="result" style="border:none; background:transparent;">
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">1. Why does the pH change so rapidly near the equivalence point?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">Near the equivalence point, the analyte is almost exhausted. Even a fractional drop of titrant causes a massive logarithmic shift in $[H^+]$ concentration.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">2. What is the difference between End Point and Equivalence Point?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">The <strong>Equivalence Point</strong> is the theoretical stoichiometric completion. The <strong>End Point</strong> is where the indicator actually changes color.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">3. Which indicator is best for Weak Acid vs Strong Base?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">Phenolphthalein is ideal because its color change interval (pH 8.2–10) matches the basic pH found at the equivalence point of weak acids.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">4. Why does a diprotic acid show two "steps"?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">It has two separate protons with different $K_a$ values. The base neutralizes the first $H^+$ completely before moving to the second, provided $K_{a1} \gg K_{a2}$.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">5. What is the "Half-Equivalence" point?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">This occurs when volume added $V = V_{eq}/2$. Here, $[Acid] = [Salt]$, so $pH = pK_a$. This is the point of maximum buffering capacity.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">6. Can very weak acids ($K_a < 10^{-7}$) be titrated?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">Standard indicators fail because the pH jump is too small. Conductometric titration or pH meters (like this simulator) are required.</p>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong style="color:var(--accent)">7. How does concentration affect the titration curve?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">Higher concentrations result in a longer vertical "inflection" region, making the end point much easier to detect accurately.</p>
-        </div>
-
-        <div>
-            <strong style="color:var(--accent)">8. What is Back Titration?</strong>
-            <p style="font-size:0.9rem; opacity:0.9;">Used for slow reactions or insoluble solids. An excess reagent is added, and the remaining unreacted portion is titrated.</p>
-        </div>
-    </div>
-</div>
 
     <div id="footer-container"></div>
 
@@ -244,7 +216,6 @@
             return parseFloat(str);
         }
 
-        // Limiting Molar Conductivities (S·cm²/mol)
         const L_H = 349.6, L_OH = 199.1, L_Na = 50.1, L_Anion = 76.3, L_AcidAnion = 40.9;
 
         function getPhysics(vAdd_ml, Ca, Va_ml, Cb, Ka1, Ka2, type, mode) {
@@ -258,7 +229,6 @@
             let isStrong = Ka1 > 0.1;
 
             if (type === 'mono') {
-                // PH Logic
                 if (Vb * Cb < molesA) {
                     if (isStrong) pH = -Math.log10((molesA - molesB) / Vtot);
                     else pH = -Math.log10(Ka1) + Math.log10(molesB / (molesA - molesB) || 1e-10);
@@ -267,18 +237,15 @@
                     pH = 14 + Math.log10(excessOH || 1e-10);
                 }
                 
-                // COND Logic
                 if (Vb * Cb <= molesA) {
                     if (isStrong) cond = (molesA - molesB)*L_H + molesB*L_Na + molesA*L_Anion;
-                    else cond = molesB*L_Na + molesB*L_AcidAnion + (molesA*0.01)*L_H; // Weak acid simplified
+                    else cond = molesB*L_Na + molesB*L_AcidAnion + (molesA*0.01)*L_H;
                 } else {
                     cond = molesA*L_Na + molesA*L_Anion + (molesB - molesA)*(L_Na + L_OH);
                 }
             } else {
-                // DIPROTIC Logic
                 let Veq1 = molesA / Cb;
                 let Veq2 = 2 * Veq1;
-
                 if (Vb <= Veq1) {
                     pH = -Math.log10(Ka1) + Math.log10(molesB / (molesA - molesB) || 1e-10);
                     cond = molesB*L_Na + molesB*L_AcidAnion + (molesA-molesB)*0.01; 
@@ -292,7 +259,6 @@
                     cond = (2*molesA)*L_Na + (molesB - 2*molesA)*(L_Na + L_OH) + molesA*L_Anion;
                 }
             }
-            
             return mode === 'ph' ? Math.max(0, Math.min(14, pH)) : cond / Vtot;
         }
 
@@ -306,23 +272,16 @@
             const Ka2 = smartParser(document.getElementById("Ka2").value) || 1e-9;
             const Vb_ml = parseFloat(document.getElementById("Vb").value);
 
-            document.getElementById("displayV").innerText = Vb_ml.toFixed(2) + " mL";
-            
-            const currentVal = getPhysics(Vb_ml, Ca, Va_ml, Cb, Ka1, Ka2, type, mode);
+            document.getElementById("displayV").innerText = Vb_ml.toFixed(1) + " mL";
+            const val = getPhysics(Vb_ml, Ca, Va_ml, Cb, Ka1, Ka2, type, mode);
             const Veq1 = (Ca * Va_ml) / Cb;
-            const Veq2 = 2 * Veq1;
 
             document.getElementById("result").innerHTML = `
-                <h3 style="color:var(--accent); margin-top:0;">Real-time Analysis</h3>
-                <div style="font-size: 2.2rem; font-weight:800; margin:15px 0;">
-                    ${currentVal.toFixed(mode==='ph'?2:1)} <small style="font-size:0.9rem; color:#94a3b8;">${mode==='ph'?'pH':'mS/cm'}</small>
-                </div>
+                <h3 style="color:var(--accent); margin-top:0;">Live Analysis</h3>
+                <div style="font-size: 2.2rem; font-weight:800; margin:10px 0;">${val.toFixed(mode==='ph'?3:1)} <span style="font-size:1rem; opacity:0.6">${mode==='ph'?'pH':'mS/cm'}</span></div>
                 <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
-                <p><b>Equivalence 1:</b> ${Veq1.toFixed(2)} mL</p>
-                ${type==='di' ? `<p><b>Equivalence 2:</b> ${Veq2.toFixed(2)} mL</p>` : ''}
-                <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">
-                    <i>Scientific Check: ${mode==='ph'?'Logarithmic concentration tracking':'Ionic mobility summation active'}</i>
-                </p>
+                <p><b>Eq. Point 1:</b> ${Veq1.toFixed(2)} mL</p>
+                ${type==='di' ? `<p><b>Eq. Point 2:</b> ${(Veq1*2).toFixed(2)} mL</p>` : ''}
             `;
 
             draw(mode, type, Ca, Va_ml, Cb, Ka1, Ka2);
@@ -332,51 +291,29 @@
             const canvas = document.getElementById("graph");
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const pts = [];
+            for(let v=0; v<=150; v+=1.5) pts.push(getPhysics(v, Ca, Va_ml, Cb, Ka1, Ka2, type, mode));
+            const maxVal = Math.max(...pts), minVal = Math.min(...pts);
 
-            const points = [];
-            for(let v=0; v<=150; v+=1.5) {
-                points.push(getPhysics(v, Ca, Va_ml, Cb, Ka1, Ka2, type, mode));
-            }
-            const maxVal = Math.max(...points);
-            const minVal = Math.min(...points);
-
-            // Axes
-            ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1; ctx.font = "12px Inter"; ctx.fillStyle = "#475569";
+            ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 0.5; ctx.font = "12px Inter"; ctx.fillStyle = "#64748b";
             for(let i=0; i<=10; i++) {
-                let yLabel = mode==='ph' ? (i*1.4).toFixed(1) : (minVal + (maxVal-minVal)*(i/10)).toFixed(1);
-                let y = canvas.height - 40 - (i/10)*(canvas.height - 80);
+                let label = mode==='ph' ? (i*1.4).toFixed(1) : (minVal + (maxVal-minVal)*(i/10)).toFixed(1);
+                let y = canvas.height - 40 - (i/10)*(canvas.height-80);
                 ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(canvas.width-20, y); ctx.stroke();
-                ctx.fillText(yLabel, 10, y + 4);
+                ctx.fillText(label, 10, y + 4);
             }
-            ctx.fillText("Titrant Volume (mL) →", canvas.width/2 - 50, canvas.height - 10);
 
-            // Plotting Curve
             ctx.beginPath();
             ctx.strokeStyle = mode === 'ph' ? "#3b82f6" : "#f43f5e";
-            ctx.lineWidth = 5;
-            ctx.lineJoin = "round";
-
-            points.forEach((p, i) => {
+            ctx.lineWidth = 4;
+            pts.forEach((p, i) => {
                 let x = 60 + (i / 100) * (canvas.width - 80);
                 let normY = mode === 'ph' ? (p/14) : (p-minVal)/(maxVal-minVal || 1);
-                let y = canvas.height - 40 - normY * (canvas.height - 80);
+                let y = canvas.height - 40 - normY * (canvas.height-80);
                 if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
             });
             ctx.stroke();
-
-            // Highlight Current Point
-            let curV = parseFloat(document.getElementById("Vb").value);
-            let curP = getPhysics(curV, Ca, Va_ml, Cb, Ka1, Ka2, type, mode);
-            let curX = 60 + (curV / 150) * (canvas.width - 80);
-            let curNormY = mode === 'ph' ? (curP/14) : (curP-minVal)/(maxVal-minVal || 1);
-            let curY = canvas.height - 40 - curNormY * (canvas.height - 80);
-            
-            ctx.beginPath();
-            ctx.fillStyle = "#0f172a"; ctx.arc(curX, curY, 8, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = varProp('--accent'); ctx.lineWidth = 3; ctx.stroke();
         }
-
-        function varProp(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 
         window.onload = () => {
             fetch("footer.html").then(r => r.text()).then(d => document.getElementById("footer-container").innerHTML = d).catch(()=>{});
