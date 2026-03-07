@@ -103,6 +103,40 @@
         .theory-section { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; margin-bottom: 30px; }
 
         @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .full-row { grid-column: span 1; } }
+
+        /* Modern Card Based Sections */
+.info-section { margin-top: 40px; }
+.info-section h3 { 
+    margin-bottom: 25px; 
+    border-left: 5px solid var(--accent); 
+    padding-left: 15px;
+    font-weight: 800;
+}
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+.info-card { 
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s ease;
+}
+.info-card:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+.card-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; }
+.card-q::before { content: "•"; margin-right: 10px; color: var(--accent); font-size: 1.5rem; }
+.card-a { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 0; }
+
+.tech-list { list-style: none; padding: 0; margin: 0; }
+.tech-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+.tech-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+        
     </style>
 </head>
 <body>
@@ -172,13 +206,116 @@
             </div>
         </div>
 
-        <section class="theory-section" style="margin-top: 40px;">
-            <h2 style="color: var(--accent);">Expert FAQ</h2>
-            <p><strong>1. Why is the pH of NaCl exactly 7.0?</strong><br>Ions from strong acids and bases (like $Na^+$ and $Cl^-$) do not hydrolyze because they are extremely weak conjugate partners.</p>
-            <p><strong>2. Does concentration affect Weak Acid + Weak Base salts?</strong><br>No. The pH of WA/WB salts depends only on their respective $pK_a$ and $pK_b$ values, not the molarity.</p>
-            <p><strong>3. What happens if I increase the temperature?</strong><br>Since hydrolysis is endothermic, the degree of hydrolysis ($h$) increases, and the neutral point (usually 7.0) shifts downward slightly.</p>
-        </section>
-    </div>
+        <div class="content-section">
+    <section class="info-section">
+        <h3>Salt Hydrolysis: Theory & Salt Types</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">What is Salt Hydrolysis?</div>
+                <p class="card-a">Salt hydrolysis is a process in which the constituent ions of a salt react with water to produce either acidity or alkalinity. It is essentially the reverse of a neutralization reaction.</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-q">The Four Salt Categories</div>
+                <ul class="tech-list">
+                    <li><strong>SA/SB (e.g., NaCl):</strong> No hydrolysis occurs. Solution remains neutral (pH ≈ 7).</li>
+                    <li><strong>WA/SB (e.g., CH₃COONa):</strong> Anionic hydrolysis occurs. Solution becomes Basic (pH > 7).</li>
+                    <li><strong>SA/WB (e.g., NH₄Cl):</strong> Cationic hydrolysis occurs. Solution becomes Acidic (pH < 7).</li>
+                    <li><strong>WA/WB (e.g., NH₄CH₃COO):</strong> Both ions hydrolyze. pH depends on relative $K_a$ and $K_b$ values.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Calculation Example (WA/SB Salt)</h3>
+        <div class="info-card">
+            <p class="card-a"><strong>Problem:</strong> Calculate the pH of a $0.1\text{ M}$ Sodium Acetate solution ($K_a \text{ of acetic acid} = 1.8 \times 10^{-5}$).</p>
+            <div class="example-box mt-3">
+                <strong>Formula:</strong> $pH = 7 + \frac{1}{2}[pK_a + \log C]$
+                <br><br>
+                <strong>Steps:</strong>
+                <ul class="tech-list">
+                    <li>$pK_a = -\log(1.8 \times 10^{-5}) = 4.74$</li>
+                    <li>$pH = 7 + \frac{1}{2}[4.74 + \log(0.1)]$</li>
+                    <li>$pH = 7 + \frac{1}{2}[4.74 - 1] = 7 + 1.87$</li>
+                    <li><strong>Result:</strong> $\mathbf{pH = 8.87}$</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Research & Analytical Techniques</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Degree of Hydrolysis ($h$)</div>
+                <p class="card-a">In research labs, the degree of hydrolysis is often determined via <strong>Conductometric Titration</strong>. As hydrolysis progresses, the change in ion mobility alters the solution's conductivity.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">UV-Vis Spectroscopy</div>
+                <p class="card-a">For salts of organic acids/bases, the change in absorption spectra due to hydrolysis allows scientists to calculate the hydrolysis constant ($K_h$) with extreme precision.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h3>Unique Hydrolysis Facts</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <p class="card-a"><strong>Antacid Effect:</strong> Baking soda ($NaHCO_3$) works as an antacid because the bicarbonate ion undergoes hydrolysis to produce $OH^-$ ions, neutralizing stomach acid.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Soil pH:</strong> Many fertilizers are salts (like Ammonium Sulfate). Their hydrolysis in soil moisture can significantly lower soil pH, affecting crop yield.</p>
+            </div>
+            <div class="info-card">
+                <p class="card-a"><strong>Amphiprotic Ions:</strong> Salts like $NaH_2PO_4$ can either donate or accept protons depending on the environment, making their hydrolysis calculations uniquely complex.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="info-section">
+        <h3>Expert FAQ: Salt Equilibrium</h3>
+        <div class="grid-layout">
+            <div class="info-card">
+                <div class="card-q">Why doesn't $NaCl$ hydrolyze?</div>
+                <p class="card-a">$Na^+$ and $Cl^-$ are conjugate partners of strong bases/acids. They have negligible affinity for $H^+$ or $OH^-$ ions in water.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the Hydrolysis Constant ($K_h$)?</div>
+                <p class="card-a">It is the equilibrium constant for the hydrolysis reaction. For a WA/SB salt, $K_h = K_w / K_a$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How does concentration affect hydrolysis?</div>
+                <p class="card-a">As concentration ($C$) decreases, the <strong>degree</strong> of hydrolysis ($h$) increases, though the total shift in pH might become less extreme.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Can a salt of WA/WB be neutral?</div>
+                <p class="card-a">Yes. If $K_a$ of the weak acid exactly equals $K_b$ of the weak base (e.g., Ammonium Acetate), the pH remains 7.0.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is Cationic Hydrolysis?</div>
+                <p class="card-a">When the cation (usually from a weak base) reacts with water to release $H_3O^+$ ions, making the solution acidic.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Is hydrolysis endothermic?</div>
+                <p class="card-a">Generally, yes. Increasing the temperature usually increases the degree of hydrolysis.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">How does $h$ relate to $K_h$?</div>
+                <p class="card-a">For dilute solutions where $h < 0.1$, the relation is $h = \sqrt{K_h / C}$.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">What is the pH of $AlCl_3$?</div>
+                <p class="card-a">Very acidic (pH ≈ 2-3). The $Al^{3+}$ ion has a high charge density, polarizing water molecules to release $H^+$ ions.</p>
+            </div>
+            <div class="info-card">
+                <div class="card-q">Does $K_w$ change the result?</div>
+                <p class="card-a">Yes. Since $K_h$ depends on $K_w$, any temperature change that shifts $K_w$ will shift the hydrolysis equilibrium.</p>
+            </div>
+        </div>
+    </section>
+</div>
 
     <div id="footer-container"></div>
 
