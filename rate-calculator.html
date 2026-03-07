@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaction Rate Calculator</title>
+    <title>Ultimate Reaction Kinetics & Collision Lab | Chemistry Spark Lab</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -11,91 +12,65 @@
             --bg-dark: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.7);
             --accent-cyan: #00ffd5;
-            --accent-blue: #007bff;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
         }
 
         body {
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
-            color: white;
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            padding-top: 90px;
+            min-height: 100vh; padding-top: 90px;
         }
 
-        /* Glassmorphism Header */
         .navbar {
-            background: rgba(15, 23, 42, 0.8) !important;
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            height: 70px;
-            position: fixed;
-            top: 0; width: 100%; z-index: 1000;
+            background: rgba(15, 23, 42, 0.9) !important;
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: 70px; position: fixed; top: 0; width: 100%; z-index: 1000;
             display: flex; align-items: center; padding: 0 20px;
         }
 
         .brand-text {
-            font-weight: 800; font-size: 1.2rem;
+            font-weight: 800; font-size: 1.4rem;
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-cyan));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-decoration: none;
         }
 
         .calc-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
+            background: var(--card-bg); backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-radius: 24px; padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-bottom: 25px;
         }
 
-        .form-label { color: var(--accent-cyan); font-weight: 600; font-size: 0.9rem; }
-        .form-control, .form-select {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+        .form-label { color: var(--accent-cyan); font-weight: 600; font-size: 0.8rem; margin-bottom: 4px; }
+        
+        input[type="text"], .form-select {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; border-radius: 10px; padding: 10px; font-size: 0.9rem;
         }
 
-        /* High-Visibility Stat Cards */
-.stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    border-top: 3px solid var(--accent-cyan);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Force Labels to be light grey/white */
-.stat-card small, 
-.stat-card .text-muted {
-    color: rgba(255, 255, 255, 0.8) !important; /* Force light visibility */
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Force Values (Numbers/Infinite) to be pure white */
-.stat-card h4 {
-    color: #ffffff !important;
-    font-weight: 700;
-    text-shadow: 0 0 10px rgba(0, 255, 213, 0.3); /* Subtle glow */
-}
-
-        .chart-container {
-            background: rgba(15, 23, 42, 0.4);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 20px;
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 15px;
+            text-align: center; border-top: 3px solid var(--accent-cyan);
         }
+        .stat-card small { color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; }
+        .stat-card h4 { color: #fff; margin-top: 5px; font-weight: 700; font-size: 1.2rem; }
 
         .btn-calc {
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-cyan));
-            border: none; font-weight: 700; color: white;
-            transition: all 0.3s;
+            border: none; font-weight: 700; color: white; border-radius: 12px;
+            transition: 0.3s; padding: 12px;
         }
+
+        /* Collision Visualizer */
+        #collisionCanvas {
+            background: #000; border-radius: 15px; width: 100%; height: 180px; margin-top: 15px;
+        }
+
+        .theory-section { background: rgba(255,255,255,0.03); border-radius: 24px; padding: 40px; border: 1px solid rgba(255,255,255,0.05); }
+        .formula-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent-cyan); margin: 20px 0; font-family: monospace; color: var(--accent-cyan); }
     </style>
 </head>
 <body>
@@ -108,154 +83,189 @@
         <div class="row g-4">
             <div class="col-lg-5">
                 <div class="calc-card">
-                    <h3 class="mb-4">Kinetics Solver</h3>
-                    <div class="row g-3">
+                    <h5 class="mb-3">1. Integrated Rate Solver (0-4 Order)</h5>
+                    <div class="row g-2">
                         <div class="col-12">
-                            <label class="form-label">Order of Reaction</label>
-                            <select id="order" class="form-select">
-                                <option value="0">Zero Order ( [A] = [A]₀ - kt )</option>
-                                <option value="1">First Order ( ln[A] = ln[A]₀ - kt )</option>
-                                <option value="2">Second Order ( 1/[A] = 1/[A]₀ + kt )</option>
+                            <label class="form-label">Reaction Order (n)</label>
+                            <select id="order" class="form-select" onchange="simulateKinetics()">
+                                <option value="0">Zero Order</option>
+                                <option value="1">First Order</option>
+                                <option value="2">Second Order</option>
+                                <option value="3">Third Order</option>
+                                <option value="4">Fourth Order</option>
                             </select>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label">Initial Conc. [A]₀ (M)</label>
-                            <input type="number" id="a0" class="form-control" value="1.0">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Rate Constant (k)</label>
-                            <input type="number" id="k_const" class="form-control" value="0.05">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Specific Time (s) for Status</label>
-                            <input type="number" id="target_t" class="form-control" value="10">
-                        </div>
-                        <div class="col-12 mt-4">
-                            <button onclick="simulateKinetics()" class="btn btn-calc w-100 py-3">RUN SIMULATION</button>
-                        </div>
+                        <div class="col-6"><label class="form-label">[A]₀ (M)</label><input type="text" id="a0" class="form-control" value="1.0" oninput="simulateKinetics()"></div>
+                        <div class="col-6"><label class="form-label">k Value</label><input type="text" id="k_const" class="form-control" value="0.05" oninput="simulateKinetics()"></div>
+                    </div>
+                </div>
+
+                <div class="calc-card">
+                    <h5 class="mb-3">2. Arrhenius & Collision Parameters</h5>
+                    <div class="row g-2">
+                        <div class="col-6"><label class="form-label">k₁ at T₁ (K)</label><input type="text" id="arr_k1" class="form-control" placeholder="0.02" value="0.02"></div>
+                        <div class="col-6"><label class="form-label">T₁ (K)</label><input type="text" id="arr_t1" class="form-control" placeholder="298" value="298"></div>
+                        <div class="col-6"><label class="form-label">k₂ at T₂ (K)</label><input type="text" id="arr_k2" class="form-control" placeholder="0.08" value="0.08"></div>
+                        <div class="col-6"><label class="form-label">T₂ (K)</label><input type="text" id="arr_t2" class="form-control" placeholder="310" value="310"></div>
+                        <div class="col-12 mt-3"><button onclick="solveKineticsFull()" class="btn btn-calc w-100">SOLVE ALL PARAMETERS</button></div>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-7">
                 <div class="calc-card">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <small class="text-muted">Half-Life (t₁/₂)</small>
-                                <h4 id="t_half" class="mb-0 text-white">-</h4>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <small class="text-muted">Completion Time</small>
-                                <h4 id="t_comp" class="mb-0 text-white">-</h4>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <small class="text-muted">Completed %</small>
-                                <h4 id="perc_comp" class="mb-0 text-white">-</h4>
-                            </div>
-                        </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4"><div class="stat-card"><small>t₁/₂ (s)</small><h4 id="res_half">-</h4></div></div>
+                        <div class="col-4"><div class="stat-card"><small>Eₐ (kJ/mol)</small><h4 id="res_ea">-</h4></div></div>
+                        <div class="col-4"><div class="stat-card"><small>Freq Factor (A)</small><h4 id="res_A">-</h4></div></div>
                     </div>
-
-                    <div class="chart-container">
-                        <canvas id="kineticsChart"></canvas>
+                    <canvas id="kineticsChart" style="max-height: 250px;"></canvas>
+                    
+                    <div class="mt-4">
+                        <label class="form-label">Collision Theory Real-Time Visualizer</label>
+                        <canvas id="collisionCanvas"></canvas>
+                        <div class="d-flex justify-content-between mt-1"><small style="color:#00ffd5">● Effective (Energy > Ea)</small><small style="color:#ff4757">● Ineffective</small></div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <section class="theory-section">
+            <h2>Reaction Rate & Collision Theory Expert Guide</h2>
+            <p>The <strong>Collision Theory</strong> states that for a reaction to occur, particles must collide with 1) Correct Orientation and 2) Sufficient Energy (Activation Energy, $E_a$).</p>
+
+            <h3>The Frequency Factor (A)</h3>
+            <p>The Arrhenius equation $k = Ae^{-E_a/RT}$ includes the pre-exponential factor <strong>A</strong>, which represents the frequency of collisions with the correct orientation.</p>
+            
+            <div class="formula-box">
+                Arrhenius Equation: ln(k) = ln(A) - (Ea / RT)
+            </div>
+
+            <h3>Temperature Coefficient ($Q_{10}$) Trick</h3>
+            <p>In most biological and chemical systems, the rate constant increases by a factor of 2 to 3 for every 10 Kelvin rise in temperature. This is known as the $Q_{10}$ temperature coefficient.</p>
+
+            <h3>FAQ</h3>
+            <div class="faq-item"><strong>What is an Effective Collision?</strong><p>A collision that results in a chemical reaction. The fraction of effective collisions is given by $f = e^{-E_a/RT}$.</p></div>
+            <div class="faq-item"><strong>How does temperature affect collisions?</strong><p>Higher temperature increases both the frequency of collisions and the kinetic energy of particles, significantly increasing the number of particles that cross the $E_a$ threshold.</p></div>
+        </section>
     </div>
 
     <script>
         let myChart = null;
+        let particles = [];
+        const colCanvas = document.getElementById('collisionCanvas');
+        const colCtx = colCanvas.getContext('2d');
+
+        function smartParser(val) {
+            if (!val || val.toString().trim() === "") return NaN;
+            let str = val.toString().toLowerCase().replace(/\s/g, "");
+            if (str.includes("^")) {
+                let parts = str.split("^");
+                return Math.pow(parseFloat(parts[0]), parseFloat(parts[1]));
+            }
+            return parseFloat(str);
+        }
+
+        function solveKineticsFull() {
+            const k1 = smartParser(document.getElementById('arr_k1').value);
+            const t1 = smartParser(document.getElementById('arr_t1').value);
+            const k2 = smartParser(document.getElementById('arr_k2').value);
+            const t2 = smartParser(document.getElementById('arr_t2').value);
+            const R = 8.314;
+
+            if (![k1, t1, k2, t2].some(isNaN)) {
+                // Ea Calculation
+                const ea_j = (R * Math.log(k2/k1) * t1 * t2) / (t2 - t1);
+                document.getElementById('res_ea').innerText = (ea_j / 1000).toFixed(2);
+                
+                // Frequency Factor A = k / e^(-Ea/RT)
+                const A = k1 / Math.exp(-ea_j / (R * t1));
+                document.getElementById('res_A').innerText = A.toExponential(2);
+            }
+            simulateKinetics();
+        }
 
         function simulateKinetics() {
             const order = parseInt(document.getElementById('order').value);
-            const a0 = parseFloat(document.getElementById('a0').value);
-            const k = parseFloat(document.getElementById('k_const').value);
-            const targetT = parseFloat(document.getElementById('target_t').value);
+            const a0 = smartParser(document.getElementById('a0').value);
+            const k = smartParser(document.getElementById('k_const').value);
+            if (isNaN(a0) || isNaN(k)) return;
 
-            // 1. Core Calculations
-            let tHalf, tComplete, at;
-            
-            if (order === 0) {
-                tHalf = a0 / (2 * k);
-                tComplete = a0 / k;
-                at = Math.max(0, a0 - (k * targetT));
-            } else if (order === 1) {
-                tHalf = 0.693 / k;
-                tComplete = "∞ (Asymptotic)";
-                at = a0 * Math.exp(-k * targetT);
-            } else {
-                tHalf = 1 / (k * a0);
-                tComplete = "∞ (Asymptotic)";
-                at = 1 / ((1 / a0) + (k * targetT));
+            let tHalf, at;
+            if (order === 0) { tHalf = a0/(2*k); at = Math.max(0, a0 - k*10); }
+            else if (order === 1) { tHalf = 0.693/k; at = a0 * Math.exp(-k*10); }
+            else if (order === 2) { tHalf = 1/(k*a0); at = 1/((1/a0) + k*10); }
+            else if (order === 3) { tHalf = 1.5/(k*a0**2); at = Math.sqrt(1/(1/a0**2 + 2*k*10)); }
+            else { tHalf = (7/3)/(k*a0**3); at = Math.pow(1/a0**3 + 3*k*10, -1/3); }
+
+            document.getElementById('res_half').innerText = tHalf.toFixed(2);
+            updateGraph(order, a0, k, tHalf);
+        }
+
+        function updateGraph(order, a0, k, tHalf) {
+            const labels = [], data = [];
+            const maxT = tHalf * 4;
+            for(let i=0; i<=40; i++) {
+                let t = (maxT/40)*i;
+                let c;
+                if(order==0) c = Math.max(0, a0-k*t);
+                else if(order==1) c = a0*Math.exp(-k*t);
+                else if(order==2) c = 1/((1/a0)+k*t);
+                else if(order==3) c = Math.sqrt(1/(1/a0**2 + 2*k*t));
+                else c = Math.pow(1/a0**3 + 3*k*t, -1/3);
+                labels.push(t.toFixed(1)); data.push(c.toFixed(3));
             }
-
-            // 2. Completion Metrics
-            const percComp = ((a0 - at) / a0) * 100;
-            const remaining = 100 - percComp;
-
-            document.getElementById('t_half').innerText = tHalf.toFixed(2) + "s";
-            document.getElementById('t_comp').innerText = typeof tComplete === 'number' ? tComplete.toFixed(2) + "s" : "Infinite";
-            document.getElementById('perc_comp').innerText = percComp.toFixed(1) + "%";
-
-            // 3. Graph Data Generation
-            const labels = [];
-            const data = [];
-            const maxTime = typeof tComplete === 'number' ? tComplete * 1.2 : tHalf * 5;
-            
-            for (let i = 0; i <= 20; i++) {
-                let time = (maxTime / 20) * i;
-                let conc;
-                if (order === 0) conc = Math.max(0, a0 - (k * time));
-                else if (order === 1) conc = a0 * Math.exp(-k * time);
-                else conc = 1 / ((1 / a0) + (k * time));
-                
-                labels.push(time.toFixed(1));
-                data.push(conc.toFixed(3));
-            }
-
-            // 4. Render Chart
-            if (myChart) myChart.destroy();
-            const ctx = document.getElementById('kineticsChart').getContext('2d');
-            myChart = new Chart(ctx, {
+            if(myChart) myChart.destroy();
+            myChart = new Chart(document.getElementById('kineticsChart'), {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Concentration [A] over Time',
-                        data: data,
-                        borderColor: '#00ffd5',
-                        backgroundColor: 'rgba(0, 255, 213, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { title: { display: true, text: 'Concentration (M)', color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                        x: { title: { display: true, text: 'Time (s)', color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
-                    }
-                }
+                data: { labels, datasets: [{ label: 'Concentration [A]', data, borderColor: '#00ffd5', fill: true, backgroundColor: 'rgba(0,255,213,0.1)', tension: 0.4, pointRadius: 0 }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { display: false } } }
             });
         }
 
-        // Run on load
-        window.onload = simulateKinetics;
+        // Collision Animation Logic
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * colCanvas.width;
+                this.y = Math.random() * colCanvas.height;
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.isEffective = Math.random() > 0.7; // Simulating Ea threshold
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > colCanvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > colCanvas.height) this.vy *= -1;
+            }
+            draw() {
+                colCtx.beginPath();
+                colCtx.arc(this.x, this.y, 4, 0, Math.PI*2);
+                colCtx.fillStyle = this.isEffective ? '#00ffd5' : '#ff4757';
+                colCtx.fill();
+            }
+        }
+
+        function initCollision() {
+            colCanvas.width = colCanvas.offsetWidth;
+            colCanvas.height = colCanvas.offsetHeight;
+            for(let i=0; i<30; i++) particles.push(new Particle());
+            animate();
+        }
+
+        function animate() {
+            colCtx.fillStyle = 'rgba(0,0,0,0.2)';
+            colCtx.fillRect(0,0,colCanvas.width, colCanvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = () => {
+            initCollision();
+            solveKineticsFull();
+        };
     </script>
-
-    <div id="footer-container"></div>
-
-<script>
-fetch("footer.html")
-.then(res => res.text())
-.then(data => {
-document.getElementById("footer-container").innerHTML = data;
-});
-</script>
 </body>
 </html>
