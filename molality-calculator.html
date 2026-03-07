@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Molality & Mole Fraction Calculator | Chemistry Spark Lab</title>
     <meta name="description" content="Calculate Molality and Mole Fraction for JEE, GATE, and CSIR-NET. Includes density-based interconversions, formulas, and step-by-step examples.">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <script>
         window.MathJax = {
             tex: {
@@ -19,11 +19,10 @@
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <style>
         :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; }
         body { background-color: var(--bg); color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
+
         .main-header {
             padding: 20px;
             background: rgba(30, 41, 59, 0.8);
@@ -37,9 +36,8 @@
             font-weight: 800;
             letter-spacing: 1px;
         }
-
         .content-section { max-width: 800px; margin: auto; padding: 20px 15px; }
-        
+
         .solver-card {
             background: var(--card);
             border-radius: 16px;
@@ -48,9 +46,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             margin-bottom: 30px;
         }
-        
+
         .form-label { color: var(--accent); font-weight: 600; margin-top: 10px; }
-        
+
         .form-control {
             background-color: #0f172a !important;
             color: #ffffff !important;
@@ -58,7 +56,7 @@
             font-weight: 600;
         }
         .form-control::placeholder { color: #64748b; }
-        
+
         .btn-solve {
             background: linear-gradient(135deg, #007bff, var(--accent));
             color: #0f172a;
@@ -71,7 +69,6 @@
             transition: 0.3s;
         }
         .btn-solve:hover { opacity: 0.9; transform: scale(1.02); }
-
         .result-display {
             display: none;
             margin-top: 20px;
@@ -80,13 +77,11 @@
             border-radius: 10px;
             border-left: 4px solid var(--accent);
         }
-
         .example-box { 
             background: rgba(0, 255, 213, 0.05); 
             padding: 15px; border-radius: 10px; 
             margin: 20px 0; border-left: 4px solid var(--accent);
         }
-
         #faq { margin-top: 50px; padding: 10px 5px; }
         .faq-item { margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .faq-q { color: var(--accent); font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; }
@@ -94,24 +89,26 @@
     </style>
 </head>
 <body>
-
     <header class="main-header">
         <a href="index.html">CHEMISTRY SPARK LAB</a>
     </header>
-
     <div class="content-section">
         <section id="intro">
             <h2>Molality ($m$) & Mole Fraction ($\chi$)</h2>
-            <p>Molality is defined as the number of moles of solute dissolved in exactly $1\text{ kg}$ of the solvent.</p>
-            
+            <p>Molality is defined as the number of moles of solute dissolved in exactly $1\text{ kg}$ of the solvent. Unlike molarity, it is independent of temperature changes.</p>
+
             <div class="example-box">
                 <strong>Standard Formula:</strong>
                 $$m = \frac{n_{\text{solute}}}{W_{\text{solvent in kg}}}$$
                 <strong>Mole Fraction ($\chi$):</strong>
                 $$\chi_{\text{solute}} = \frac{n_{\text{solute}}}{n_{\text{solute}} + n_{\text{solvent}}}$$
             </div>
+            <div class="example-box">
+                <strong>Advanced Example:</strong> $20\text{ g}$ of $NaOH$ ($M_w=40$) in $500\text{ g}$ water.
+                <br>Moles $= 20/40 = 0.5$. Mass of solvent $= 0.5\text{ kg}$.
+                <br>Result: $\mathbf{1.0\text{ m}}$.
+            </div>
         </section>
-
         <div class="solver-card">
             <h3 class="text-center mb-4">Molality Ultra-Calculator</h3>
             <div class="row g-3">
@@ -134,7 +131,6 @@
                 <p class="small text-secondary">Formula: $m = \frac{w \times 1000}{M_w \times W}$</p>
             </div>
         </div>
-
         <div class="solver-card">
             <h3 class="text-center mb-4">Mole Fraction Solver ($\chi$)</h3>
             <div class="row g-3">
@@ -153,7 +149,6 @@
                 <p>$\chi_{\text{solvent}}$: <span id="out_chi_b" class="text-white fw-bold"></span></p>
             </div>
         </div>
-
         <div class="solver-card">
             <h3 class="text-center">Quick Unit Converter</h3>
             <div class="row g-2">
@@ -167,17 +162,58 @@
                 </div>
             </div>
         </div>
+        <section>
+            <h3>Techniques & Interconversions</h3>
+            <p>For high-level exams like GATE, you must master the density interconversion. If you are given a percentage by weight (w/w), the mass of the solvent is $(100 - \text{weight}\%)$.</p>
+            <ul>
+                <li><strong>Temperature Independence:</strong> Molality does not change with temperature as it is mass-based.</li>
+                <li><strong>Molarity to Molality:</strong> $m = \frac{1000M}{1000d - MM_s}$.</li>
+            </ul>
+        </section>
+        <section id="faq">
+            <h3>Expert FAQ</h3>
+            <div class="faq-item">
+                <div class="faq-q">1. Why is molality preferred in colligative properties?</div>
+                <div class="faq-a">Colligative properties like boiling point elevation depend on the ratio of solute to solvent molecules. Since molality doesn't change with temperature, it provides a stable reference.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">2. Can molality be less than molarity?</div>
+                <div class="faq-a">Yes, if the density of the solution is significantly less than $1\text{ g/mL}$, but for most aqueous solutions, molality is slightly higher.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">3. What is the mole fraction of a pure substance?</div>
+                <div class="faq-a">The mole fraction of a pure substance is always $1$ because there are no other components.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">4. How do I find molality from mass percent?</div>
+                <div class="faq-a">Use: $m = \frac{\% \text{ by mass} \times 1000}{(100 - \%) \times M_{\text{solute}}}$.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">5. Does adding solvent change the mole fraction?</div>
+                <div class="faq-a">Yes. Adding solvent increases the total moles ($n_A + n_B$), which decreases the mole fraction of the solute.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">6. What is the unit of mole fraction?</div>
+                <div class="faq-a">Mole fraction is a dimensionless quantity (it has no units) because it is a ratio of similar units.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">7. Is molality used for concentrated solutions?</div>
+                <div class="faq-a">Molality is useful for all concentrations, but it is especially important in high-precision thermodynamic calculations where volume changes are significant.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">8. Relationship between $\chi$ and $m$?</div>
+                <div class="faq-a">The relationship is: $m = \frac{\chi_A \times 1000}{\chi_B \times M_B}$.</div>
+            </div>
+        </section>
     </div>
-
     <script>
         /**
          * Smart Parser [2026-03-06]
-         * Interprets scientific notation and multiplication.
+         * Correctly interprets ^, e, and * in text inputs.
          */
         function smartParser(val) {
-            if (!val || val.toString().trim() === "") return NaN;
+            if (val === null || val === undefined || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
-            
             try {
                 if (str.includes("e")) return parseFloat(str);
                 if (str.includes("*")) {
@@ -198,7 +234,7 @@
             const mm = smartParser(document.getElementById('mm_s').value);
             const mv = smartParser(document.getElementById('mass_v').value);
             
-            if(isNaN(ms) || isNaN(mm) || isNaN(mv)) { alert("Enter valid numeric values (e.g., 10^2)"); return; }
+            if(isNaN(ms) || isNaN(mm) || isNaN(mv)) { alert("Enter all values"); return; }
             
             const moles = ms / mm;
             const kg_solvent = mv / 1000;
@@ -213,7 +249,7 @@
             const nA = smartParser(document.getElementById('moles_a').value);
             const nB = smartParser(document.getElementById('moles_b').value);
             
-            if(isNaN(nA) || isNaN(nB)) { alert("Enter valid mole values (e.g., 6.022e23)"); return; }
+            if(isNaN(nA) || isNaN(nB)) { alert("Enter both mole values"); return; }
             
             const total = nA + nB;
             document.getElementById('out_chi_a').innerText = (nA / total).toFixed(4);
@@ -233,6 +269,14 @@
                 g.value = isNaN(val) ? "" : (val * 1000);
             }
         }
+
+        // Load Footer
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(data => {
+                const footerContainer = document.getElementById("footer-container");
+                if (footerContainer) footerContainer.innerHTML = data;
+            });
     </script>
 </body>
 </html>
