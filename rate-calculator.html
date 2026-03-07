@@ -201,9 +201,6 @@
             <div class="formula-box">
                 $\log\left(\frac{k_2}{k_1}\right) = \frac{E_a}{2.303R} \left[\frac{T_2 - T_1}{T_1 T_2}\right]$
             </div>
-
-            <h3>4. Collision Theory Parameters</h3>
-            <p>According to collision theory, the Rate $= Z \cdot \rho \cdot e^{-E_a/RT}$, where $Z$ is collision frequency and $\rho$ is the steric factor. In our simulation, <b>green particles</b> represent effective collisions (energy $> E_a$) and <b>red particles</b> represent ineffective ones.</p>
         </section>
     </div>
 
@@ -217,23 +214,42 @@
         const colCtx = colCanvas.getContext('2d');
 
         /**
-         * Smart Parser [cite: 2026-03-06]
-         * Interprets inputs with '^' (like 10^-5) and 'e' (like 1.5e-3)
+         * Advanced Pro Smart Parser [cite: 2026-03-06]
+         * Handles: 2*10^2, 1e-5, 10^-3, and standard floats.
          */
         function smartParser(val) {
-            if (val === null || val === undefined || val.toString().trim() === "") return NaN;
+            if (!val || val.toString().trim() === "") return NaN;
             let str = val.toString().toLowerCase().replace(/\s/g, "");
             
-            // Handle power notation (e.g., 10^-5 or 2^3)
+            // Handle multiplication with power (e.g., 2*10^5)
+            if (str.includes("*")) {
+                let factors = str.split("*");
+                return factors.reduce((acc, part) => acc * smartParser(part), 1);
+            }
+
+            // Handle power notation (e.g., 10^-5)
             if (str.includes("^")) {
                 let parts = str.split("^");
                 let base = parseFloat(parts[0]);
-                let exponent = parseFloat(parts[1]);
-                return Math.pow(base, exponent);
+                let exp = parseFloat(parts[1]);
+                return Math.pow(base, exp);
             }
             
-            // parseFloat natively handles 'e' notation (e.g., 1.2e-4)
             return parseFloat(str);
+        }
+
+        /**
+         * Formats scientific results into professional strings
+         */
+        function formatResult(num, unit = "") {
+            if (isNaN(num) || !isFinite(num)) return "N/A";
+            const absNum = Math.abs(num);
+            if (absNum === 0) return `0 ${unit}`.trim();
+            
+            if (absNum < 0.01 || absNum > 9999) {
+                return num.toExponential(3) + (unit ? " " + unit : "");
+            }
+            return num.toFixed(3) + (unit ? " " + unit : "");
         }
 
         function toggleInputs() {
@@ -247,13 +263,12 @@
             const mode = document.getElementById('solveMode').value;
             const order = parseInt(document.getElementById('order').value);
             
-            // Apply smartParser to all numeric inputs
             const a0 = smartParser(document.getElementById('a0').value);
             const at_input = smartParser(document.getElementById('at').value);
             const k_input = smartParser(document.getElementById('k').value);
             const t_input = smartParser(document.getElementById('t').value);
 
-            let res, tHalf, k_eff, t_eff, at_eff;
+            let resValue, tHalf, k_eff, t_eff, at_eff;
 
             try {
                 if (mode === 'at') {
@@ -262,7 +277,7 @@
                     else if (order === 1) at_eff = a0 * Math.exp(-k_eff * t_eff);
                     else if (order === 2) at_eff = 1 / (k_eff * t_eff + (1/a0));
                     else if (order === 3) at_eff = Math.sqrt(1 / (2 * k_eff * t_eff + (1/(a0**2))));
-                    res = at_eff.toExponential(4) + " M";
+                    resValue = formatResult(at_eff, "M");
                 } 
                 else if (mode === 't') {
                     k_eff = k_input; at_eff = at_input;
@@ -270,7 +285,7 @@
                     else if (order === 1) t_eff = Math.log(a0 / at_eff) / k_eff;
                     else if (order === 2) t_eff = (1/at_eff - 1/a0) / k_eff;
                     else if (order === 3) t_eff = (1/(2 * at_eff**2) - 1/(2 * a0**2)) / k_eff;
-                    res = t_eff.toFixed(2) + " s";
+                    resValue = formatResult(t_eff, "s");
                 }
                 else if (mode === 'k') {
                     t_eff = t_input; at_eff = at_input;
@@ -278,25 +293,23 @@
                     else if (order === 1) k_eff = Math.log(a0 / at_eff) / t_eff;
                     else if (order === 2) k_eff = (1/at_eff - 1/a0) / t_eff;
                     else if (order === 3) k_eff = (1/(2 * at_eff**2) - 1/(2 * a0**2)) / t_eff;
-                    res = k_eff.toExponential(3);
+                    resValue = formatResult(k_eff);
                 }
 
-                // Generic Half-life Logic
                 if (order === 0) tHalf = a0 / (2 * k_eff);
                 else if (order === 1) tHalf = Math.log(2) / k_eff;
                 else if (order === 2) tHalf = 1 / (k_eff * a0);
                 else if (order === 3) tHalf = 1.5 / (k_eff * (a0**2));
 
-                document.getElementById('res_main').innerText = res;
-                document.getElementById('res_half').innerText = (isFinite(tHalf) && tHalf > 0) ? tHalf.toFixed(2) + "s" : "N/A";
+                document.getElementById('res_main').innerText = resValue;
+                document.getElementById('res_half').innerText = formatResult(tHalf, "s");
                 
                 updateGraph(order, a0, k_eff, tHalf);
                 if (window.MathJax) MathJax.typesetPromise();
-            } catch(e) { console.error("Kinetics Error:", e); }
+            } catch(e) { console.error(e); }
         }
 
         function solveArrhenius() {
-            // Apply smartParser to Arrhenius inputs
             const k1 = smartParser(document.getElementById('arr_k1').value);
             const t1 = smartParser(document.getElementById('arr_t1').value);
             const k2 = smartParser(document.getElementById('arr_k2').value);
@@ -304,7 +317,6 @@
             const R = 8.314;
 
             if (!isNaN(k1) && !isNaN(k2) && !isNaN(t1) && !isNaN(t2)) {
-                // Two-point Arrhenius: Ea = (R * ln(k2/k1)) / (1/T1 - 1/T2)
                 const ea = (R * Math.log(k2/k1)) / ((1/t1) - (1/t2));
                 const ea_kj = ea / 1000;
                 document.getElementById('res_ea').innerText = ea_kj.toFixed(2);
@@ -312,27 +324,22 @@
             }
         }
 
+        // Rest of animation and graph logic (Destroyed and recreated as needed)
         function updateBoltzmann(Ea) {
             const ctx = document.getElementById('boltzmannChart').getContext('2d');
-            const R = 8.314;
-            const T = 298; 
-            const labels = [];
-            const data = [];
-
+            const R = 8.314; const T = 298; 
+            const labels = []; const data = [];
             for (let e = 0; e <= 150; e += 2) {
                 let fE = (1 / (R * T / 1000)) * Math.exp(-e / (R * T / 1000));
-                labels.push(e);
-                data.push(fE);
+                labels.push(e); data.push(fE);
             }
-
             if (boltzChartInstance) boltzChartInstance.destroy();
-
             boltzChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Fraction of Molecules',
+                        label: 'Fraction',
                         data: data,
                         borderColor: '#3b82f6',
                         fill: true,
@@ -348,24 +355,16 @@
                             gradient.addColorStop(1, 'rgba(0, 255, 213, 0.4)');
                             return gradient;
                         },
-                        tension: 0.4,
-                        pointRadius: 0
+                        tension: 0.4, pointRadius: 0
                     }]
                 },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { title: { display: true, text: 'Energy (kJ/mol)', color: '#94a3b8' } },
-                        y: { display: false }
-                    }
-                }
+                options: { plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'Energy (kJ/mol)', color: '#94a3b8' } }, y: { display: false } } }
             });
         }
 
         function updateGraph(order, a0, k, tHalf) {
             const labels = [], data = [];
             const maxT = (isFinite(tHalf) && tHalf > 0) ? tHalf * 4 : 50;
-            
             for(let i=0; i<=30; i++) {
                 let time = (maxT/30)*i;
                 let conc;
@@ -373,34 +372,13 @@
                 else if(order==1) conc = a0 * Math.exp(-k*time);
                 else if(order==2) conc = 1 / (k*time + (1/a0));
                 else conc = Math.sqrt(1 / (2*k*time + (1/a0**2)));
-                
-                labels.push(time.toFixed(1)); 
-                data.push(conc.toFixed(4));
+                labels.push(time.toFixed(1)); data.push(conc.toFixed(4));
             }
-            
             if(myChart) myChart.destroy();
             myChart = new Chart(document.getElementById('kineticsChart'), {
                 type: 'line',
-                data: { 
-                    labels, 
-                    datasets: [{ 
-                        label: 'Concentration [A]', 
-                        data, 
-                        borderColor: '#00ffd5', 
-                        fill: true, 
-                        backgroundColor: 'rgba(0,255,213,0.1)', 
-                        tension: 0.4, 
-                        pointRadius: 0 
-                    }] 
-                },
-                options: { 
-                    responsive: true, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Conc (M)', color: '#94a3b8' } }, 
-                        x: { title: { display: true, text: 'Time (s)', color: '#94a3b8' } } 
-                    } 
-                }
+                data: { labels, datasets: [{ label: 'Conc [A]', data, borderColor: '#00ffd5', fill: true, backgroundColor: 'rgba(0,255,213,0.1)', tension: 0.4, pointRadius: 0 }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { title: { display: true, text: 'Conc (M)', color: '#94a3b8' } }, x: { title: { display: true, text: 'Time (s)', color: '#94a3b8' } } } }
             });
         }
 
@@ -436,10 +414,7 @@
         }
 
         window.onload = () => { 
-            toggleInputs(); 
-            initCollision(); 
-            solveKinetics(); 
-            updateBoltzmann(50);
+            toggleInputs(); initCollision(); solveKinetics(); updateBoltzmann(50);
             fetch('footer.html').then(res => res.text()).then(d => {
                 const f = document.getElementById('footer-container');
                 if(f) f.innerHTML = d;
