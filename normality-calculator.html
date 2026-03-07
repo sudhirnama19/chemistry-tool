@@ -72,6 +72,22 @@
             border-radius: 12px;
             padding: 12px;
         }
+
+        /* This makes the hint text (placeholders) visible on dark backgrounds */
+input::placeholder {
+    color: #94a3b8 !important; /* A light silver-grey */
+    opacity: 0.8 !important;   /* Ensures it isn't too faint */
+}
+
+/* For older browsers like Internet Explorer or Edge */
+input:-ms-input-placeholder {
+    color: #94a3b8 !important;
+}
+
+/* For Safari and Chrome */
+input::-webkit-input-placeholder {
+    color: #94a3b8 !important;
+}
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 0.25rem rgba(0, 255, 213, 0.1); }
 
         .btn-calc {
@@ -171,26 +187,105 @@
             <div id="res_mix" class="result-display"></div>
         </div>
 
-        <div class="info-card">
-            <h6 style="color:var(--accent);">JEE Advanced & GATE Insights</h6>
-            <p class="theory-text">
-                Normality is crucial in <strong>Redox Titrations</strong>. The law of equivalence states that at the end point, equivalents of oxidizing agent = equivalents of reducing agent ($N_1V_1 = N_2V_2$). 
-            </p>
-            <p class="theory-text">
-                <strong>CSIR-NET Difficulty:</strong> Advanced problems involve "Double Titration" (e.g., $Na_2CO_3$ and $NaHCO_3$ mixture). Always calculate the n-factor based on the specific indicator used (Phenolphthalein vs Methyl Orange).
-            </p>
-        </div>
+        <style>
+    input::placeholder { color: #94a3b8 !important; opacity: 0.8 !important; }
+    input::-webkit-input-placeholder { color: #94a3b8 !important; }
+    input:-ms-input-placeholder { color: #94a3b8 !important; }
+</style>
 
-        <div class="info-card">
-            <h6 style="color:var(--accent);">Scientific Research & FAQs</h6>
-            <div class="theory-text">
-                <strong>Q: Is Normality temperature-dependent?</strong><br>
-                A: Yes. Because volume changes with temperature, Normality is not thermally stable. In high-precision research, Molality is often used instead.
-            </div>
-            <div class="theory-text">
-                <strong>Unique Fact:</strong> For mono-protic acids like $HCl$, Molarity and Normality are identical ($n=1$).
-            </div>
-        </div>
+<div class="info-card">
+    <h6 style="color:var(--accent); font-weight:800; font-size:1.1rem;">Advanced Analytical Chemistry & Competitive Exam Logic</h6>
+    
+    <p class="theory-text">
+        In high-level competitive examinations such as <strong>JEE Advanced, GATE, and CSIR-NET</strong>, Normality ($N$) is the preferred concentration unit for solving complex volumetric analysis problems without the need for balanced chemical equations. This is possible due to the <strong>Law of Chemical Equivalence</strong>, which dictates that one gram equivalent of an oxidizing agent reacts exactly with one gram equivalent of a reducing agent ($N_1V_1 = N_2V_2$).
+    </p>
+
+    <p class="theory-text">
+        <strong>Double Titration Dynamics:</strong> Advanced stoichiometry often involves mixtures like $Na_2CO_3$ and $NaHCO_3$. The calculated Normality varies based on the indicator's endpoint:
+        <ul>
+            <li class="small text-dim"><strong>Phenolphthalein:</strong> Only half-neutralizes Carbonate to Bicarbonate ($n=1$).</li>
+            <li class="small text-dim"><strong>Methyl Orange:</strong> Fully neutralizes both Carbonate and Bicarbonate components ($n=2$ for $Na_2CO_3$).</li>
+        </ul>
+    </p>
+
+    <p class="theory-text">
+        <strong>Redox Potential & n-factor Variability:</strong> Unlike Molarity, the Normality of a solution can change based on the reaction medium. For example, $KMnO_4$ (Potassium Permanganate) exhibits an $n$-factor of 5 in acidic conditions ($Mn^{+7}$ to $Mn^{+2}$), 3 in neutral/weakly alkaline ($Mn^{+7}$ to $Mn^{+4}$), and 1 in strongly alkaline media ($Mn^{+7}$ to $Mn^{+6}$).
+    </p>
+</div>
+
+<div class="info-card">
+    <h6 style="color:var(--accent); font-weight:800; font-size:1.1rem;">Normality FAQ: 12 Essential Questions</h6>
+    
+    <div class="theory-text">
+        <strong>1. What is the fundamental difference between Molarity and Normality?</strong><br>
+        Molarity measures moles per liter, while Normality measures equivalents per liter, accounting for the reactive capacity or valency factor of the solute.
+    </div>
+
+    <div class="theory-text">
+        <strong>2. Why is Normality considered temperature-dependent?</strong><br>
+        Since Normality is a volume-based unit, and liquids expand or contract with temperature, the concentration changes slightly as the temperature fluctuates.
+    </div>
+
+    <div class="theory-text">
+        <strong>3. Can Normality ever be less than Molarity?</strong><br>
+        No. Because the $n$-factor (valency) is always an integer $\ge 1$, Normality is always equal to or greater than Molarity ($N = M \times n$).
+    </div>
+
+    <div class="theory-text">
+        <strong>4. How do you calculate the n-factor for an acid?</strong><br>
+        For acids, the $n$-factor is equal to its <strong>basicity</strong>, which is the number of replaceable $H^+$ ions per molecule (e.g., $H_2SO_4$ has $n=2$).
+    </div>
+
+    <div class="theory-text">
+        <strong>5. What is the n-factor for a base?</strong><br>
+        For bases, it is the <strong>acidity</strong>, representing the number of replaceable $OH^-$ ions (e.g., $NaOH$ has $n=1$, $Ca(OH)_2$ has $n=2$).
+    </div>
+
+    <div class="theory-text">
+        <strong>6. What is the Normality of a 1M solution of $H_3PO_4$?</strong><br>
+        It can be $1N$, $2N$, or $3N$ depending on how many hydrogen atoms are replaced in the specific chemical reaction.
+    </div>
+
+    <div class="theory-text">
+        <strong>7. Is Normality used in Organic Chemistry?</strong><br>
+        While less common than Molarity, it is used in organic analysis for saponification values and determining the equivalent weights of organic acids.
+    </div>
+
+    <div class="theory-text">
+        <strong>8. What unit is used for Normality?</strong><br>
+        The standard unit is equivalents per liter ($eq/L$), often abbreviated as '$N$'.
+    </div>
+
+    <div class="theory-text">
+        <strong>9. How do you find the Resultant Normality when mixing an acid and a base?</strong><br>
+        If the volumes and normalities differ, use $N_R = \frac{|N_aV_a - N_bV_b|}{V_a + V_b}$ to find the remaining concentration after neutralization.
+    </div>
+
+    <div class="theory-text">
+        <strong>10. Why is Molality often preferred over Normality in research?</strong><br>
+        Molality is mass-based and remains constant regardless of temperature, making it more reliable for thermodynamic calculations.
+    </div>
+
+    <div class="theory-text">
+        <strong>11. What is a "Normal Solution"?</strong><br>
+        A normal solution ($1N$) contains exactly one gram equivalent of solute dissolved in one liter of solution.
+    </div>
+
+    <div class="theory-text">
+        <strong>12. How does n-factor work in salt solutions?</strong><br>
+        For salts, the $n$-factor is the total magnitude of the positive or negative charge on the ions produced (e.g., for $Al_2(SO_4)_3$, $n=6$).
+    </div>
+</div>
+
+<div class="info-card">
+    <h6 style="color:var(--accent); font-weight:800;">Scientific Research Facts</h6>
+    <p class="theory-text">
+        <strong>Historical Context:</strong> The concept of equivalents was developed before the modern understanding of atomic weights to standardize titration results across different laboratories.
+    </p>
+    <p class="theory-text">
+        <strong>Precision Tip:</strong> In modern ISO-certified labs, Normality is frequently cross-verified with Molarity using high-performance liquid chromatography (HPLC) to ensure reagent stability.
+    </p>
+</div>
 
     </div>
 
