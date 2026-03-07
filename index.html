@@ -5,120 +5,180 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Chemistry Tools Lab | Free JEE, NEET, CSIR-NET & GATE Chemistry Calculators</title>
-    <meta name="description" content="Access free advanced chemistry tools: pH Calculator, Buffer Solution Simulator, Salt Hydrolysis, and more. Designed for NEET, JEE, and CSIR-NET aspirants.">
+    <title>Chemistry Spark Lab | Advanced Interactive Chemistry Tools</title>
+    <meta name="description" content="Professional-grade chemistry calculators for JEE, NEET, and CSIR-NET. pH Calculator, Titration Simulators, and Thermodynamics Solvers with a modern interface.">
     <link rel="canonical" href="https://chemistrytools.sudhirnama.in/">
     <link rel="alternate" hreflang="en" href="https://chemistrytools.sudhirnama.in/">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://chemistrytools.sudhirnama.in/">
-    <meta property="og:title" content="Chemistry Tools Lab | Interactive Chemistry Simulators">
-    <meta property="og:description" content="Master physical chemistry with professional-grade calculators.">
-    <meta property="og:image" content="https://images.sudhirnama.in/images/chemistry-spark.webp">
 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Chemistry Tools Lab",
+      "name": "Chemistry Spark Lab",
       "url": "https://chemistrytools.sudhirnama.in",
-      "description": "Interactive chemistry calculators for competitive exams.",
-      "applicationCategory": "EducationalApplication",
-      "operatingSystem": "Any",
+      "applicationCategory": "Education",
+      "genre": "Chemistry",
+      "browserRequirements": "Requires JavaScript",
       "author": { "@type": "Person", "name": "Sudhir Nama" }
     }
     </script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&family=Inter:wght@400;600;800&display=swap">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-blue: #007bff;
-            --accent-cyan: #00ffd5;
-            --glass: rgba(255, 255, 255, 0.07);
-            --bg-dark: #0f172a;
+            --bg-deep: #020617;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #22d3ee;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
-            color: white;
+            background: radial-gradient(circle at 0% 0%, #0f172a 0%, #020617 100%);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             margin: 0;
             padding-top: 100px;
-            font-size: 16px;
+            line-height: 1.6;
         }
 
+        /* --- MODERN NAVBAR --- */
         .navbar {
-            background: rgba(15, 23, 42, 0.9) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            height: 80px;
+            background: rgba(2, 6, 23, 0.7) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
         }
 
-        .brand-text {
+        .navbar-brand {
             font-weight: 800;
-            font-size: 1.4rem;
-            background: linear-gradient(45deg, #007bff, #00ffd5);
+            letter-spacing: -1px;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero-section {
+            text-align: center;
+            padding: 40px 0 60px;
         }
 
         .hero-title {
             font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            margin-bottom: 10px;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
-            color: #94a3b8;
-            font-size: 1.1rem;
-            margin-bottom: 40px;
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            max-width: 650px;
+            margin: 0 auto;
         }
 
-        /* Optimized Grid: No unnecessary wrappers */
+        /* --- TRENDY TOOL GRID --- */
         .tool-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            padding-bottom: 80px;
         }
 
         .tool-card {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 40px 30px;
             text-decoration: none !important;
-            color: white !important;
-            transition: 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            height: 100%;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .tool-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(34, 211, 238, 0.1), transparent);
+            opacity: 0;
+            transition: 0.4s;
         }
 
         .tool-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.06);
             border-color: var(--accent-cyan);
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+                        0 0 20px rgba(34, 211, 238, 0.1);
         }
 
-        .icon-box {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: var(--accent-cyan);
+        .tool-card:hover::after { opacity: 1; }
+
+        .icon-wrapper {
+            width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            transition: 0.3s;
         }
 
-        .tool-name { font-weight: 700; font-size: 1.25rem; margin-bottom: 10px; color: white; }
-        .tool-desc { font-size: 0.95rem; color: #cbd5e1; line-height: 1.4; margin: 0; }
+        .tool-card:hover .icon-wrapper {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            transform: scale(1.1) rotate(5deg);
+        }
 
-        footer p { color: rgba(255, 255, 255, 0.7) !important; }
+        .tool-name {
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .tool-desc {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            margin: 0;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid var(--glass-border);
+            padding: 60px 0 30px;
+            margin-top: 50px;
+        }
+
+        .footer-text { color: var(--text-dim); font-size: 0.9rem; }
+        .footer-link { 
+            color: var(--accent-cyan); 
+            text-decoration: none; 
+            font-weight: 600;
+        }
 
         @media (max-width: 768px) {
-            body { padding-top: 90px; }
+            body { padding-top: 80px; }
+            .hero-title { font-size: 2.8rem; }
             .tool-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -127,95 +187,94 @@
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <span class="brand-text">Chemistry Spark Lab</span>
-            </a>
-            <div class="ms-auto text-muted small d-none d-md-block">Powered by Sudhir Nama</div>
+            <a class="navbar-brand" href="/">CHEMISTRY SPARK</a>
+            <div class="ms-auto d-none d-md-block text-dim small">
+                Interactive Lab Suite v3.0
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <header class="text-center">
-            <h1 class="hero-title">Virtual Chemistry Tools</h1>
-            <p class="hero-subtitle">Advanced Calculators for JEE, NEET, and Chemistry Exams</p>
+        <header class="hero-section">
+            <h1 class="hero-title">Virtual Chemistry Lab</h1>
+            <p class="hero-subtitle">Professional analytical tools designed for JEE, NEET, and Advanced Academic Chemistry research.</p>
         </header>
 
         <section class="tool-grid">
             <a href="ph-calculator.html" class="tool-card">
-                <div class="icon-box">🧪</div>
-                <h2 class="tool-name">pH Calculator</h2>
-                <p class="tool-desc">Calculate pH of strong/weak acids and mixtures instantly.</p>
+                <div class="icon-wrapper">🧪</div>
+                <h2 class="tool-name">pH Master</h2>
+                <p class="tool-desc">Calculate pH for strong/weak acids, bases, and complex aqueous mixtures.</p>
             </a>
 
             <a href="buffer-calculator.html" class="tool-card">
-                <div class="icon-box">🛡️</div>
-                <h2 class="tool-name">Buffer Calculator</h2>
-                <p class="tool-desc">Henderson-Hasselbalch based advanced buffer solutions.</p>
+                <div class="icon-wrapper">🛡️</div>
+                <h2 class="tool-name">Buffer Solver</h2>
+                <p class="tool-desc">Henderson-Hasselbalch simulator for high-precision buffer preparation.</p>
             </a>
 
             <a href="salt-hydrolysis.html" class="tool-card">
-                <div class="icon-box">⚗️</div>
-                <h2 class="tool-name">Salt Hydrolysis</h2>
-                <p class="tool-desc">Analyze cationic, anionic, and amphiprotic salt hydrolysis.</p>
+                <div class="icon-wrapper">⚗️</div>
+                <h2 class="tool-name">Hydrolysis Lab</h2>
+                <p class="tool-desc">Analyze cationic, anionic, and amphiprotic salt hydrolysis constants.</p>
             </a>
 
             <a href="titration-simulator.html" class="tool-card">
-                <div class="icon-box">📊</div>
-                <h2 class="tool-name">Titration Simulator</h2>
-                <p class="tool-desc">Visualize titration curves for various acid-base pairs.</p>
+                <div class="icon-wrapper">📊</div>
+                <h2 class="tool-name">Titration Pro</h2>
+                <p class="tool-desc">Generate titration curves and locate equivalence points with visual data.</p>
             </a>
 
             <a href="rate-calculator.html" class="tool-card">
-                <div class="icon-box">⌛</div>
-                <h2 class="tool-name">Rate Calculator</h2>
-                <p class="tool-desc">Calculate reaction rates and half-life for all reaction orders.</p>
+                <div class="icon-wrapper">⌛</div>
+                <h2 class="tool-name">Rate Kinetics</h2>
+                <p class="tool-desc">Calculate order of reaction, rate constants, and half-life dynamics.</p>
             </a>
 
             <a href="stereoisomers-calculator.html" class="tool-card">
-                <div class="icon-box">🧬</div>
-                <h2 class="tool-name">Stereoisomers</h2>
-                <p class="tool-desc">Find total optical and geometrical isomers for compounds.</p>
+                <div class="icon-wrapper">🧬</div>
+                <h2 class="tool-name">Isomer Center</h2>
+                <p class="tool-desc">Calculate total stereoisomers including enantiomers and meso-forms.</p>
             </a>
 
             <a href="thermodynamics-solver.html" class="tool-card">
-                <div class="icon-box">🔥</div>
-                <h2 class="tool-name">Thermodynamics</h2>
-                <p class="tool-desc">Solve for Enthalpy, Entropy, and Gibbs Free Energy.</p>
+                <div class="icon-wrapper">🔥</div>
+                <h2 class="tool-name">Thermo Solver</h2>
+                <p class="tool-desc">Solve Gibbs Free Energy, Enthalpy, and Entropy for chemical equilibrium.</p>
             </a>
 
             <a href="molarity-calculator.html" class="tool-card">
-                <div class="icon-box">💧</div>
-                <h2 class="tool-name">Molarity Calculator</h2>
-                <p class="tool-desc">Calculate molarity, moles, and volume for solutions.</p>
+                <div class="icon-wrapper">💧</div>
+                <h2 class="tool-name">Molarity Calc</h2>
+                <p class="tool-desc">Solution stoichiometry and concentration mapping for laboratory use.</p>
             </a>
 
             <a href="molality-calculator.html" class="tool-card">
-                <div class="icon-box">⚖️</div>
-                <h2 class="tool-name">Molality Calculator</h2>
-                <p class="tool-desc">Calculate molality based on solute and solvent mass.</p>
+                <div class="icon-wrapper">⚖️</div>
+                <h2 class="tool-name">Molality Calc</h2>
+                <p class="tool-desc">Temperature-independent concentration calculations for precise solutes.</p>
             </a>
         </section>
 
-        <footer class="mt-5 pt-5 pb-4 text-center">
-            <hr style="opacity: 0.1;">
-            <p class="small">
-                © 2023-2026 Chemistry Spark Publication. All rights reserved.<br>
-                <a href="https://sudhirnama.in" target="_blank" rel="noopener" style="color:var(--accent-cyan); text-decoration:none;">Developed by Sudhir Nama</a>
+        <footer class="text-center">
+            <p class="footer-text">
+                © 2023-2026 Chemistry Spark Publication. Engineered for Excellence.<br>
+                <a href="https://sudhirnama.in" target="_blank" class="footer-link">Developed by Sudhir Nama</a>
             </p>
         </footer>
     </main>
 
-    <script defer>
-        window.addEventListener('load', () => {
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.tool-card');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
-                card.style.transform = 'translateY(15px)';
+                card.style.transform = 'translateY(20px)';
                 setTimeout(() => {
-                    card.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+                    card.style.transition = '0.6s cubic-bezier(0.23, 1, 0.32, 1)';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, 50 * index);
+                }, 60 * index);
             });
         });
     </script>
