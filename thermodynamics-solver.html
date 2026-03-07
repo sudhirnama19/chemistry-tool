@@ -113,6 +113,28 @@
         }
 
         .faq-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; margin-bottom: 15px; }
+
+        /* Fix for equations overflowing boxes on mobile */
+.formula-box {
+    overflow-x: auto; /* Adds horizontal scroll if math is too wide */
+    white-space: nowrap; /* Keeps equations on one line */
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    border-left: 4px solid var(--accent-cyan);
+    margin: 20px 0;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: var(--accent-cyan) transparent;
+}
+
+/* Custom scrollbar for Chrome/Safari to keep it looking premium */
+.formula-box::-webkit-scrollbar {
+    height: 4px;
+}
+.formula-box::-webkit-scrollbar-thumb {
+    background: var(--accent-cyan);
+    border-radius: 10px;
+}
     </style>
 </head>
 <body>
@@ -172,13 +194,22 @@
         </div>
 
         <section class="theory-section">
-    <h2>Fundamental Thermodynamic Equations</h2>
+    <h2 class="mb-4">Fundamental Thermodynamic Equations</h2>
     <div class="formula-box">
-        <p><strong>Enthalpy:</strong> $\Delta H = \Delta U + P\Delta V$</p>
-        <p><strong>Entropy Change:</strong> $\Delta S = nC_v\ln(T_2/T_1) + nR\ln(V_2/V_1)$</p>
-        <p><strong>Gibbs Energy:</strong> $\Delta G = \Delta H - T\Delta S$</p>
+        <div class="mb-3">
+            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Enthalpy:</span>
+            $\Delta H = \Delta U + P\Delta V$
+        </div>
+        <div class="mb-3">
+            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Entropy Change:</span>
+            $\Delta S = nC_v\ln(T_2/T_1) + nR\ln(V_2/V_1)$
+        </div>
+        <div>
+            <span style="color: var(--accent-cyan); display: block; margin-bottom: 5px;">Gibbs Energy:</span>
+            $\Delta G = \Delta H - T\Delta S$
+        </div>
     </div>
-        </section>
+</section>
 
             <h2 class="mt-5">Frequently Asked Questions (FAQ)</h2>
             <div class="faq-item">
