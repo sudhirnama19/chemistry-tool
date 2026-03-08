@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrolysis & Electroplating Solver | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 750px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 1rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #footer-container { margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 style="color:var(--accent); font-weight:800;">Electrolysis & Faraday's Laws</h4>
+            <p class="theory-text">
+                **Electrolysis** is a process that uses direct electric current (DC) to drive an otherwise non-spontaneous chemical reaction. This is commercially important in the separation of elements from naturally occurring sources.
+            </p>
+            <div class="formula-box text-center">
+                Faraday's 1st Law: $W = Z \cdot I \cdot t$ <br>
+                Mass Liberated: $W = \frac{E \cdot I \cdot t}{96500}$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-mass', this)">Mass Liberated</button>
+            <button class="pill-tab" onclick="switchTab('calc-time', this)">Time Required</button>
+            <button class="pill-tab" onclick="switchTab('calc-current', this)">Current (I)</button>
+            <button class="pill-tab" onclick="switchTab('calc-charge', this)">Charge (Q)</button>
+            <button class="pill-tab" onclick="switchTab('calc-plating', this)">Plating Thickness</button>
+        </div>
+
+        <div id="calc-mass" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Calculate Mass Liberated ($W$)</h5>
+            <label class="form-label">Equivalent Weight ($E$) [At. Mass / Valency]</label>
+            <input type="text" id="eq_w" class="form-control" placeholder="e.g. 31.75 for Cu">
+            <label class="form-label">Current ($I$) in Amperes</label>
+            <input type="text" id="curr_i" class="form-control" placeholder="e.g. 2.0">
+            <label class="form-label">Time ($t$) in Seconds</label>
+            <input type="text" id="time_t" class="form-control" placeholder="e.g. 1800">
+            <button onclick="calculateMass()" class="btn-calc">Find Mass (grams)</button>
+            <div id="res_mass" class="result-display"></div>
+        </div>
+
+        <div id="calc-time" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Calculate Time Required ($t$)</h5>
+            <label class="form-label">Mass to be deposited ($W$) in grams</label>
+            <input type="text" id="mass_w" class="form-control" placeholder="e.g. 0.5">
+            <label class="form-label">Equivalent Weight ($E$)</label>
+            <input type="text" id="eq_w_t" class="form-control" placeholder="e.g. 107.87 for Ag">
+            <label class="form-label">Current ($I$) in Amperes</label>
+            <input type="text" id="curr_i_t" class="form-control" placeholder="e.g. 1.5">
+            <button onclick="calculateTime()" class="btn-calc" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">Calculate Time</button>
+            <div id="res_time" class="result-display"></div>
+        </div>
+
+        <div id="calc-current" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Calculate Current Intensity ($I$)</h5>
+            <label class="form-label">Mass Deposited ($W$) in grams</label>
+            <input type="text" id="mass_w_i" class="form-control">
+            <label class="form-label">Equivalent Weight ($E$)</label>
+            <input type="text" id="eq_w_i" class="form-control">
+            <label class="form-label">Time ($t$) in Seconds</label>
+            <input type="text" id="time_t_i" class="form-control">
+            <button onclick="calculateCurrent()" class="btn-calc" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Find Amperage</button>
+            <div id="res_curr" class="result-display"></div>
+        </div>
+
+        <div id="calc-charge" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Charge & Faraday Count</h5>
+            <label class="form-label">Current ($I$) in Amperes</label>
+            <input type="text" id="q_i" class="form-control">
+            <label class="form-label">Time ($t$) in Seconds</label>
+            <input type="text" id="q_t" class="form-control">
+            <button onclick="calculateCharge()" class="btn-calc" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">Calculate Coulombs</button>
+            <div id="res_charge" class="result-display"></div>
+        </div>
+
+        <div id="calc-plating" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Electroplating Thickness</h5>
+            <label class="form-label">Mass Deposited ($W$) in grams</label>
+            <input type="text" id="plate_mass" class="form-control" placeholder="e.g. 2.5">
+            <label class="form-label">Surface Area ($A$) in $cm^2$</label>
+            <input type="text" id="plate_area" class="form-control" placeholder="e.g. 50">
+            <label class="form-label">Density of Metal ($\rho$) in $g/cm^3$</label>
+            <input type="text" id="plate_dens" class="form-control" placeholder="e.g. 8.96 for Copper">
+            <button onclick="calculateThickness()" class="btn-calc" style="background: linear-gradient(135deg, #22d3ee, #3b82f6);">Calculate Thickness</button>
+            <div id="res_plating" class="result-display"></div>
+            <div class="formula-box text-center mt-3" style="font-size: 0.85rem;">
+                Thickness ($d$) = $\frac{W}{A \cdot \rho}$
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">What is Electrolysis?</h5>
+            <p class="theory-text">
+                Electrolysis is the decomposition of an electrolyte by the passage of an electric current. It occurs in an **Electrolytic Cell**, where electrical energy is converted into chemical energy.
+            </p>
+            <h6 style="color:var(--accent);">How it Works</h6>
+            <p class="theory-text">
+                When the DC power supply is turned on:
+                <ul>
+                    <li><strong>Cations (+):</strong> Migrate toward the negative electrode (**Cathode**) and gain electrons (Reduction).</li>
+                    <li><strong>Anions (-):</strong> Migrate toward the positive electrode (**Anode**) and lose electrons (Oxidation).</li>
+                </ul>
+                The total amount of chemical change is directly proportional to the quantity of electricity passed.
+            </p>
+            <h6 style="color:var(--accent);">Applications</h6>
+            <ul>
+                <li><strong>Electroplating:</strong> Coating a cheap metal with a layer of a precious metal (Gold, Silver, Chromium).</li>
+                <li><strong>Extraction of Metals:</strong> Producing Reactive metals like Aluminum (Hall-Héroult process) and Sodium.</li>
+                <li><strong>Refining:</strong> Purifying metals like Copper to 99.99% purity.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Solved Examples</h5>
+            <div class="theory-text">
+                <strong>Example 1:</strong> A current of 0.5A is passed through $CuSO_4$ for 30 mins. Find the mass of Cu deposited. ($E=31.75$)<br>
+                $W = (31.75 \times 0.5 \times 1800) / 96500 = 0.296$ g.
+            </div>
+            <hr style="border-color:var(--border)">
+            <div class="theory-text">
+                <strong>Example 2:</strong> How many Coulombs are required to deposit 1 mole of $Al$ from $Al^{3+}$?<br>
+                Since $n=3$, Charge = $3 \times 96500 = 289,500$ C.
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Scientific Research & Green Energy</h5>
+            <p class="theory-text">
+                Electrolysis is at the heart of the "Hydrogen Economy." Researchers are focusing on:
+                <ul>
+                    <li><strong>Water Electrolysis:</strong> Splitting water into Hydrogen and Oxygen using renewable energy (Solar/Wind).</li>
+                    <li><strong>Carbon Capture:</strong> Using electrolytic cells to convert atmospheric $CO_2$ into useful fuels.</li>
+                    <li><strong>Nanotechnology:</strong> Electro-deposition of nanowires for next-gen semiconductors.</li>
+                </ul>
+            </p>
+        </div>
+
+        <h5 class="text-center mb-4" style="color:var(--accent);">Frequently Asked Questions</h5>
+        <div class="row g-3">
+            <script>
+                const faqs = [
+                    ["What is Faraday's First Law?", "The mass of a substance deposited at an electrode is directly proportional to the quantity of electricity passed."],
+                    ["What is an electrolyte?", "A substance that dissociates into ions in solution and conducts electricity."],
+                    ["What is the value of 1 Faraday?", "Approximately 96,500 Coulombs (the charge of 1 mole of electrons)."],
+                    ["Which electrode is negative in electrolysis?", "The Cathode is the negative electrode in an electrolytic cell."],
+                    ["What is Electro-chemical Equivalent (Z)?", "The mass of substance deposited by 1 Coulomb of electricity."],
+                    ["Can AC be used for electrolysis?", "No, AC changes direction rapidly, resulting in no net chemical change. DC is required."],
+                    ["What is the Hall-Héroult process?", "An industrial electrolytic process used to extract pure Aluminum from Alumina."],
+                    ["What is overpotential?", "The extra voltage required beyond the theoretical value to drive a reaction at a specific rate."],
+                    ["Does temperature affect electrolysis?", "Yes, higher temperatures increase ionic mobility and usually speed up the process."],
+                    ["What happens at the Anode?", "Oxidation occurs at the anode (loss of electrons)."],
+                    ["Why is a salt bridge not used here?", "Electrolytic cells often use a single compartment; salt bridges are for Galvanic cells."],
+                    ["What is 'Current Efficiency'?", "The ratio of the actual mass deposited to the theoretical mass calculated by Faraday's law."],
+                    ["What is brine electrolysis?", "Electrolysis of NaCl solution to produce Chlorine gas, Hydrogen, and NaOH."],
+                    ["What determines which ion is discharged?", "The standard reduction potential and the concentration of the ions."],
+                    ["What is the units of Z?", "Grams per Coulomb (g/C)."],
+                    ["Is electrolysis spontaneous?", "No, it is non-spontaneous and requires an external EMF source."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`
+                        <div class="col-12">
+                            <div class="glass-card mb-0" style="padding:15px 20px;">
+                                <p class="mb-1"><strong>${f[0]}</strong></p>
+                                <small class="text-secondary">${f[1]}</small>
+                            </div>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calculateMass() {
+            let e = smartParser(document.getElementById('eq_w').value);
+            let i = smartParser(document.getElementById('curr_i').value);
+            let t = smartParser(document.getElementById('time_t').value);
+            if(isNaN(e) || isNaN(i) || isNaN(t)) return;
+            let res = (e * i * t) / 96500;
+            let out = document.getElementById('res_mass');
+            out.innerHTML = `<strong>Mass Deposited ($W$):</strong> ${res.toFixed(5)} grams`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateTime() {
+            let w = smartParser(document.getElementById('mass_w').value);
+            let e = smartParser(document.getElementById('eq_w_t').value);
+            let i = smartParser(document.getElementById('curr_i_t').value);
+            if(isNaN(w) || isNaN(e) || isNaN(i)) return;
+            let res = (w * 96500) / (e * i);
+            let out = document.getElementById('res_time');
+            out.innerHTML = `<strong>Time Required ($t$):</strong> ${res.toFixed(2)} seconds <br><small>(${ (res/60).toFixed(2) } minutes)</small>`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateCurrent() {
+            let w = smartParser(document.getElementById('mass_w_i').value);
+            let e = smartParser(document.getElementById('eq_w_i').value);
+            let t = smartParser(document.getElementById('time_t_i').value);
+            if(isNaN(w) || isNaN(e) || isNaN(t)) return;
+            let res = (w * 96500) / (e * t);
+            let out = document.getElementById('res_curr');
+            out.innerHTML = `<strong>Current Intensity ($I$):</strong> ${res.toFixed(4)} Amperes`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateCharge() {
+            let i = smartParser(document.getElementById('q_i').value);
+            let t = smartParser(document.getElementById('q_t').value);
+            if(isNaN(i) || isNaN(t)) return;
+            let q = i * t;
+            let f = q / 96500;
+            let out = document.getElementById('res_charge');
+            out.innerHTML = `<strong>Total Charge ($Q$):</strong> ${q.toFixed(2)} Coulombs <br><strong>Faradays:</strong> ${f.toFixed(5)} F`;
+            out.style.display = "block";
+        }
+
+        function calculateThickness() {
+            let w = smartParser(document.getElementById('plate_mass').value);
+            let a = smartParser(document.getElementById('plate_area').value);
+            let rho = smartParser(document.getElementById('plate_dens').value);
+            if(isNaN(w) || isNaN(a) || isNaN(rho) || a === 0 || rho === 0) return;
+            let d = w / (a * rho);
+            let out = document.getElementById('res_plating');
+            out.innerHTML = `<strong>Layer Thickness ($d$):</strong> ${d.toFixed(6)} cm <br><small>(${ (d * 10000).toFixed(2) } Micrometers/µm)</small>`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
