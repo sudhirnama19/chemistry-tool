@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ionic Strength & Mean Activity Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+            padding-bottom: 0 !important; margin-bottom: 0 !important;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 700px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS & PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        input::placeholder { color: #94a3b8 !important; opacity: 0.8 !important; font-size: 0.9rem; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .tab-panel { display: none; animation: fadeIn 0.4s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.9rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+
+        /* TABLE STYLING */
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .ref-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; text-align: left; }
+        .ref-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+
+        #footer-container { margin-top: 20px; padding-bottom: 20px; margin-bottom: 0 !important; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">What is Ionic Strength ($I$)?</h6>
+            <p class="theory-text">
+                Ionic strength is a measure of the total concentration of ions in a solution. It significantly influences the activity coefficients of electrolytes and the solubility of sparingly soluble salts.
+            </p>
+            <div class="formula-box text-center">
+                $I = \frac{1}{2} \sum c_i z_i^2$ &nbsp; | &nbsp; $\log \gamma_{\pm} = -0.509 |z_+ z_-| \sqrt{I}$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-i', this)">Ionic Strength</button>
+            <button class="pill-tab" onclick="switchTab('calc-gamma', this)">Single Ion $\gamma$</button>
+            <button class="pill-tab" onclick="switchTab('calc-mean', this)">Mean $\gamma_{\pm}$</button>
+        </div>
+
+        <div id="calc-i" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Ionic Strength Solver</h5>
+            <div id="ion-list">
+                <div class="row g-2 mb-3 ion-row">
+                    <div class="col-6"><label class="form-label">Molar Conc (mol/L)</label><input type="text" class="form-control ion-c" placeholder="e.g. 0.1"></div>
+                    <div class="col-6"><label class="form-label">Ion Charge ($z$)</label><input type="text" class="form-control ion-z" placeholder="e.g. 1"></div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-info w-100 mb-3" onclick="addIonRow()">+ Add Another Ion</button>
+            <button onclick="calculateI()" class="btn-calc">Calculate $I$</button>
+            <div id="res_i" class="result-display"></div>
+        </div>
+
+        <div id="calc-gamma" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Activity Coefficient ($\gamma$)</h5>
+            <label class="form-label">Ionic Strength ($I$)</label>
+            <input type="text" id="i_input" class="form-control" placeholder="e.g. 0.1">
+            <label class="form-label">Charge of target ion ($z$)</label>
+            <input type="text" id="z_target" class="form-control" placeholder="e.g. 2">
+            <button onclick="calculateGamma()" class="btn-calc">Calculate $\gamma$</button>
+            <div id="res_gamma" class="result-display"></div>
+        </div>
+
+        <div id="calc-mean" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Mean Activity ($\gamma_{\pm}$)</h5>
+            <label class="form-label">Ionic Strength ($I$)</label>
+            <input type="text" id="i_mean_input" class="form-control" placeholder="e.g. 0.1">
+            <div class="row g-2">
+                <div class="col-6"><label class="form-label">Cation Charge ($z_+$)</label><input type="text" id="z_plus" class="form-control" placeholder="e.g. 2"></div>
+                <div class="col-6"><label class="form-label">Anion Charge ($z_-$)</label><input type="text" id="z_minus" class="form-control" placeholder="e.g. 3"></div>
+            </div>
+            <button onclick="calculateMeanGamma()" class="btn-calc">Calculate $\gamma_{\pm}$</button>
+            <div id="res_mean" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Quick Reference: Ionic Strength vs Molarity</h6>
+            <table class="ref-table">
+                <thead>
+                    <tr><th>Electrolyte Type</th><th>0.1 M</th><th>0.5 M</th><th>1.0 M</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1:1 (e.g., NaCl)</td><td>0.10 I</td><td>0.50 I</td><td>1.00 I</td></tr>
+                    <tr><td>1:2 (e.g., MgCl₂)</td><td>0.30 I</td><td>1.50 I</td><td>3.00 I</td></tr>
+                    <tr><td>2:2 (e.g., MgSO₄)</td><td>0.40 I</td><td>2.00 I</td><td>4.00 I</td></tr>
+                    <tr><td>1:3 (e.g., AlCl₃)</td><td>0.60 I</td><td>3.00 I</td><td>6.00 I</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800; font-size:1.1rem;">Scientific Research & Application</h6>
+            <p class="theory-text">
+                In <strong>Scientific Research</strong>, ionic strength is a critical parameter in the <strong>Debye-Hückel Theory</strong>, which describes how ions interact in dilute solutions. It is used to calculate the mean activity coefficient, which is essential for accurate pH measurements and electrochemical studies.
+            </p>
+            <p class="theory-text">
+                <strong>Example Application:</strong> In protein purification (Chromatography), researchers adjust the ionic strength of the buffer to modulate the binding affinity between proteins and the stationary phase.
+            </p>
+        </div>
+
+        <h5 class="mt-5 mb-3 text-center" style="color:var(--accent)">16 Frequently Asked Questions</h5>
+        
+        <div class="glass-card"><p><strong>1. Does ionic strength depend on the type of ion?</strong><br><small>Yes, because the charge ($z$) is squared, multi-valent ions contribute much more to ionic strength.</small></p></div>
+        <div class="glass-card"><p><strong>2. What is the ionic strength of 0.1M NaCl?</strong><br><small>Since both ions have $z=1$, the ionic strength is exactly 0.1 M.</small></p></div>
+        <div class="glass-card"><p><strong>3. How does ionic strength affect solubility?</strong><br><small>Increasing ionic strength typically increases the solubility of a salt by decreasing activity coefficients.</small></p></div>
+        <div class="glass-card"><p><strong>4. Is ionic strength the same as ionic concentration?</strong><br><small>No. It weights ions by the square of their charges.</small></p></div>
+        <div class="glass-card"><p><strong>5. Can ionic strength be zero?</strong><br><small>Only in pure water or solutions of non-electrolytes.</small></p></div>
+        <div class="glass-card"><p><strong>6. Why is ionic strength important in biochemistry?</strong><br><small>It stabilizes DNA and proteins by screening electrostatic repulsions.</small></p></div>
+        <div class="glass-card"><p><strong>7. What is the unit of ionic strength?</strong><br><small>Usually expressed in Molar ($mol/L$) or Molal ($mol/kg$).</small></p></div>
+        <div class="glass-card"><p><strong>8. How does Debye-Hückel relate to $I$?</strong><br><small>The limiting law states $\log \gamma$ is proportional to $\sqrt{I}$.</small></p></div>
+        <div class="glass-card"><p><strong>9. Does temperature affect ionic strength?</strong><br><small>In Molarity, it changes slightly due to volume expansion; in Molality, it remains constant.</small></p></div>
+        <div class="glass-card"><p><strong>10. What is the ionic strength of a 1:2 electrolyte?</strong><br><small>For 0.1M $MgCl_2$, $I = 0.3 M$.</small></p></div>
+        <div class="glass-card"><p><strong>11. How is it applied in electrochemistry?</strong><br><small>Used to maintain a constant "ionic background" to minimize migration current.</small></p></div>
+        <div class="glass-card"><p><strong>12. Does pH affect ionic strength?</strong><br><small>Yes, especially in buffers where pH changes ionization states.</small></p></div>
+        <div class="glass-card"><p><strong>13. What is the "Salt-Out" effect?</strong><br><small>At high $I$, ions compete for water, causing proteins to precipitate.</small></p></div>
+        <div class="glass-card"><p><strong>14. Is ionic strength used in soil science?</strong><br><small>Yes, to understand cation exchange and nutrient availability.</small></p></div>
+        <div class="glass-card"><p><strong>15. Can I use this for CSIR-NET?</strong><br><small>Absolutely. It covers fundamental physical chemistry modules.</small></p></div>
+        <div class="glass-card"><p><strong>16. Why is the charge squared in the formula?</strong><br><small>Electrostatic potential depends on the square of the charge per Coulomb's Law.</small></p></div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function addIonRow() {
+            let div = document.createElement('div');
+            div.className = "row g-2 mb-3 ion-row";
+            div.innerHTML = `
+                <div class="col-6"><input type="text" class="form-control ion-c" placeholder="Conc."></div>
+                <div class="col-6"><input type="text" class="form-control ion-z" placeholder="Charge"></div>`;
+            document.getElementById('ion-list').appendChild(div);
+        }
+
+        function calculateI() {
+            let cs = document.getElementsByClassName('ion-c');
+            let zs = document.getElementsByClassName('ion-z');
+            let sum = 0;
+            for(let i=0; i<cs.length; i++) {
+                let c = smartParser(cs[i].value);
+                let z = smartParser(zs[i].value);
+                if(!isNaN(c) && !isNaN(z)) sum += (c * Math.pow(z, 2));
+            }
+            let i_val = 0.5 * sum;
+            let out = document.getElementById('res_i');
+            out.innerHTML = `<strong>Resultant Ionic Strength ($I$):</strong> ${i_val.toFixed(5)} M`;
+            out.style.display = "block";
+            document.getElementById('i_input').value = i_val.toFixed(5);
+            document.getElementById('i_mean_input').value = i_val.toFixed(5);
+            MathJax.typesetPromise();
+        }
+
+        function calculateGamma() {
+            let i = smartParser(document.getElementById('i_input').value);
+            let z = smartParser(document.getElementById('z_target').value);
+            if(isNaN(i) || isNaN(z)) return;
+            let logGamma = -0.509 * Math.pow(z, 2) * Math.sqrt(i);
+            let gamma = Math.pow(10, logGamma);
+            let out = document.getElementById('res_gamma');
+            out.innerHTML = `<strong>Activity Coefficient ($\gamma$):</strong> ${gamma.toFixed(4)}`;
+            out.style.display = "block";
+        }
+
+        function calculateMeanGamma() {
+            let i = smartParser(document.getElementById('i_mean_input').value);
+            let zp = Math.abs(smartParser(document.getElementById('z_plus').value));
+            let zm = Math.abs(smartParser(document.getElementById('z_minus').value));
+            if(isNaN(i) || isNaN(zp) || isNaN(zm)) return;
+            let logGammaPm = -0.509 * (zp * zm) * Math.sqrt(i);
+            let gammaPm = Math.pow(10, logGammaPm);
+            let out = document.getElementById('res_mean');
+            out.innerHTML = `<strong>Mean Activity Coefficient ($\gamma_{\pm}$):</strong> ${gammaPm.toFixed(4)}`;
+            out.style.display = "block";
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
