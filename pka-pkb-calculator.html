@@ -1,1 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pKa & pKb Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; padding-bottom: 50px; 
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 700px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS - NO OVERLAP */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; transition: 0.3s;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .form-control::placeholder { color: #64748b !important; opacity: 0.8; }
+        
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .tab-panel { display: none; animation: fadeIn 0.4s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.9rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">What are $pK_a$ and $pK_b$?</h6>
+            <p class="theory-text">
+                $pK_a$ and $pK_b$ are logarithmic scales used to determine the strength of acids and bases, respectively. They represent the negative base-10 logarithm of the dissociation constants ($K_a$ and $K_b$).
+            </p>
+            <div class="formula-box text-center">
+                $pK_a = -\log_{10}(K_a)$ &nbsp; | &nbsp; $pK_b = -\log_{10}(K_b)$ <br>
+                <strong>Relationship:</strong> $pK_a + pK_b = 14$ (at 25°C)
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchCalc('pka-tab', this)">Solve $pK_a$</button>
+            <button class="pill-tab" onclick="switchCalc('pkb-tab', this)">Solve $pK_b$</button>
+            <button class="pill-tab" onclick="switchCalc('conv-tab', this)">$pK_a \leftrightarrow pK_b$</button>
+        </div>
+
+        <div id="pka-tab" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Acid Dissociation Constant</h5>
+            <label class="form-label">Acid Dissociation Constant ($K_a$)</label>
+            <input type="text" id="ka_val" class="form-control" placeholder="e.g. 1.8e-5">
+            <button onclick="calcPka()" class="btn-calc">Calculate $pK_a$</button>
+            <div id="res_pka" class="result-display"></div>
+        </div>
+
+        <div id="pkb-tab" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Base Dissociation Constant</h5>
+            <label class="form-label">Base Dissociation Constant ($K_b$)</label>
+            <input type="text" id="kb_val" class="form-control" placeholder="e.g. 1.75e-5">
+            <button onclick="calcPkb()" class="btn-calc">Calculate $pK_b$</button>
+            <div id="res_pkb" class="result-display"></div>
+        </div>
+
+        <div id="conv-tab" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Relationship Solver</h5>
+            <p class="small text-center text-secondary">Converts between conjugate acid-base pairs</p>
+            <label class="form-label">Known Value ($pK_a$ or $pK_b$)</label>
+            <input type="text" id="known_p" class="form-control" placeholder="e.g. 4.74">
+            <button onclick="calcConv()" class="btn-calc">Find Conjugate Value</button>
+            <div id="res_conv" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Scientific Significance & Research</h6>
+            <p class="theory-text">
+                In <strong>Scientific Research</strong>, $pK_a$ values are critical for predicting the ionization state of molecules at specific pH levels. This is vital in pharmacology for drug absorption and in biochemistry for understanding protein folding. 
+            </p>
+            <p class="theory-text">
+                <strong>JEE & GATE Insight:</strong> Lower $pK_a$ values indicate stronger acids. For example, Trifluoroacetic acid has a much lower $pK_a$ than Acetic acid due to the electron-withdrawing inductive effect of Fluorine atoms.
+            </p>
+        </div>
+
+        <h5 class="mt-5 mb-3 text-center" style="color:var(--accent)">Frequently Asked Questions</h5>
+        
+        <div class="glass-card"><p><strong>1. What does a high pKa value mean?</strong><br><small>A higher $pK_a$ indicates a weaker acid because it means the $K_a$ is smaller, showing less dissociation.</small></p></div>
+        <div class="glass-card"><p><strong>2. How are pKa and pH different?</strong><br><small>pH measures the $H^+$ concentration of a solution, while $pK_a$ is a constant property of the acid itself.</small></p></div>
+        <div class="glass-card"><p><strong>3. Can pKa be negative?</strong><br><small>Yes. Strong acids like $HCl$ have negative $pK_a$ values, meaning they dissociate almost completely in water.</small></p></div>
+        <div class="glass-card"><p><strong>4. Why is pKa + pKb = 14?</strong><br><small>This stems from the water auto-ionization constant ($K_w = 10^{-14}$). It applies to any conjugate acid-base pair.</small></p></div>
+        <div class="glass-card"><p><strong>5. Does temperature affect pKa?</strong><br><small>Yes. Equilibrium constants are temperature-dependent. Most standard values are measured at 25°C.</small></p></div>
+        <div class="glass-card"><p><strong>6. Is pKa used in medicine?</strong><br><small>Crucially. It determines if a drug will be absorbed in the acidic stomach or the alkaline intestines.</small></p></div>
+        <div class="glass-card"><p><strong>7. What is the pKa of water?</strong><br><small>The $pK_a$ of water is approximately 15.7 at 25°C.</small></p></div>
+        <div class="glass-card"><p><strong>8. How do I find Ka from pKa?</strong><br><small>Use the inverse log formula: $K_a = 10^{-pK_a}$.</small></p></div>
+        <div class="glass-card"><p><strong>9. Why is pKa important for buffers?</strong><br><small>A buffer is most effective when the pH of the solution is close to the $pK_a$ of the acid used.</small></p></div>
+        <div class="glass-card"><p><strong>10. What is the n-factor in pKa?</strong><br><small>For polyprotic acids (like $H_2SO_4$), there is a different $pK_a$ for each dissociable hydrogen ($pK_{a1}$, $pK_{a2}$).</small></p></div>
+        <div class="glass-card"><p><strong>11. Are pKb values used for amines?</strong><br><small>Yes, amines are weak bases, and $pK_b$ is the standard way to compare their basic strengths.</small></p></div>
+        <div class="glass-card"><p><strong>12. Can I use this for CSIR-NET?</strong><br><small>Absolutely. It covers the fundamental logarithmic relationships required for advanced chemical equilibrium questions.</small></p></div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser for scientific notation (e, ^)
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchCalc(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+            if(window.MathJax) MathJax.typesetPromise();
+        }
+
+        function calcPka() {
+            let ka = smartParser(document.getElementById('ka_val').value);
+            let res = -Math.log10(ka);
+            let out = document.getElementById('res_pka');
+            out.innerHTML = `<strong>$pK_a$:</strong> ${res.toFixed(4)}`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calcPkb() {
+            let kb = smartParser(document.getElementById('kb_val').value);
+            let res = -Math.log10(kb);
+            let out = document.getElementById('res_pkb');
+            out.innerHTML = `<strong>$pK_b$:</strong> ${res.toFixed(4)}`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calcConv() {
+            let p = smartParser(document.getElementById('known_p').value);
+            let res = 14 - p;
+            let out = document.getElementById('res_conv');
+            out.innerHTML = `<strong>Conjugate Value:</strong> ${res.toFixed(4)}`;
+            out.style.display = "block";
+        }
+
+        // Load External Footer
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
