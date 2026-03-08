@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equilibrium Constant (Kc & Kp) Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+            padding-bottom: 0 !important; margin-bottom: 0 !important;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 700px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS & PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        input::placeholder { color: #94a3b8 !important; opacity: 0.8 !important; font-size: 0.9rem; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .tab-panel { display: none; animation: fadeIn 0.4s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.9rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+
+        /* FOOTER GAP FIX */
+        #footer-container { margin-top: 20px; padding-bottom: 20px; margin-bottom: 0 !important; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Chemical Equilibrium Definition</h6>
+            <p class="theory-text">
+                Chemical equilibrium occurs in a reversible reaction when the rate of the forward reaction equals the rate of the backward reaction, resulting in constant concentrations of reactants and products.
+            </p>
+            <div class="formula-box text-center">
+                For reaction: $aA + bB \rightleftharpoons cC + dD$ <br><br>
+                $K_c = \frac{[C]^c [D]^d}{[A]^a [B]^b}$ &nbsp; | &nbsp; $K_p = K_c(RT)^{\Delta n}$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchCalc('kc-solver', this)">$K_c$ Solver</button>
+            <button class="pill-tab" onclick="switchCalc('kp-converter', this)">$K_p$ Converter</button>
+            <button class="pill-tab" onclick="switchCalc('le-chatelier', this)">Le Chatelier</button>
+        </div>
+
+        <div id="kc-solver" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Equilibrium Constant ($K_c$)</h5>
+            <div class="row g-2">
+                <div class="col-6"><label class="form-label">[Product C]</label><input type="text" id="prodC" class="form-control" placeholder="Conc."></div>
+                <div class="col-6"><label class="form-label">Coeff (c)</label><input type="text" id="coeffC" class="form-control" placeholder="1"></div>
+                <div class="col-6"><label class="form-label">[Product D]</label><input type="text" id="prodD" class="form-control" placeholder="Conc."></div>
+                <div class="col-6"><label class="form-label">Coeff (d)</label><input type="text" id="coeffD" class="form-control" placeholder="1"></div>
+                <hr class="my-3 border-secondary">
+                <div class="col-6"><label class="form-label">[Reactant A]</label><input type="text" id="reacA" class="form-control" placeholder="Conc."></div>
+                <div class="col-6"><label class="form-label">Coeff (a)</label><input type="text" id="coeffA" class="form-control" placeholder="1"></div>
+                <div class="col-6"><label class="form-label">[Reactant B]</label><input type="text" id="reacB" class="form-control" placeholder="Conc."></div>
+                <div class="col-6"><label class="form-label">Coeff (b)</label><input type="text" id="coeffB" class="form-control" placeholder="1"></div>
+            </div>
+            <button onclick="calculateKc()" class="btn-calc">Calculate $K_c$</button>
+            <div id="res_kc" class="result-display"></div>
+        </div>
+
+        <div id="kp-converter" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">$K_c$ to $K_p$ Conversion</h5>
+            <label class="form-label">Known $K_c$</label>
+            <input type="text" id="kc_input" class="form-control" placeholder="e.g. 2.5e-2">
+            <label class="form-label">Change in Gas Moles ($\Delta n$)</label>
+            <input type="text" id="dn_input" class="form-control" placeholder="e.g. -1">
+            <label class="form-label">Temperature (K)</label>
+            <input type="text" id="temp_input" class="form-control" placeholder="298">
+            <button onclick="calculateKp()" class="btn-calc">Calculate $K_p$</button>
+            <div id="res_kp" class="result-display"></div>
+        </div>
+
+        <div id="le-chatelier" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Equilibrium Shift Predictor</h5>
+            <label class="form-label">Select Disturbance</label>
+            <select id="disturbance" class="form-control">
+                <option value="inc_reac">Increase Reactant Concentration</option>
+                <option value="dec_reac">Decrease Reactant Concentration</option>
+                <option value="inc_press">Increase Pressure (Gas side: R=3, P=2)</option>
+                <option value="dec_press">Decrease Pressure (Gas side: R=3, P=2)</option>
+                <option value="inc_temp">Increase Temp (Exothermic Reaction)</option>
+                <option value="dec_temp">Decrease Temp (Exothermic Reaction)</option>
+            </select>
+            <button onclick="simulateShift()" class="btn-calc">Predict Shift</button>
+            <div id="res_shift" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800; font-size:1.1rem;">The Role of $K_c$ in Advanced Chemistry</h6>
+            <p class="theory-text">
+                The equilibrium constant ($K_c$) provides a quantitative measure of the extent of a chemical reaction. A large $K_c$ ( > 10³) suggests the reaction favors product formation, while a small $K_c$ ( < 10⁻³) indicates that reactants predominate at equilibrium.
+            </p>
+            <p class="theory-text">
+                <strong>Types of Constants:</strong>
+                <ul>
+                    <li class="small text-dim"><strong>$K_p$:</strong> Equilibrium constant in terms of partial pressures (for gases).</li>
+                    <li class="small text-dim"><strong>$K_{sp}$:</strong> Solubility product constant for sparingly soluble salts.</li>
+                    <li class="small text-dim"><strong>$K_a / K_b$:</strong> Dissociation constants for weak acids and bases.</li>
+                </ul>
+            </p>
+        </div>
+
+        <h5 class="mt-5 mb-3 text-center" style="color:var(--accent)">Equilibrium FAQ: Expert Insights</h5>
+        
+        <div class="glass-card"><p><strong>1. Does $K_c$ change with concentration?</strong><br><small>No. While individual concentrations change, the ratio ($K_c$) remains constant at a fixed temperature.</small></p></div>
+        <div class="glass-card"><p><strong>2. How does temperature affect $K_c$?</strong><br><small>For exothermic reactions, $K_c$ decreases as temperature rises. For endothermic reactions, it increases.</small></p></div>
+        <div class="glass-card"><p><strong>3. What is the difference between $Q_c$ and $K_c$?</strong><br><small>$Q_c$ is the reaction quotient at any time, while $K_c$ is specifically the ratio at equilibrium.</small></p></div>
+        <div class="glass-card"><p><strong>4. Can $K_c$ ever be zero?</strong><br><small>Theoretically no; as long as the reaction is reversible, some reactants and products will coexist.</small></p></div>
+        <div class="glass-card"><p><strong>5. Why are pure solids/liquids omitted from $K_c$?</strong><br><small>Their active masses are considered constant and are mathematically absorbed into the equilibrium constant.</small></p></div>
+        <div class="glass-card"><p><strong>6. What is the relationship between $K_p$ and $K_c$?</strong><br><small>The relationship is defined as $K_p = K_c(RT)^{\Delta n}$, where $R$ is the gas constant.</small></p></div>
+        <div class="glass-card"><p><strong>7. How is $K_c$ used in the Haber Process?</strong><br><small>It helps determine the precise industrial conditions needed to maximize ammonia yield.</small></p></div>
+        <div class="glass-card"><p><strong>8. Does a catalyst change $K_c$?</strong><br><small>No. Catalysts decrease the time to reach equilibrium but do not shift the equilibrium position.</small></p></div>
+        <div class="glass-card"><p><strong>9. Is $K_c$ related to Gibbs Free Energy?</strong><br><small>Yes, $\Delta G^\circ = -RT \ln K_c$ links chemical equilibrium to thermodynamics.</small></p></div>
+        <div class="glass-card"><p><strong>10. What are the units of $K_c$?</strong><br><small>Units vary based on the difference in stoichiometry, typically $(mol/L)^{\Delta n}$.</small></p></div>
+        <div class="glass-card"><p><strong>11. What is Le Chatelier's Principle?</strong><br><small>It predicts how a system shifts to counteract changes in concentration, pressure, or temperature.</small></p></div>
+        <div class="glass-card"><p><strong>12. Why is $K_c$ vital for environmental research?</strong><br><small>It is used to predict pollutant behavior and atmospheric gas interactions.</small></p></div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchCalc(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+            if(window.MathJax) MathJax.typesetPromise();
+        }
+
+        function calculateKc() {
+            const getVal = (id) => smartParser(document.getElementById(id).value) || 1;
+            const getConc = (id) => smartParser(document.getElementById(id).value);
+            let c = getConc('prodC'), d = getConc('prodD'), a = getConc('reacA'), b = getConc('reacB');
+            let cc = getVal('coeffC'), cd = getVal('coeffD'), ca = getVal('coeffA'), cb = getVal('coeffB');
+            let num = (isNaN(c)?1:Math.pow(c,cc)) * (isNaN(d)?1:Math.pow(d,cd));
+            let den = (isNaN(a)?1:Math.pow(a,ca)) * (isNaN(b)?1:Math.pow(b,cb));
+            let kc = num / den;
+            let out = document.getElementById('res_kc');
+            out.innerHTML = `<strong>Equilibrium Constant ($K_c$):</strong> ${kc.toExponential(4)}`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateKp() {
+            let kc = smartParser(document.getElementById('kc_input').value);
+            let dn = smartParser(document.getElementById('dn_input').value);
+            let t = smartParser(document.getElementById('temp_input').value) || 298;
+            let kp = kc * Math.pow(0.0821 * t, dn);
+            let out = document.getElementById('res_kp');
+            out.innerHTML = `<strong>Calculated $K_p$:</strong> ${kp.toExponential(4)}`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function simulateShift() {
+            let choice = document.getElementById('disturbance').value;
+            let msg = "";
+            if(choice === "inc_reac") msg = "Shift: <strong>Forward (Right)</strong> to consume excess reactant.";
+            else if(choice === "dec_reac") msg = "Shift: <strong>Backward (Left)</strong> to replace lost reactant.";
+            else if(choice === "inc_press") msg = "Shift: <strong>Forward (Right)</strong> toward fewer moles (2 < 3).";
+            else if(choice === "dec_press") msg = "Shift: <strong>Backward (Left)</strong> toward more moles (3 > 2).";
+            else if(choice === "inc_temp") msg = "Shift: <strong>Backward (Left)</strong> to absorb heat (Exothermic).";
+            else if(choice === "dec_temp") msg = "Shift: <strong>Forward (Right)</strong> to release heat (Exothermic).";
+            let out = document.getElementById('res_shift');
+            out.innerHTML = msg;
+            out.style.display = "block";
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
