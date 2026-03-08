@@ -39,17 +39,27 @@
     <link rel="alternate" hreflang="en" href="https://chemistrytools.sudhirnama.in/">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Advanced Chemistry Tools",
-      "url": "https://chemistrytools.sudhirnama.in",
-      "applicationCategory": "Education",
-      "genre": "Chemistry",
-      "browserRequirements": "Requires JavaScript",
-      "author": { "@type": "Person", "name": "Sudhir Nama" }
-    }
-    </script>
+{
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "Chemistry Calculators",
+"url": "https://chemistrytools.sudhirnama.in/",
+"applicationCategory": "EducationalApplication",
+"operatingSystem": "All",
+"description": "Free online chemistry calculators including pH calculator, buffer calculator, molarity calculator, dilution calculator, titration calculator and more.",
+"creator": {
+ "@type": "Person",
+ "name": "Sudhir Nama",
+ "url": "https://sudhirnama.in"
+},
+"publisher": {
+ "@type": "Organization",
+ "name": "Chemistry Spark",
+ "url": "https://chemistryspark.sudhirnama.in",
+ "logo": "https://images.sudhirnama.in/images/chemistry-spark.webp"
+}
+}
+</script>
 
     <script type="application/ld+json">
 {
@@ -298,6 +308,45 @@
     height: 80%;
     object-fit: contain;
 }
+
+
+
+        .calculator-directory {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.directory-title {
+    color: #f8fafc;
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.calc-card {
+    background: #1e293b; /* Subtle dark blue-grey card */
+    color: #cbd5e1;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+}
+
+.calc-card:hover {
+    background: #334155;
+    transform: translateY(-3px);
+    color: #fff;
+}
     </style>
 </head>
 <body>
@@ -495,6 +544,43 @@
                 </div>
             </div>
         </div>
+    </div>
+</section>
+
+
+
+
+        <section class="calculator-directory">
+    <h2 class="directory-title">Popular Chemistry Calculators</h2>
+    <div class="calculator-grid">
+        <div class="calc-card">pH Calculator</div>
+        <div class="calc-card">pOH Calculator</div>
+        <div class="calc-card">Buffer Calculator</div>
+        <div class="calc-card">Henderson Hasselbalch Calculator</div>
+        <div class="calc-card">Molarity Calculator</div>
+        <div class="calc-card">Dilution Calculator</div>
+        <div class="calc-card">Titration Calculator</div>
+        <div class="calc-card">Salt Hydrolysis Calculator</div>
+        <div class="calc-card">Rate Of Reaction Calculator</div>
+        <div class="calc-card">Arrhenius Activation Solver</div>
+        <div class="calc-card">Stereoisomers Calculator</div>
+        <div class="calc-card">Thermodynamics Problem Solver</div>
+        <div class="calc-card">Mixture Molarity Calculator</div>
+        <div class="calc-card">Quick Unit Converter</div>
+        <div class="calc-card">Molality Calculator</div>
+        <div class="calc-card">Mole Fraction Solver</div>
+        <div class="calc-card">Weight To Normality Calculator</div>
+        <div class="calc-card">Molarity To Normality Calculation</div>
+        <div class="calc-card">Mixing Solution Normality</div>
+        <div class="calc-card">pKa Solver</div>
+        <div class="calc-card">pKb Solver</div>
+        <div class="calc-card">pKa & pKb Relationship Calculator</div>
+        <div class="calc-card">Equilibrium Constant (Kc) Solver</div>
+        <div class="calc-card">Kc To Kp Converter</div>
+        <div class="calc-card">Equilibrium Shift Predictor</div>
+        <div class="calc-card">Ionic Strength Calculator</div>
+        <div class="calc-card">Activity Coefficient Calculation</div>
+        <div class="calc-card">Mean Activity Solver</div>
     </div>
 </section>
 
