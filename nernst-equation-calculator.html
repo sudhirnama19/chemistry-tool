@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nernst Equation & pH Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+            padding-bottom: 0 !important; margin-bottom: 0 !important;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 700px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* INPUTS & PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        input::placeholder { color: #94a3b8 !important; opacity: 0.8 !important; font-size: 0.9rem; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.9rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+
+        /* TABLE STYLING */
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .ref-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; text-align: left; }
+        .ref-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+
+        #footer-container { margin-top: 20px; padding-bottom: 20px; margin-bottom: 0 !important; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">What is the Nernst Equation?</h6>
+            <p class="theory-text">
+                The Nernst Equation relates the reduction potential of an electrochemical reaction to the standard electrode potential, temperature, and activities of the chemical species undergoing oxidation and reduction.
+            </p>
+            <div class="formula-box text-center">
+                At 25°C (298.15 K): <br>
+                $E = E^0 - \frac{0.0592}{n} \log_{10} Q$ <br><br>
+                General Form: $E = E^0 - \frac{RT}{nF} \ln Q$
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="text-center mb-4">Nernst Potential Solver</h5>
+            
+            <label class="form-label">Standard Cell Potential ($E^0$) in Volts</label>
+            <input type="text" id="e0_val" class="form-control" placeholder="e.g. 1.10">
+            
+            <label class="form-label">Number of Electrons Transferred ($n$)</label>
+            <input type="text" id="n_val" class="form-control" placeholder="e.g. 2">
+
+            <div class="row">
+                <div class="col-6">
+                    <label class="form-label">[Products]</label>
+                    <input type="text" id="prod_val" class="form-control" placeholder="e.g. 0.01">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">[Reactants]</label>
+                    <input type="text" id="reac_val" class="form-control" placeholder="e.g. 1.0">
+                </div>
+            </div>
+
+            <button onclick="calculateNernst()" class="btn-calc">Calculate Cell Potential ($E$)</button>
+            <div id="res_nernst" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="text-center mb-4">Hydrogen Electrode & pH Converter</h5>
+            <p class="theory-text small">Use this for $2H^+ + 2e^- \rightarrow H_2$ reactions ($E^0 = 0$).</p>
+            
+            <label class="form-label">Solution pH</label>
+            <input type="text" id="ph_input" class="form-control" placeholder="e.g. 7.0">
+            
+            <label class="form-label">Pressure of $H_2$ (atm)</label>
+            <input type="text" id="p_h2" class="form-control" value="1.0">
+
+            <button onclick="calculateH2Potential()" class="btn-calc" style="background: linear-gradient(135deg, #a855f7, var(--accent));">Calculate $E_{H_2}$</button>
+            <div id="res_ph" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Standard Reduction Potentials ($E^0$) at 25°C</h6>
+            <table class="ref-table">
+                <thead>
+                    <tr><th>Half-Reaction</th><th>$E^0$ (V)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>$Li^+ + e^- \rightarrow Li$</td><td>-3.04</td></tr>
+                    <tr><td>$Zn^{2+} + 2e^- \rightarrow Zn$</td><td>-0.76</td></tr>
+                    <tr><td>$2H^+ + 2e^- \rightarrow H_2$</td><td>0.00</td></tr>
+                    <tr><td>$Cu^{2+} + 2e^- \rightarrow Cu$</td><td>+0.34</td></tr>
+                    <tr><td>$Ag^+ + e^- \rightarrow Ag$</td><td>+0.80</td></tr>
+                    <tr><td>$F_2 + 2e^- \rightarrow 2F^-$</td><td>+2.87</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800; font-size:1.1rem;">How the Nernst Equation Works</h6>
+            <p class="theory-text">
+                The equation functions as a bridge between thermodynamics and electrochemistry. It determines the maximum potential a battery can generate based on the concentration of its electrolytes. As reactants are consumed, $Q$ increases, causing $E$ to drop until the cell reaches equilibrium ($E = 0$).
+            </p>
+            
+            <h6 class="mt-4" style="color:var(--accent); font-weight:700;">Small Derivation</h6>
+            <div class="formula-box">
+                1. From Gibbs Free Energy: $\Delta G = \Delta G^0 + RT \ln Q$ <br>
+                2. Substitute $\Delta G = -nFE$: $-nFE = -nFE^0 + RT \ln Q$ <br>
+                3. Divide by $-nF$: $E = E^0 - \frac{RT}{nF} \ln Q$
+            </div>
+            
+            <h6 class="mt-4" style="color:var(--accent); font-weight:700;">Key Objects/Variables</h6>
+            <ul class="theory-text small">
+                <li><strong>$R$:</strong> Universal Gas Constant (8.314 J/mol·K)</li>
+                <li><strong>$T$:</strong> Absolute Temperature in Kelvin</li>
+                <li><strong>$F$:</strong> Faraday Constant (96485 C/mol)</li>
+                <li><strong>$Q$:</strong> Reaction Quotient ([Products]/[Reactants])</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Application in Scientific Research</h6>
+            <p class="theory-text">
+                In modern research, the Nernst Equation is vital for:
+                <ul>
+                    <li><strong>Ion-Selective Electrodes:</strong> Designing pH meters and sensors for blood analysis.</li>
+                    <li><strong>Neuroscience:</strong> Calculating the resting membrane potential of neurons based on ion gradients.</li>
+                    <li><strong>Battery Tech:</strong> Optimizing lithium-ion charge/discharge cycles.</li>
+                </ul>
+            </p>
+        </div>
+
+        <h5 class="mt-5 mb-3 text-center" style="color:var(--accent)">16 Frequently Asked Questions</h5>
+        
+        <div class="glass-card"><p><strong>1. What happens to $E$ when concentrations are equal?</strong><br><small>If [Products] = [Reactants], $Q=1$ and $\log(1)=0$, so $E = E^0$.</small></p></div>
+        <div class="glass-card"><p><strong>2. Can the Nernst potential be negative?</strong><br><small>Yes, if the concentration gradient is strong enough to reverse the spontaneous direction of the cell.</small></p></div>
+        <div class="glass-card"><p><strong>3. Why is 0.0592 used in some versions?</strong><br><small>It represents the value of $(2.303 \times RT) / F$ at exactly 25°C.</small></p></div>
+        <div class="glass-card"><p><strong>4. Does temperature affect the cell potential?</strong><br><small>Yes, as $T$ increases, the effect of the concentration ratio on the potential becomes more significant.</small></p></div>
+        <div class="glass-card"><p><strong>5. What is $Q$ in the Nernst equation?</strong><br><small>It is the reaction quotient, calculated as the activity of products divided by reactants.</small></p></div>
+        <div class="glass-card"><p><strong>6. Is Nernst equation applicable to gases?</strong><br><small>Yes, by using partial pressures ($P$) instead of molar concentrations.</small></p></div>
+        <div class="glass-card"><p><strong>7. How is it used in biology?</strong><br><small>To calculate the equilibrium potential for specific ions like $K^+$ across a cell membrane.</small></p></div>
+        <div class="glass-card"><p><strong>8. What is the value of Faraday's constant?</strong><br><small>Approximately 96,485 Coulombs per mole of electrons.</small></p></div>
+        <div class="glass-card"><p><strong>9. Does it work for non-standard states?</strong><br><small>That is its primary purpose: determining potential under any concentration/pressure.</small></p></div>
+        <div class="glass-card"><p><strong>10. What is $E^0$?</strong><br><small>The standard reduction potential measured at 1M concentration and 1 atm pressure.</small></p></div>
+        <div class="glass-card"><p><strong>11. Why do batteries "die"?</strong><br><small>Because concentrations change until $Q$ reaches a value where $E = 0$ (Equilibrium).</small></p></div>
+        <div class="glass-card"><p><strong>12. Can I use this for concentration cells?</strong><br><small>Yes. In concentration cells, $E^0$ is 0, and the potential is driven purely by the Nernst term.</small></p></div>
+        <div class="glass-card"><p><strong>13. Is the equation accurate for high concentrations?</strong><br><small>At high concentrations, activities should be used instead of molarity for better accuracy.</small></p></div>
+        <div class="glass-card"><p><strong>14. How many electrons ($n$) should I use?</strong><br><small>Use the total number of electrons exchanged in the balanced redox half-reaction.</small></p></div>
+        <div class="glass-card"><p><strong>15. Does it assume ideal behavior?</strong><br><small>Yes, the basic form assumes ideal solution behavior; corrections use activity coefficients.</small></p></div>
+        <div class="glass-card"><p><strong>16. Why is natural log ($\ln$) sometimes $\log_{10}$?</strong><br><small>Chemists often use $\log_{10}$ by multiplying the $\ln$ term by 2.303 for easier mental calculation.</small></p></div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser for Scientific Notation
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function calculateNernst() {
+            let e0 = smartParser(document.getElementById('e0_val').value);
+            let n = smartParser(document.getElementById('n_val').value);
+            let prod = smartParser(document.getElementById('prod_val').value);
+            let reac = smartParser(document.getElementById('reac_val').value);
+
+            if(isNaN(e0) || isNaN(n) || isNaN(prod) || isNaN(reac)) {
+                alert("Please check your inputs."); return;
+            }
+
+            let Q = prod / reac;
+            let result = e0 - (0.0592 / n) * Math.log10(Q);
+
+            let out = document.getElementById('res_nernst');
+            out.innerHTML = `<strong>Cell Potential ($E$):</strong> ${result.toFixed(4)} V`;
+            out.style.display = "block";
+            if(window.MathJax) MathJax.typesetPromise();
+        }
+
+        function calculateH2Potential() {
+            let ph = smartParser(document.getElementById('ph_input').value);
+            let p_h2 = smartParser(document.getElementById('p_h2').value);
+
+            if(isNaN(ph) || isNaN(p_h2)) {
+                alert("Please enter valid pH and Pressure."); return;
+            }
+
+            // [H+] = 10^-ph. Q = P_h2 / [H+]^2
+            let h_conc = Math.pow(10, -ph);
+            let Q = p_h2 / Math.pow(h_conc, 2);
+            let result = 0 - (0.0592 / 2) * Math.log10(Q);
+
+            let out = document.getElementById('res_ph');
+            out.innerHTML = `<strong>Hydrogen Electrode Potential:</strong> ${result.toFixed(4)} V<br><small class="text-accent">Simplified: $E \approx -0.0592 \times pH$ (if $P=1$)</small>`;
+            out.style.display = "block";
+            if(window.MathJax) MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
