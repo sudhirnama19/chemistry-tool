@@ -294,19 +294,15 @@
 
 
         .icon-wrapper {
-    /* Ensure the wrapper is a flex container to center the image */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; 
+    width: 64px;   /* Adjust this to match your design's "small box" size */
+    height: 64px;
+    margin: 0 auto 20px auto; /* Centers the box and adds space below */
 }
 
-.app-icon {
-    /* This ensures the image fills the box without exceeding its bounds */
-    width: 100%;
+.icon-wrapper img {
+    width: 100%;   /* Makes the 512px image fit into the 64px box */
     height: 100%;
-    object-fit: contain; /* Maintains aspect ratio while fitting inside */
-    border-radius: 12px; /* Optional: matches the rounded corners in your screenshot */
+    object-fit: contain;
 }
     </style>
 </head>
