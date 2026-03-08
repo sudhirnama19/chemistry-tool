@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMF, Conductivity & Kohlrausch's Law | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 750px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 1rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* TABLE STYLING */
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        .ref-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; text-align: left; }
+        .ref-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+
+        #footer-container { margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 style="color:var(--accent); font-weight:800;">Electromotive Force (EMF)</h4>
+            <p class="theory-text">
+                The **Electromotive Force (EMF)** of a cell is the maximum potential difference between two electrodes when no current is flowing through the circuit. It represents the energy provided by a source per unit charge.
+            </p>
+            <div class="formula-box text-center">
+                Standard Cell Potential: $E^0_{cell} = E^0_{cathode} - E^0_{anode}$ <br>
+                Nernst Equation: $E_{cell} = E^0_{cell} - \frac{RT}{nF} \ln Q$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-standard', this)">Standard EMF</button>
+            <button class="pill-tab" onclick="switchTab('calc-nernst', this)">Nernst Eq.</button>
+            <button class="pill-tab" onclick="switchTab('calc-gibbs', this)">EMF to $\Delta G$</button>
+            <button class="pill-tab" onclick="switchTab('calc-cond', this)">Molar Cond.</button>
+            <button class="pill-tab" onclick="switchTab('calc-kohl', this)">Kohlrausch</button>
+            <button class="pill-tab" onclick="switchTab('calc-ref', this)">Reduction Table</button>
+        </div>
+
+        <div id="calc-standard" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Standard Cell Potential</h5>
+            <label class="form-label">Cathode Potential ($E^0_{red}$) in Volts</label>
+            <input type="text" id="e_cath" class="form-control" placeholder="e.g. 0.34">
+            <label class="form-label">Anode Potential ($E^0_{red}$) in Volts</label>
+            <input type="text" id="e_anod" class="form-control" placeholder="e.g. -0.76">
+            <button onclick="calculateStandard()" class="btn-calc">Calculate $E^0_{cell}$</button>
+            <div id="res_std" class="result-display"></div>
+        </div>
+
+        <div id="calc-nernst" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Non-Standard EMF (Nernst)</h5>
+            <label class="form-label">$E^0_{cell}$ (Standard Potential)</label>
+            <input type="text" id="e0_n" class="form-control" placeholder="e.g. 1.10">
+            <label class="form-label">Electrons Transferred ($n$)</label>
+            <input type="text" id="n_val" class="form-control" placeholder="e.g. 2">
+            <label class="form-label">Reaction Quotient ($Q$)</label>
+            <input type="text" id="q_val" class="form-control" placeholder="e.g. 0.01">
+            <button onclick="calculateNernst()" class="btn-calc">Calculate $E_{cell}$</button>
+            <div id="res_nernst" class="result-display"></div>
+        </div>
+
+        <div id="calc-gibbs" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">EMF to Free Energy</h5>
+            <label class="form-label">Cell Potential ($E_{cell}$) in Volts</label>
+            <input type="text" id="e_gibbs" class="form-control" placeholder="e.g. 1.10">
+            <label class="form-label">Electrons Transferred ($n$)</label>
+            <input type="text" id="n_gibbs" class="form-control" placeholder="e.g. 2">
+            <button onclick="calculateGibbs()" class="btn-calc">Calculate $\Delta G$</button>
+            <div id="res_gibbs" class="result-display"></div>
+        </div>
+
+        <div id="calc-cond" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Molar Conductivity ($\Lambda_m$)</h5>
+            <label class="form-label">Specific Conductivity ($\kappa$) in $S \cdot cm^{-1}$</label>
+            <input type="text" id="kappa_val" class="form-control" placeholder="e.g. 0.002">
+            <label class="form-label">Concentration ($C$) in $mol \cdot L^{-1}$</label>
+            <input type="text" id="conc_val" class="form-control" placeholder="e.g. 0.1">
+            <button onclick="calculateConductivity()" class="btn-calc" style="background: linear-gradient(135deg, #f472b6, #8b5cf6);">Find Molar Conductivity</button>
+            <div id="res_cond" class="result-display"></div>
+            <div class="formula-box text-center mt-3" style="font-size: 0.85rem;">
+                $\Lambda_m = \frac{\kappa \times 1000}{C}$
+            </div>
+        </div>
+
+        <div id="calc-kohl" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Kohlrausch's Law Calculator</h5>
+            <label class="form-label">Cation Cond. ($\lambda_+^0$)</label>
+            <input type="text" id="cat_cond" class="form-control" placeholder="e.g. 349.6 for H+">
+            <label class="form-label">Anion Cond. ($\lambda_-^0$)</label>
+            <input type="text" id="ani_cond" class="form-control" placeholder="e.g. 76.3 for Cl-">
+            <div class="row">
+                <div class="col-6"><label class="form-label">Cation count ($v_+$)</label><input type="text" id="cat_v" class="form-control" value="1"></div>
+                <div class="col-6"><label class="form-label">Anion count ($v_-$)</label><input type="text" id="ani_v" class="form-control" value="1"></div>
+            </div>
+            <button onclick="calculateKohlrausch()" class="btn-calc" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Calculate $\Lambda_m^0$</button>
+            <div id="res_kohl" class="result-display"></div>
+        </div>
+
+        <div id="calc-ref" class="tab-panel glass-card">
+            <h5 class="text-center mb-3">Standard Reduction Potentials ($E^0$ at 25°C)</h5>
+            <div style="overflow-x:auto;">
+                <table class="ref-table">
+                    <thead>
+                        <tr><th>Half-Reaction</th><th>$E^0$ (Volts)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>$F_2(g) + 2e^- \rightarrow 2F^-(aq)$</td><td>+2.87</td></tr>
+                        <tr><td>$Au^{3+}(aq) + 3e^- \rightarrow Au(s)$</td><td>+1.50</td></tr>
+                        <tr><td>$Cl_2(g) + 2e^- \rightarrow 2Cl^-(aq)$</td><td>+1.36</td></tr>
+                        <tr><td>$Ag^+(aq) + e^- \rightarrow Ag(s)$</td><td>+0.80</td></tr>
+                        <tr><td>$Cu^{2+}(aq) + 2e^- \rightarrow Cu(s)$</td><td>+0.34</td></tr>
+                        <tr><td>$2H^+(aq) + 2e^- \rightarrow H_2(g)$</td><td>0.00</td></tr>
+                        <tr><td>$Ni^{2+}(aq) + 2e^- \rightarrow Ni(s)$</td><td>-0.25</td></tr>
+                        <tr><td>$Fe^{2+}(aq) + 2e^- \rightarrow Fe(s)$</td><td>-0.44</td></tr>
+                        <tr><td>$Zn^{2+}(aq) + 2e^- \rightarrow Zn(s)$</td><td>-0.76</td></tr>
+                        <tr><td>$Al^{3+}(aq) + 3e^- \rightarrow Al(s)$</td><td>-1.66</td></tr>
+                        <tr><td>$Li^+(aq) + e^- \rightarrow Li(s)$</td><td>-3.05</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">EMF of Cell vs. Battery</h5>
+            <p class="theory-text">
+                While often used interchangeably, a **Cell** is a single unit of an electrochemical device, whereas a **Battery** consists of multiple cells connected in series or parallel to increase voltage or capacity.
+            </p>
+            <h6 style="color:var(--accent);">How it Works</h6>
+            <p class="theory-text">
+                EMF is generated by the chemical potential difference between two materials. When a redox reaction occurs, electrons are pushed from the anode (oxidation) through an external circuit to the cathode (reduction). The "force" driving this flow is the EMF.
+            </p>
+            <h6 style="color:var(--accent);">Applications</h6>
+            <ul>
+                <li><strong>Portable Electronics:</strong> Li-ion batteries utilizing high EMF values.</li>
+                <li><strong>Corrosion Protection:</strong> Using sacrificial anodes with lower EMF.</li>
+                <li><strong>pH Meters:</strong> Measuring EMF changes to determine ion concentration.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Solved Examples</h5>
+            <div class="theory-text">
+                <strong>Example 1:</strong> Calculate the standard EMF of a Zn-Cu cell.<br>
+                $E^0_{Cu^{2+}/Cu} = +0.34V$, $E^0_{Zn^{2+}/Zn} = -0.76V$.<br>
+                $E^0_{cell} = 0.34 - (-0.76) = 1.10V$.
+            </div>
+            <hr style="border-color:var(--border)">
+            <div class="theory-text">
+                <strong>Example 2:</strong> Find $\Delta G$ for a cell with $E_{cell} = 1.10V$ and $n=2$.<br>
+                $\Delta G = -nFE_{cell} = -(2)(96500)(1.10) = -212.3$ kJ/mol.
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Scientific Research & Future Tech</h5>
+            <p class="theory-text">
+                In modern electrochemistry, EMF measurements are pivotal for:
+                <ul>
+                    <li><strong>Fuel Cell Development:</strong> Optimizing hydrogen-oxygen recombination for clean energy.</li>
+                    <li><strong>Neural Interfacing:</strong> Measuring bio-EMF in neurons to develop prosthetic controls.</li>
+                    <li><strong>Solid-State Physics:</strong> Exploring the thermoelectric effect to convert waste heat into electricity.</li>
+                </ul>
+            </p>
+        </div>
+
+        <h5 class="text-center mb-4" style="color:var(--accent);">Frequently Asked Questions</h5>
+        <div class="row g-3">
+            <script>
+                const faqs = [
+                    ["What is the SI unit of EMF?", "The SI unit is the Volt (V), which is equivalent to one Joule per Coulomb."],
+                    ["Is EMF a force?", "Technically no. It is a potential difference (energy per charge), not a mechanical force in Newtons."],
+                    ["What is the Nernst Equation?", "It relates the reduction potential of an electrochemical cell to the standard electrode potential and concentrations."],
+                    ["Can EMF be negative?", "A negative calculated EMF indicates the reaction is non-spontaneous in the written direction."],
+                    ["Difference between EMF and Terminal Voltage?", "Terminal voltage is EMF minus the voltage drop due to internal resistance when current flows."],
+                    ["How do you measure EMF?", "Using a high-resistance voltmeter or a potentiometer to ensure no current is drawn."],
+                    ["What is a Standard Hydrogen Electrode?", "A reference electrode with a defined potential of exactly 0.00V."],
+                    ["What is Faraday's Constant?", "Approximately 96,485 C/mol, representing the charge of one mole of electrons."],
+                    ["How does temperature affect EMF?", "According to the Nernst equation, higher temperatures generally decrease cell potential for spontaneous reactions."],
+                    ["What is the salt bridge's role?", "It maintains electrical neutrality by allowing ion flow between half-cells."],
+                    ["What is the EMF of a dry cell?", "A typical Zinc-Carbon dry cell has an EMF of approximately 1.5V."],
+                    ["Can EMF generate heat?", "Yes, internal resistance converts some of the chemical energy into heat during discharge."],
+                    ["Why do batteries die?", "As reactants are converted to products, $Q$ approaches $K$, and EMF drops to zero."],
+                    ["What is a secondary cell?", "A cell that is rechargeable by passing current in the opposite direction."],
+                    ["What is the Lead-Acid battery EMF?", "A single cell is 2.0V; a standard car battery (6 cells) is 12V."],
+                    ["What is the relationship between EMF and work?", "EMF represents the maximum electrical work the cell can perform per unit charge."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`
+                        <div class="col-12">
+                            <div class="glass-card mb-0" style="padding:15px 20px;">
+                                <p class="mb-1"><strong>${f[0]}</strong></p>
+                                <small class="text-secondary">${f[1]}</small>
+                            </div>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser for numeric inputs
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calculateStandard() {
+            let c = smartParser(document.getElementById('e_cath').value);
+            let a = smartParser(document.getElementById('e_anod').value);
+            if(isNaN(c) || isNaN(a)) return;
+            let res = c - a;
+            let out = document.getElementById('res_std');
+            out.innerHTML = `<strong>Standard EMF ($E^0_{cell}$):</strong> ${res.toFixed(4)} V`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateNernst() {
+            let e0 = smartParser(document.getElementById('e0_n').value);
+            let n = smartParser(document.getElementById('n_val').value);
+            let q = smartParser(document.getElementById('q_val').value);
+            if(isNaN(e0) || isNaN(n) || isNaN(q)) return;
+            let res = e0 - (0.0592 / n) * Math.log10(q);
+            let out = document.getElementById('res_nernst');
+            out.innerHTML = `<strong>Cell Potential ($E_{cell}$):</strong> ${res.toFixed(4)} V`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateGibbs() {
+            let e = smartParser(document.getElementById('e_gibbs').value);
+            let n = smartParser(document.getElementById('n_gibbs').value);
+            let F = 96485;
+            if(isNaN(e) || isNaN(n)) return;
+            let dg = -(n * F * e) / 1000;
+            let out = document.getElementById('res_gibbs');
+            out.innerHTML = `<strong>Gibbs Free Energy ($\Delta G$):</strong> ${dg.toFixed(2)} kJ/mol`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateConductivity() {
+            let k = smartParser(document.getElementById('kappa_val').value);
+            let c = smartParser(document.getElementById('conc_val').value);
+            if(isNaN(k) || isNaN(c) || c === 0) return;
+            let res = (k * 1000) / c;
+            let out = document.getElementById('res_cond');
+            out.innerHTML = `<strong>Molar Conductivity ($\Lambda_m$):</strong> ${res.toFixed(2)} $S \cdot cm^2 \cdot mol^{-1}$`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateKohlrausch() {
+            let cat = smartParser(document.getElementById('cat_cond').value);
+            let ani = smartParser(document.getElementById('ani_cond').value);
+            let nv = smartParser(document.getElementById('cat_v').value);
+            let mv = smartParser(document.getElementById('ani_v').value);
+            if(isNaN(cat) || isNaN(ani) || isNaN(nv) || isNaN(mv)) return;
+            let res = (nv * cat) + (mv * ani);
+            let out = document.getElementById('res_kohl');
+            out.innerHTML = `<strong>Limiting Molar Conductivity ($\Lambda_m^0$):</strong> ${res.toFixed(2)} $S \cdot cm^2 \cdot mol^{-1}$`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
