@@ -88,6 +88,29 @@
 .form-control::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.4); }
 .form-control::-moz-placeholder { color: rgba(255, 255, 255, 0.4); }
 .form-control:-ms-input-placeholder { color: rgba(255, 255, 255, 0.4); }
+
+
+        /* Fix for horizontal swiping/overflow */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Ensure the main container doesn't push the screen wide */
+.container-narrow {
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-sizing: border-box; /* Includes padding in the width */
+}
+
+/* Fix for tables or long text pushing the width on mobile */
+.glass-card {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
     </style>
 </head>
 <body>
