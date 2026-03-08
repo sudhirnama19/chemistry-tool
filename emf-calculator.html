@@ -76,6 +76,17 @@
         .ref-table td { padding: 10px; border-bottom: 1px solid var(--border); }
 
         #footer-container { margin-top: 40px; }
+
+        /* Placeholder visibility fix */
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+    opacity: 1; /* Ensures Firefox doesn't dim it further */
+}
+
+/* For older browsers */
+.form-control::-webkit-input-placeholder { color: rgba(255, 255, 255, 0.4); }
+.form-control::-moz-placeholder { color: rgba(255, 255, 255, 0.4); }
+.form-control:-ms-input-placeholder { color: rgba(255, 255, 255, 0.4); }
     </style>
 </head>
 <body>
