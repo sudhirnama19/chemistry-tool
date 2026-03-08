@@ -291,6 +291,23 @@
             .hero-title { font-size: 2.8rem; }
             .tool-grid { grid-template-columns: 1fr; }
         }
+
+
+        .icon-wrapper {
+    /* Ensure the wrapper is a flex container to center the image */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+}
+
+.app-icon {
+    /* This ensures the image fills the box without exceeding its bounds */
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintains aspect ratio while fitting inside */
+    border-radius: 12px; /* Optional: matches the rounded corners in your screenshot */
+}
     </style>
 </head>
 <body>
@@ -312,7 +329,9 @@
 
         <section class="tool-grid">
             <a href="ph-calculator.html" class="tool-card">
-                <div class="icon-wrapper">🧪</div>
+                <div class="icon-wrapper">
+    <img src="https://images.sudhirnama.in/images/ph.webp" alt="pH calculator Logo" class="app-icon">
+</div>
                 <h2 class="tool-name">pH Master</h2>
                 <p class="tool-desc">Calculate pH for strong/weak acids, bases, and complex aqueous mixtures.</p>
             </a>
