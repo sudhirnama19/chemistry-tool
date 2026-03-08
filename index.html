@@ -347,6 +347,55 @@
     transform: translateY(-3px);
     color: #fff;
 }
+
+
+        .calculator-info {
+    max-width: 1000px;
+    margin: 20px auto 40px auto;
+    padding: 0 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.info-card {
+    background: rgba(30, 41, 59, 0.5); /* Subtle semi-transparent dark blue */
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: border-color 0.3s ease;
+}
+
+.info-card h3 {
+    color: #f8fafc;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.info-card p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Subtle highlight for the exams card */
+.highlight-card {
+    border-left: 3px solid #38bdf8; /* Subtle blue accent */
+}
+
+.info-card strong {
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.info-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
     </style>
 </head>
 <body>
