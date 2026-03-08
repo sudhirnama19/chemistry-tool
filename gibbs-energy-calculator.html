@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gibbs, Helmholtz & Isotherm Solver | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6; 
+            padding-bottom: 0 !important; margin-bottom: 0 !important;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 700px; margin: auto; padding: 15px; }
+
+        /* GLASS MORPH CARD */
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS */
+        .form-label { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.9rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+        
+        /* REFERENCE TABLE */
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .ref-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; text-align: left; }
+        .ref-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #footer-container { margin-top: 20px; padding-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Thermodynamic Potentials</h6>
+            <p class="theory-text">
+                <strong>Gibbs Free Energy ($G$):</strong> The maximum reversible work performable by a system at constant temperature and pressure. 
+                <strong>Helmholtz Energy ($A$):</strong> The maximum reversible work performable at constant temperature and volume.
+            </p>
+            <div class="formula-box text-center">
+                $\Delta G = \Delta H - T\Delta S$ &nbsp; | &nbsp; $\Delta A = \Delta U - T\Delta S$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-gibbs', this)">Gibbs</button>
+            <button class="pill-tab" onclick="switchTab('calc-helm', this)">Helmholtz</button>
+            <button class="pill-tab" onclick="switchTab('calc-k', this)">Equil. ($K$)</button>
+            <button class="pill-tab" onclick="switchTab('calc-cc', this)">Vapor P.</button>
+            <button class="pill-tab" onclick="switchTab('calc-shift', this)">Q vs K Shift</button>
+            <button class="pill-tab" onclick="switchTab('calc-iso', this)">Isotherm ($\Delta G$)</button>
+        </div>
+
+        <div id="calc-gibbs" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Calculate $\Delta G$</h5>
+            <label class="form-label">Enthalpy Change ($\Delta H$) in kJ/mol</label>
+            <input type="text" id="dh_val" class="form-control" placeholder="e.g. -285.8">
+            <label class="form-label">Temperature ($T$) in Kelvin</label>
+            <input type="text" id="t_val_g" class="form-control" placeholder="e.g. 298.15">
+            <label class="form-label">Entropy Change ($\Delta S$) in J/mol·K</label>
+            <input type="text" id="ds_val" class="form-control" placeholder="e.g. -163.2">
+            <button onclick="calculateGibbs()" class="btn-calc">Find Gibbs Energy</button>
+            <div id="res_gibbs" class="result-display"></div>
+        </div>
+
+        <div id="calc-helm" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Calculate $\Delta A$</h5>
+            <label class="form-label">Internal Energy ($\Delta U$) in kJ/mol</label>
+            <input type="text" id="du_val" class="form-control" placeholder="e.g. -150">
+            <label class="form-label">Temperature ($T$) in Kelvin</label>
+            <input type="text" id="t_val_a" class="form-control" placeholder="e.g. 298.15">
+            <label class="form-label">Entropy Change ($\Delta S$) in J/mol·K</label>
+            <input type="text" id="ds_val_a" class="form-control" placeholder="e.g. 50">
+            <button onclick="calculateHelm()" class="btn-calc">Find Helmholtz Energy</button>
+            <div id="res_helm" class="result-display"></div>
+        </div>
+
+        <div id="calc-k" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">$\Delta G^0$ to $K_{eq}$ Converter</h5>
+            <label class="form-label">Standard Gibbs Energy ($\Delta G^0$) in kJ/mol</label>
+            <input type="text" id="dg_k_val" class="form-control" placeholder="e.g. -30">
+            <label class="form-label">Temperature ($T$) in Kelvin</label>
+            <input type="text" id="t_k_val" class="form-control" value="298.15">
+            <button onclick="calculateK()" class="btn-calc" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">Calculate Equilibrium $K$</button>
+            <div id="res_k" class="result-display"></div>
+        </div>
+
+        <div id="calc-cc" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Vapor Pressure Solver</h5>
+            <label class="form-label">Enthalpy of Vaporization ($\Delta H_{vap}$) kJ/mol</label>
+            <input type="text" id="dh_vap" class="form-control" placeholder="e.g. 40.7">
+            <div class="row">
+                <div class="col-6"><label class="form-label">$T_1$ (K)</label><input type="text" id="t1" class="form-control" value="373.15"></div>
+                <div class="col-6"><label class="form-label">$P_1$ (atm)</label><input type="text" id="p1" class="form-control" value="1.0"></div>
+            </div>
+            <label class="form-label">Target Temperature $T_2$ (K)</label>
+            <input type="text" id="t2" class="form-control" placeholder="e.g. 353.15">
+            <button onclick="calculateCC()" class="btn-calc" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Find New Pressure ($P_2$)</button>
+            <div id="res_cc" class="result-display"></div>
+        </div>
+
+        <div id="calc-shift" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Reaction Shift Predictor</h5>
+            <label class="form-label">Equilibrium Constant ($K$)</label>
+            <input type="text" id="k_shift" class="form-control" placeholder="e.g. 150">
+            <label class="form-label">Reaction Quotient ($Q$)</label>
+            <input type="text" id="q_shift" class="form-control" placeholder="e.g. 200">
+            <button onclick="predictShift()" class="btn-calc" style="background: linear-gradient(135deg, #f472b6, #8b5cf6);">Predict Shift Direction</button>
+            <div id="res_shift" class="result-display"></div>
+        </div>
+
+        <div id="calc-iso" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Reaction Isotherm ($\Delta G$)</h5>
+            <label class="form-label">$\Delta G^0$ (Standard) in kJ/mol</label>
+            <input type="text" id="dg0_iso" class="form-control" placeholder="e.g. -20">
+            <label class="form-label">Temperature ($T$) in Kelvin</label>
+            <input type="text" id="t_iso" class="form-control" value="298.15">
+            <label class="form-label">Reaction Quotient ($Q$)</label>
+            <input type="text" id="q_iso" class="form-control" placeholder="e.g. 0.01">
+            <button onclick="calculateIsotherm()" class="btn-calc" style="background: linear-gradient(135deg, #fbbf24, #d97706);">Find Non-Standard $\Delta G$</button>
+            <div id="res_iso" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Reaction Spontaneity Matrix</h6>
+            <table class="ref-table">
+                <thead>
+                    <tr><th>$\Delta H$</th><th>$\Delta S$</th><th>Spontaneity ($ \Delta G $)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Negative (-)</td><td>Positive (+)</td><td>Spontaneous at all $T$</td></tr>
+                    <tr><td>Positive (+)</td><td>Negative (-)</td><td>Non-spontaneous at all $T$</td></tr>
+                    <tr><td>Negative (-)</td><td>Negative (-)</td><td>Spontaneous at Low $T$</td></tr>
+                    <tr><td>Positive (+)</td><td>Positive (+)</td><td>Spontaneous at High $T$</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">The Gibbs-Helmholtz Equation</h6>
+            <p class="theory-text">
+                This equation is critical for calculating how the Gibbs free energy of a system changes with temperature.
+            </p>
+            <div class="formula-box text-center">
+                $\left( \frac{\partial (G/T)}{\partial T} \right)_P = -\frac{H}{T^2}$
+            </div>
+            <h6 class="mt-4" style="color:var(--accent); font-weight:700;">Derivation & Logic</h6>
+            <p class="theory-text small">
+                Starting from $G = H - TS$, we know $dG = VdP - SdT$. At constant pressure, $dG = -SdT$, meaning $(\partial G/\partial T)_P = -S$. Substituting this back into the original equation gives the functional relationship between $G$, $H$, and $T$.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Solved Example</h6>
+            <p class="theory-text small">
+                <strong>Problem:</strong> A reaction has $\Delta H = -100$ kJ and $\Delta S = -200$ J/K at 300 K. Is it spontaneous?<br>
+                <strong>Solution:</strong> <br>
+                $\Delta G = -100 - (300 \times -0.200) = -100 + 60 = -40$ kJ.<br>
+                Since $\Delta G < 0$, the reaction is <strong>spontaneous</strong>.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h6 style="color:var(--accent); font-weight:800;">Application in Scientific Research</h6>
+            <p class="theory-text">
+                <ul>
+                    <li><strong>Drug Design:</strong> Predicting binding affinity between ligands and proteins.</li>
+                    <li><strong>Metallurgy:</strong> Using Ellingham diagrams to find the stability of oxides.</li>
+                    <li><strong>Phase Transitions:</strong> Determining the boiling and melting points of new materials.</li>
+                </ul>
+            </p>
+        </div>
+
+        <h5 class="mt-5 mb-3 text-center" style="color:var(--accent)">16 Frequently Asked Questions</h5>
+        <div class="row g-3">
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>1. What does a negative $\Delta G$ mean?</strong><br><small>It indicates a spontaneous process (exergonic) that can occur without external energy.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>2. What is the difference between $G$ and $A$?</strong><br><small>$G$ is for constant Pressure/Temp (lab conditions); $A$ is for constant Volume/Temp (closed containers).</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>3. Can $\Delta G$ be zero?</strong><br><small>Yes, at equilibrium, the change in Gibbs free energy is exactly zero.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>4. How does $T$ affect spontaneity?</strong><br><small>If $\Delta H$ and $\Delta S$ have the same sign, temperature determines if $\Delta G$ is negative.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>5. What is the unit of $S$ in calculations?</strong><br><small>Entropy is usually J/K, but must be converted to kJ/K ($/1000$) for $\Delta G$ formulas.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>6. What is the Gibbs-Helmholtz equation used for?</strong><br><small>To calculate enthalpy changes from temperature-dependent EMF or equilibrium data.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>7. Is Helmholtz energy used in explosives?</strong><br><small>Yes, because explosions often happen at nearly constant volume.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>8. What is the "Free" in Free Energy?</strong><br><small>It represents the energy available to do work, as opposed to energy lost as heat.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>9. How is $G$ related to $K$ (Equilibrium)?</strong><br><small>$\Delta G^0 = -RT \ln K$.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>10. Does $\Delta G$ indicate reaction rate?</strong><br><small>No, it only indicates if a reaction *can* happen, not how fast it will go.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>11. What is an endergonic reaction?</strong><br><small>A reaction where $\Delta G$ is positive, requiring energy input.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>12. Can I calculate $G$ at any temperature?</strong><br><small>Yes, assuming $\Delta H$ and $\Delta S$ are relatively constant over that range.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>13. What is the standard state for Gibbs Energy?</strong><br><small>Usually 298.15 K and 1 bar pressure.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>14. Is Helmholtz energy a state function?</strong><br><small>Yes, it depends only on the current state of the system, not the path taken.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>15. Why is $A$ called the work function?</strong><br><small>From the German word "Arbeit" (Work), as it represents total work capacity.</small></p></div></div>
+            <div class="col-12"><div class="glass-card mb-0"><p><strong>16. Can entropy ever be zero?</strong><br><small>Only for a perfect crystal at 0 K, according to the Third Law.</small></p></div></div>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calculateGibbs() {
+            let h = smartParser(document.getElementById('dh_val').value);
+            let t = smartParser(document.getElementById('t_val_g').value);
+            let s = smartParser(document.getElementById('ds_val').value);
+            if(isNaN(h) || isNaN(t) || isNaN(s)) return;
+            let res = h - (t * (s / 1000));
+            let out = document.getElementById('res_gibbs');
+            out.innerHTML = `<strong>$\Delta G$:</strong> ${res.toFixed(3)} kJ/mol <br> <small>${res < 0 ? "Spontaneous" : "Non-spontaneous"}</small>`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateHelm() {
+            let u = smartParser(document.getElementById('du_val').value);
+            let t = smartParser(document.getElementById('t_val_a').value);
+            let s = smartParser(document.getElementById('ds_val_a').value);
+            if(isNaN(u) || isNaN(t) || isNaN(s)) return;
+            let res = u - (t * (s / 1000));
+            let out = document.getElementById('res_helm');
+            out.innerHTML = `<strong>$\Delta A$:</strong> ${res.toFixed(3)} kJ/mol`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateK() {
+            let dg = smartParser(document.getElementById('dg_k_val').value);
+            let t = smartParser(document.getElementById('t_k_val').value);
+            let R = 8.314; if(isNaN(dg) || isNaN(t)) return;
+            let exponent = -(dg * 1000) / (R * t);
+            let K = Math.exp(exponent);
+            let out = document.getElementById('res_k');
+            out.innerHTML = `<strong>Equilibrium $K$:</strong> ${K.toExponential(4)}`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateCC() {
+            let h = smartParser(document.getElementById('dh_vap').value);
+            let t1 = smartParser(document.getElementById('t1').value);
+            let p1 = smartParser(document.getElementById('p1').value);
+            let t2 = smartParser(document.getElementById('t2').value);
+            let R = 8.314; if(isNaN(h) || isNaN(t1) || isNaN(p1) || isNaN(t2)) return;
+            let lnP2P1 = -(h * 1000 / R) * ((1/t2) - (1/t1));
+            let p2 = p1 * Math.exp(lnP2P1);
+            let out = document.getElementById('res_cc');
+            out.innerHTML = `<strong>Vapor Pressure ($P_2$):</strong> ${p2.toFixed(4)} atm`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function predictShift() {
+            let k = smartParser(document.getElementById('k_shift').value);
+            let q = smartParser(document.getElementById('q_shift').value);
+            if(isNaN(k) || isNaN(q)) return;
+            let out = document.getElementById('res_shift');
+            let direction = (q < k) ? "Forward Shift" : (q > k) ? "Backward Shift" : "At Equilibrium";
+            out.innerHTML = `<strong>Result:</strong> ${direction}`;
+            out.style.display = "block";
+        }
+
+        function calculateIsotherm() {
+            let dg0 = smartParser(document.getElementById('dg0_iso').value);
+            let t = smartParser(document.getElementById('t_iso').value);
+            let q = smartParser(document.getElementById('q_iso').value);
+            let R = 8.314; if(isNaN(dg0) || isNaN(t) || isNaN(q)) return;
+            let dg = dg0 + (R * t * Math.log(q) / 1000);
+            let out = document.getElementById('res_iso');
+            out.innerHTML = `<strong>Non-Standard $\Delta G$:</strong> ${dg.toFixed(3)} kJ/mol`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
