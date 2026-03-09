@@ -84,6 +84,12 @@
         }
 
         .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        .small-btn { 
+            background: rgba(255,255,255,0.1); border: 1px solid var(--border); 
+            color: #fff; font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; 
+            margin-top: 5px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -158,29 +164,31 @@
         </div>
 
         <div id="calc-curve" class="tab-panel glass-card">
-            <h5 class="text-center mb-3">Calibration Regression Analysis</h5>
+            <h5 class="text-center mb-1">Calibration Regression Analysis</h5>
+            <p class="text-center text-secondary" style="font-size:0.75rem;">Enter values separated by spaces, commas, or new lines.</p>
             <div class="data-grid">
                 <div>
                     <label class="form-label">Conc (x values)</label>
-                    <textarea id="curv_x" class="form-control" rows="4" placeholder="0.1 0.2 0.3 0.4"></textarea>
+                    <textarea id="curv_x" class="form-control" rows="4" placeholder="0.1 0.2 0.3"></textarea>
                 </div>
                 <div>
                     <label class="form-label">Abs (y values)</label>
-                    <textarea id="curv_y" class="form-control" rows="4" placeholder="0.05 0.11 0.16 0.21"></textarea>
+                    <textarea id="curv_y" class="form-control" rows="4" placeholder="0.05 0.11 0.16"></textarea>
                 </div>
             </div>
+            <button onclick="loadExampleData()" class="small-btn">Load Example Data</button>
             <button onclick="runRegression()" class="btn-calc">Find Line of Best Fit</button>
             <div id="res_curve" class="result-display"></div>
         </div>
 
         <div id="calc-sample" class="tab-panel glass-card">
-            <h5 class="text-center mb-4">Solve Unknown Concentration ($x = \frac{y-b}{m}$)</h5>
+            <h5 class="text-center mb-4">Solve Unknown Concentration</h5>
             <label class="form-label">Measured Absorbance of Sample ($y$)</label>
             <input type="text" id="samp_y" class="form-control" placeholder="e.g. 0.45">
             <label class="form-label">Calibration Slope ($m$)</label>
-            <input type="text" id="samp_m" class="form-control" placeholder="Get from Regression tab">
+            <input type="text" id="samp_m" class="form-control" placeholder="Copy 'm' from Regression tab">
             <label class="form-label">Y-Intercept ($b$)</label>
-            <input type="text" id="samp_b" class="form-control" placeholder="e.g. 0.002">
+            <input type="text" id="samp_b" class="form-control" placeholder="Copy 'b' from Regression tab">
             <button onclick="solveUnknown()" class="btn-calc" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">Solve Concentration</button>
             <div id="res_samp" class="result-display"></div>
         </div>
@@ -237,7 +245,7 @@
                     ["Bathochromic shift?", "A shift of absorption to longer wavelengths (Red shift)."],
                     ["Hypsochromic shift?", "A shift of absorption to shorter wavelengths (Blue shift)."],
                     ["Cuvette Cleaning?", "Cuvettes must be lint-free and fingerprint-free for accuracy."],
-                    ["Matrix Effect?", "Components in a sample (other than the analyte) that affect absorbance."],
+                    ["Matrix Effect?", "Components in a sample that affect absorbance."],
                     ["Instrumental resolution?", "The ability to resolve two adjacent absorption peaks."],
                     ["Polychromatic light?", "Light with multiple wavelengths; can cause non-linearity."],
                     ["Electronic Transitions?", "Absorbance occurs when electrons move from ground to excited states."],
@@ -268,6 +276,7 @@
             btn.classList.add('active');
         }
 
+        // Logic Functions
         function runAbsorbance() {
             let e = smartParser(document.getElementById('eps_a').value);
             let l = smartParser(document.getElementById('len_a').value);
@@ -299,19 +308,45 @@
             display('res_t', `Transmittance (T): <strong>${t.toFixed(4)}</strong><br>Percent T: <strong>${(t*100).toFixed(2)}%</strong>`);
         }
 
+        // IMPROVED REGRESSION LOGIC
+        function loadExampleData() {
+            document.getElementById('curv_x').value = "1.0e-4 2.0e-4 3.0e-4 4.0e-4";
+            document.getElementById('curv_y').value = "0.15 0.31 0.46 0.62";
+        }
+
         function runRegression() {
-            let xs = document.getElementById('curv_x').value.trim().split(/\s+/).map(Number);
-            let ys = document.getElementById('curv_y').value.trim().split(/\s+/).map(Number);
-            if(xs.length !== ys.length || xs.length < 2) return;
+            // Smart Extraction: split by spaces, commas, or new lines and clean empty strings
+            let rawX = document.getElementById('curv_x').value.trim().split(/[\s,\n]+/);
+            let rawY = document.getElementById('curv_y').value.trim().split(/[\s,\n]+/);
+            
+            let xs = rawX.map(v => smartParser(v)).filter(v => !isNaN(v));
+            let ys = rawY.map(v => smartParser(v)).filter(v => !isNaN(v));
+
+            if(xs.length !== ys.length || xs.length < 2) {
+                alert("Please enter an equal number of X and Y values (at least 2 pairs).");
+                return;
+            }
+            
             let n = xs.length, sumX=0, sumY=0, sumXY=0, sumX2=0, sumY2=0;
             for(let i=0; i<n; i++) {
                 sumX += xs[i]; sumY += ys[i];
                 sumXY += xs[i]*ys[i]; sumX2 += xs[i]*xs[i]; sumY2 += ys[i]*ys[i];
             }
-            let m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+            
+            let denominator = (n*sumX2 - sumX*sumX);
+            if(denominator === 0) return;
+
+            let m = (n*sumXY - sumX*sumY) / denominator;
             let b = (sumY - m*sumX) / n;
-            let r = (n*sumXY - sumX*sumY) / Math.sqrt((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));
-            display('res_curve', `Equation: $y = ${m.toFixed(5)}x + ${b.toFixed(5)}$ <br> $R^2$: ${(r*r).toFixed(6)}`);
+            let r_denom = Math.sqrt((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));
+            let r = (n*sumXY - sumX*sumY) / r_denom;
+
+            display('res_curve', `
+                <strong>Best Fit:</strong> $y = ${m.toFixed(4)}x + ${b.toFixed(4)}$ <br>
+                <strong>Slope (m):</strong> ${m.toExponential(4)} <br>
+                <strong>Intercept (b):</strong> ${b.toFixed(4)} <br>
+                <strong>$R^2$:</strong> ${(r*r).toFixed(5)}
+            `);
         }
 
         function solveUnknown() {
