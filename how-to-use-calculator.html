@@ -6,47 +6,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How to Use Chemistry Calculators</title>
     <style>
+        /* Base styles for the standalone page */
         body {
             background: #0f172a;
             color: #f1f5f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            padding: 20px;
         }
+
+        /* The Subtle Glass Card */
         .glass-container {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, 0.7); /* Matches your pH Master card */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
+            width: 100%;
             max-width: 600px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-sizing: border-box; /* Fixes the overlapping/overflow issue */
         }
-        h2 { border-bottom: 2px solid #38bdf8; padding-bottom: 10px; }
+
+        h2 { 
+            border-left: 4px solid #38bdf8; 
+            padding-left: 15px; 
+            font-size: 1.4rem;
+            margin-top: 0;
+        }
+
         .symbol-grid {
             display: grid;
-            grid-template-columns: 80px 1fr;
+            grid-template-columns: 60px 1fr;
             gap: 15px;
             margin: 20px 0;
+            align-items: center;
         }
+
         .symbol {
             background: rgba(56, 189, 248, 0.2);
             color: #38bdf8;
             font-weight: bold;
             text-align: center;
-            padding: 5px;
-            border-radius: 8px;
+            padding: 8px 0;
+            border-radius: 10px;
             font-family: monospace;
+            font-size: 1.2rem;
         }
+
+        .symbol-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
         .example-box {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
         }
-        code { color: #f472b6; font-size: 1.1em; }
+
+        .example-box h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #f8fafc;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #94a3b8;
+        }
+
+        code { 
+            color: #f472b6; 
+            background: rgba(244, 114, 182, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -56,13 +102,13 @@
         
         <div class="symbol-grid">
             <div class="symbol">^</div> 
-            <div><strong>Exponent:</strong> Use for powers. <code>10^1</code> means 10 to the power of 1.</div>
+            <div class="symbol-text"><strong>Exponent:</strong> Use for powers. <code>10^1</code> means 10 to the power of 1.</div>
             
             <div class="symbol">*</div> 
-            <div><strong>Multiply:</strong> <code>10*1</code> means 10 multiplied by 1.</div>
+            <div class="symbol-text"><strong>Multiply:</strong> <code>10*1</code> means 10 multiplied by 1.</div>
             
             <div class="symbol">e</div> 
-            <div><strong>Scientific:</strong> <code>1.8e-5</code> is shorthand for 1.8 × 10⁻⁵.</div>
+            <div class="symbol-text"><strong>Scientific:</strong> <code>1.8e-5</code> is shorthand for $1.8 \times 10^{-5}$.</div>
         </div>
 
         <div class="example-box">
