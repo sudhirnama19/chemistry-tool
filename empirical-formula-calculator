@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Empirical Formula Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(15, 23, 42, 0.9);
+        }
+        
+        html, body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+        }
+        
+        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); word-wrap: break-word; overflow: hidden;
+        }
+
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
+
+        /* PLACEHOLDER VISIBILITY FIX */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
+        .form-control {
+            background: var(--input-bg) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 10px;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; opacity: 1; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 16px;
+            border-radius: 14px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+
+        .btn-add {
+            background: rgba(255,255,255,0.1); color: var(--accent);
+            border: 1px dashed var(--accent); padding: 8px 15px; border-radius: 10px;
+            font-size: 0.8rem; margin-top: 10px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-add:hover { background: rgba(0, 255, 213, 0.1); }
+
+        .element-row { display: grid; grid-template-columns: 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: end; }
+
+        /* FORMULA OVERFLOW FIX */
+        .formula-box { 
+            background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.1rem; 
+            border: 1px solid var(--border); margin: 20px 0; text-align: center;
+            overflow-x: auto; white-space: nowrap;
+        }
+
+        .result-display {
+            display: none; margin-top: 25px; padding: 20px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 18px; border-left: 6px solid var(--accent);
+        }
+
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 18px; margin-bottom: 15px;
+        }
+
+        .example-box { 
+            border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 25px; 
+            background: rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">The Empirical Formula: Chemistry’s Simplest Ratio</h4>
+            <p class="theory-text">
+                The <strong>Empirical Formula</strong> of a chemical compound is the simplest positive integer ratio of atoms present in the compound. Unlike the molecular formula, which tells you the exact number of atoms (e.g., $C_6H_{12}O_6$ for glucose), the empirical formula provides the reduced ratio (e.g., $CH_2O$).
+            </p>
+            <div class="formula-box">
+                $\text{Moles} = \frac{\text{Mass (g)}}{\text{Molar Mass (g/mol)}} \rightarrow \text{Divide by Smallest} \rightarrow \text{Integer Ratio}$
+            </div>
+            <p class="theory-text">
+                This is the first step in identifying an unknown substance in analytical chemistry, often derived from <strong>Combustion Analysis</strong> or <strong>Elemental Analysis</strong> data.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="text-center h-accent">Empirical Formula Generator</h5>
+            <p class="text-center text-secondary" style="font-size:0.8rem;">Enter mass or percentage for each element.</p>
+            
+            <div id="element-container">
+                <div class="element-row">
+                    <div>
+                        <label class="form-label">Element Symbol</label>
+                        <input type="text" class="form-control el-sym" placeholder="e.g. C" value="C">
+                    </div>
+                    <div>
+                        <label class="form-label">Mass / %</label>
+                        <input type="text" class="form-control el-val" placeholder="e.g. 40.0">
+                    </div>
+                    <div></div>
+                </div>
+                <div class="element-row">
+                    <div>
+                        <input type="text" class="form-control el-sym" placeholder="e.g. H" value="H">
+                    </div>
+                    <div>
+                        <input type="text" class="form-control el-val" placeholder="e.g. 6.7">
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+
+            <button onclick="addElement()" class="btn-add">+ Add Element</button>
+            
+            <label class="form-label">Molar Mass of Compound (Optional - for Molecular Formula)</label>
+            <input type="text" id="compound_mw" class="form-control" placeholder="e.g. 180.16">
+
+            <button onclick="calculateEmpirical()" class="btn-calc">Determine Formula</button>
+            
+            <div id="res_emp" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Interpretation & Rules of Calculation</h5>
+            <p class="theory-text">Calculating the empirical formula follows a rigid logical sequence to ensure accuracy:</p>
+            <ul class="theory-text">
+                <li><strong>Assumption of 100g:</strong> If data is given in percentages, assume a $100g$ sample. This turns percentages directly into grams.</li>
+                <li><strong>The Mole Conversion:</strong> Divide the mass of each element by its specific atomic weight from the Periodic Table.</li>
+                <li><strong>Pseudo-Formula:</strong> Write the ratio as subscripts (e.g., $C_{3.33}H_{6.66}O_{3.33}$).</li>
+                <li><strong>Normalization:</strong> Divide all mole values by the <em>smallest</em> mole value in the set.</li>
+                <li><strong>Rounding Rules:</strong> If a ratio is $0.5$, multiply all by $2$. If it is $0.33$ or $0.66$, multiply all by $3$.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">How It Works: Solved Examples</h5>
+            <div class="example-box">
+                <p><strong>Example 1: Vitamin C (Ascorbic Acid)</strong><br>
+                Composition: $40.9\% \, C$, $4.58\% \, H$, $54.5\% \, O$.<br>
+                1. Moles: $C: 3.41, H: 4.54, O: 3.41$.<br>
+                2. Divide by $3.41$: $C: 1, H: 1.33, O: 1$.<br>
+                3. Multiply by $3$ to clear fraction: **$C_3H_4O_3$**.</p>
+            </div>
+            <div class="example-box">
+                <p><strong>Example 2: Hydrocarbon Analysis</strong><br>
+                $85.6\% \, C$ and $14.4\% \, H$.<br>
+                1. Moles: $C: 7.13, H: 14.28$.<br>
+                2. Divide by $7.13$: $C: 1, H: 2$.<br>
+                3. Formula: **$CH_2$**.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Scientific Research & Applications</h5>
+            <p class="theory-text">
+                In **Synthetic Chemistry**, the empirical formula is the "fingerprint" used to verify if a reaction was successful. After synthesizing a new molecule, researchers send a sample for **CHNS Analysis**, which provides the mass percentages used to calculate the empirical formula.
+            </p>
+            <p class="theory-text">
+                In **Geochemistry**, empirical formulas are used to classify minerals. For example, a geologist analyzing a silicate rock will use the ratios of oxygen to silicon to determine the mineral's structural class.
+            </p>
+        </div>
+
+        <h5 class="text-center mb-3 h-accent">Empirical Formula FAQ</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["What is the difference between Empirical and Molecular?", "Empirical is the simplest ratio; Molecular is the actual number of atoms."],
+                    ["Can the empirical and molecular formulas be the same?", "Yes, for molecules like $H_2O$ or $CO_2$ that cannot be reduced further."],
+                    ["What do I do with a ratio of 1.5?", "Multiply all subscripts in the formula by 2 to get whole numbers."],
+                    ["Why use the empirical formula?", "It is the direct result of elemental analysis and identifies the compound's basic structure."],
+                    ["Is it used for ionic compounds?", "Yes, formulas for ionic compounds (like $NaCl$) are almost always empirical formulas."],
+                    ["Can subscripts be decimals?", "In a final chemical formula, no. They must be whole numbers."],
+                    ["How do I find the molar mass of an element?", "Use the atomic weight provided on the Periodic Table."],
+                    ["What if the total percentage doesn't add to 100?", "Small rounding errors are common, but large gaps may indicate a missing element like Oxygen."],
+                    ["What is the role of combustion analysis?", "It burns a sample to produce $CO_2$ and $H_2O$, allowing mass-based calculation of C and H."],
+                    ["Can a molecule have two different empirical formulas?", "No, a specific compound has only one unique simplest ratio."],
+                    ["What is the empirical formula of Benzene?", "$CH$ (Molecular formula is $C_6H_6$)."],
+                    ["How does rounding work?", "Values within $\pm 0.1$ of a whole number can usually be rounded."],
+                    ["Is it applicable to polymers?", "Yes, polymers are often expressed by their repeating empirical unit ($n$)."],
+                    ["What is elemental analysis?", "A process where a sample is decomposed to find the mass of each constituent element."],
+                    ["Why is Oxygen often calculated by difference?", "Oxygen is hard to measure directly in combustion, so it is found by subtracting other elements from the total mass."],
+                    ["Can a gas have an empirical formula?", "Yes, all chemical compounds, regardless of state, have one."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700;">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Molar Mass Dictionary for common elements
+        const atomicWeights = {
+            "H": 1.008, "HE": 4.0026, "LI": 6.94, "BE": 9.0122, "B": 10.81, "C": 12.011, "N": 14.007, "O": 15.999,
+            "F": 18.998, "NE": 20.180, "NA": 22.990, "MG": 24.305, "AL": 26.982, "SI": 28.085, "P": 30.974, "S": 32.06,
+            "CL": 35.45, "AR": 39.948, "K": 39.098, "CA": 40.078, "FE": 55.845, "CU": 63.546, "ZN": 65.38, "BR": 79.904, "I": 126.90
+        };
+
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function addElement() {
+            const container = document.getElementById('element-container');
+            const row = document.createElement('div');
+            row.className = 'element-row';
+            row.innerHTML = `
+                <input type="text" class="form-control el-sym" placeholder="Symbol">
+                <input type="text" class="form-control el-val" placeholder="Value">
+                <button class="btn-add" style="border-color:#f43f5e; color:#f43f5e; margin:0;" onclick="this.parentElement.remove()">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function calculateEmpirical() {
+            const syms = document.querySelectorAll('.el-sym');
+            const vals = document.querySelectorAll('.el-val');
+            let data = [];
+
+            for (let i = 0; i < syms.length; i++) {
+                let s = syms[i].value.toUpperCase().trim();
+                let v = smartParser(vals[i].value);
+                let mw = atomicWeights[s] || 1.0; // Default to 1 if unknown, prompt user in real app
+                if (!isNaN(v) && s !== "") {
+                    data.push({ sym: s, moles: v / mw });
+                }
+            }
+
+            if (data.length < 1) return;
+
+            // Find smallest moles
+            let minMoles = Math.min(...data.map(d => d.moles));
+            
+            // Initial Ratios
+            data.forEach(d => d.ratio = d.moles / minMoles);
+
+            // Fraction multiplier logic (simplified)
+            let multiplier = 1;
+            for (let m of [2, 3, 4, 5]) {
+                let allClose = data.every(d => {
+                    let product = d.ratio * m;
+                    return Math.abs(product - Math.round(product)) < 0.15;
+                });
+                if (allClose) { multiplier = m; break; }
+            }
+
+            let formulaHtml = "";
+            data.forEach(d => {
+                let count = Math.round(d.ratio * multiplier);
+                formulaHtml += d.sym + (count > 1 ? `<sub>${count}</sub>` : "");
+            });
+
+            let res = document.getElementById('res_emp');
+            res.innerHTML = `
+                <span style="font-size:0.9rem; color:#94a3b8;">Determined Ratio:</span><br>
+                <span style="font-size:1.8rem; font-weight:800; color:var(--accent);">${formulaHtml}</span>
+            `;
+            
+            // Molecular Formula Logic
+            let compMw = smartParser(document.getElementById('compound_mw').value);
+            if(!isNaN(compMw) && compMw > 0) {
+                let empMw = 0;
+                data.forEach(d => empMw += (atomicWeights[d.sym] || 0) * Math.round(d.ratio * multiplier));
+                let n = Math.round(compMw / empMw);
+                if(n > 1) {
+                    let molFormula = "";
+                    data.forEach(d => {
+                        let count = Math.round(d.ratio * multiplier) * n;
+                        molFormula += d.sym + `<sub>${count}</sub>`;
+                    });
+                    res.innerHTML += `<br><br><span style="font-size:0.9rem; color:#94a3b8;">Molecular Formula (n=${n}):</span><br>
+                                      <span style="font-size:1.4rem; font-weight:700;">${molFormula}</span>`;
+                }
+            }
+
+            res.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
+            } catch (error) { console.error(error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
