@@ -254,6 +254,9 @@
             </div>
         </div>
 
+
+        <div id="how-to-guide"></div>
+
         <div class="content-section">
     <section class="info-section">
         <h3>Understanding pH & Calculations</h3>
@@ -492,6 +495,26 @@
                 document.getElementById("footer-container").innerHTML = d;
             }).catch(err => console.log("Footer load error"));
         };
+
+        
+
+        // Function to fetch the guide and inject it into the page
+async function loadGuide() {
+    try {
+        const response = await fetch('how-to-use-calculator.html');
+        const data = await response.text();
+        // We only want the content inside the body
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, 'text/html');
+        const content = doc.querySelector('.glass-container').outerHTML;
+        document.getElementById('how-to-guide').innerHTML = content;
+    } catch (error) {
+        console.error("Could not load the guide:", error);
+    }
+}
+
+// Call the function on page load
+window.onload = loadGuide;
     </script>
 </body>
 </html>
