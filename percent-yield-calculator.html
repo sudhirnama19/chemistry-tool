@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reaction Suite: Yield, Limiting, Gas, Enthalpy & Balancer | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        
+        /* NO-SWIPE HORIZONTAL FIX */
+        html, body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6;
+            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 750px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); word-wrap: break-word;
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 8px 14px; border-radius: 50px; font-weight: 700; font-size: 0.6rem; transition: 0.3s; cursor: pointer;
+            text-transform: uppercase;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS & PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.45) !important; opacity: 1; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.95rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+        
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #footer-container { margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 style="color:var(--accent); font-weight:800;">Reaction Metrics Suite</h4>
+            <p class="theory-text">
+                Success in synthetic chemistry is measured by mass efficiency, energy management, and stoichiometric accuracy. Use the tabs below to solve any reaction parameter.
+            </p>
+            <div class="formula-box text-center">
+                $\text{Percent Yield} = \left( \frac{\text{Actual Yield}}{\text{Theoretical Yield}} \right) \times 100$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-yield', this)">Yield %</button>
+            <button class="pill-tab" onclick="switchTab('calc-limiting', this)">Limiting</button>
+            <button class="pill-tab" onclick="switchTab('calc-moles', this)">Mass-Mol</button>
+            <button class="pill-tab" onclick="switchTab('calc-gas', this)">Gas Law</button>
+            <button class="pill-tab" onclick="switchTab('calc-heat', this)">Enthalpy</button>
+            <button class="pill-tab" onclick="switchTab('calc-balance', this)">Balancer</button>
+        </div>
+
+        <div id="calc-yield" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Yield Efficiency Calculator</h5>
+            <label class="form-label">Actual Yield (g or mol)</label>
+            <input type="text" id="yield_act" class="form-control" placeholder="e.g. 18.5">
+            <label class="form-label">Theoretical Yield (g or mol)</label>
+            <input type="text" id="yield_theo" class="form-control" placeholder="e.g. 21.0">
+            <button onclick="calculatePercentYield()" class="btn-calc">Calculate Yield %</button>
+            <div id="res_yield" class="result-display"></div>
+        </div>
+
+        <div id="calc-limiting" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Limiting Reactant Finder</h5>
+            <div class="row g-2">
+                <div class="col-6"><label class="form-label">Mol Reactant A</label><input type="text" id="mol_a" class="form-control" placeholder="e.g. 1.5"></div>
+                <div class="col-6"><label class="form-label">Coeff A</label><input type="text" id="coeff_a" class="form-control" placeholder="e.g. 2"></div>
+                <div class="col-6"><label class="form-label">Mol Reactant B</label><input type="text" id="mol_b" class="form-control" placeholder="e.g. 2.0"></div>
+                <div class="col-6"><label class="form-label">Coeff B</label><input type="text" id="coeff_b" class="form-control" placeholder="e.g. 1"></div>
+            </div>
+            <button onclick="calculateLimiting()" class="btn-calc" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Analyze Reactants</button>
+            <div id="res_limiting" class="result-display"></div>
+        </div>
+
+        <div id="calc-moles" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Molar Mass Converter</h5>
+            <label class="form-label">Mass in Grams (g)</label>
+            <input type="text" id="conv_mass" class="form-control" placeholder="e.g. 10.0">
+            <label class="form-label">Molar Mass (g/mol)</label>
+            <input type="text" id="conv_mm" class="form-control" placeholder="e.g. 180.16">
+            <button onclick="calculateMoles()" class="btn-calc" style="background: linear-gradient(135deg, #f59e0b, #d97706);">Convert to Moles</button>
+            <div id="res_moles" class="result-display"></div>
+        </div>
+
+        <div id="calc-gas" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Ideal Gas Solver ($n = \frac{PV}{RT}$)</h5>
+            <label class="form-label">Pressure (atm)</label>
+            <input type="text" id="gas_p" class="form-control" placeholder="e.g. 1.0">
+            <label class="form-label">Volume (L)</label>
+            <input type="text" id="gas_v" class="form-control" placeholder="e.g. 22.4">
+            <label class="form-label">Temp (K)</label>
+            <input type="text" id="gas_t" class="form-control" placeholder="e.g. 273.15">
+            <button onclick="calculateGasMoles()" class="btn-calc" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">Find Moles (n)</button>
+            <div id="res_gas_moles" class="result-display"></div>
+        </div>
+
+        <div id="calc-heat" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Reaction Enthalpy ($\Delta H$)</h5>
+            <label class="form-label">Σ ΔHf Products (kJ)</label>
+            <input type="text" id="heat_prod" class="form-control" placeholder="e.g. -393">
+            <label class="form-label">Σ ΔHf Reactants (kJ)</label>
+            <input type="text" id="heat_react" class="form-control" placeholder="e.g. 0">
+            <button onclick="calculateEnthalpy()" class="btn-calc" style="background: linear-gradient(135deg, #ef4444, #f97316);">Estimate Energy</button>
+            <div id="res_heat" class="result-display"></div>
+        </div>
+
+        <div id="calc-balance" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Stoichiometry Assistant</h5>
+            <p class="theory-text" style="font-size:0.8rem;">Enter atomic counts for Reactants and Products to check if balanced.</p>
+            <div class="row g-2">
+                <div class="col-6"><label class="form-label">Reactant Total Atoms</label><input type="text" id="bal_r" class="form-control" placeholder="e.g. 12"></div>
+                <div class="col-6"><label class="form-label">Product Total Atoms</label><input type="text" id="bal_p" class="form-control" placeholder="e.g. 12"></div>
+            </div>
+            <button onclick="checkBalance()" class="btn-calc" style="background: linear-gradient(135deg, #64748b, #334155);">Check Balance</button>
+            <div id="res_balance" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Scientific Rules of Efficiency</h5>
+            <p class="theory-text">
+                1. <strong>Theoretical Yield:</strong> Absolute max mass predicted by Stoichiometry.<br>
+                2. <strong>Enthalpy:</strong> Exothermic (ΔH < 0) vs Endothermic (ΔH > 0).<br>
+                3. <strong>Balancing:</strong> Law of Conservation of Mass must be satisfied.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Scientific Research Context</h5>
+            <p class="theory-text">
+                In Green Chemistry, "Atom Economy" and "Percent Yield" are the primary indicators of a process's environmental impact. Researchers use mass balance equations to ensure that no toxic precursors are wasted, thereby reducing the environmental "E-factor" of pharmaceutical synthesis.
+            </p>
+        </div>
+
+        <h5 class="text-center mb-4" style="color:var(--accent);">Frequently Asked Questions</h5>
+        <div class="row g-3">
+            <script>
+                const faqs = [
+                    ["Why is percent yield important?", "It measures the efficiency of a synthetic process and resource management."],
+                    ["What is theoretical yield?", "The maximum mass of product formed based on stoichiometry."],
+                    ["What is actual yield?", "The mass of product actually recovered in the laboratory."],
+                    ["Can yield exceed 100%?", "In practice, yes, due to impurities or solvent retention."],
+                    ["How to find limiting reactant?", "Divide moles by coefficients; the smallest value is limiting."],
+                    ["What is ΔH?", "Enthalpy of reaction, indicating heat exchange with surroundings."],
+                    ["Negative ΔH meaning?", "The reaction is exothermic (releases heat)."],
+                    ["What is STP?", "Standard Temperature and Pressure (0°C, 1 atm)."],
+                    ["Catalyst and yield?", "Catalysts increase speed but not the theoretical yield limit."],
+                    ["Atom Economy?", "How many atoms from reactants end up in the desired product."],
+                    ["How to report yield?", "Report mass, percentage, and product purity."],
+                    ["Limiting reactant impact?", "It determines the absolute ceiling of the product mass."],
+                    ["Scale-up challenges?", "Industrial scale often lowers yield due to heat transfer issues."],
+                    ["What is R in PV=nRT?", "The gas constant, 0.0821 L·atm/mol·K."],
+                    ["Balanced Equation?", "Must have the same number of atoms of each element on both sides."],
+                    ["Why use moles?", "Chemical reactions occur in specific molar ratios, not mass ratios."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="col-12"><div class="glass-card mb-0" style="padding:15px 20px;"><p class="mb-1"><strong>${f[0]}</strong></p><small class="text-secondary">${f[1]}</small></div></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calculatePercentYield() {
+            let act = smartParser(document.getElementById('yield_act').value);
+            let theo = smartParser(document.getElementById('yield_theo').value);
+            if(isNaN(act) || isNaN(theo) || theo === 0) return;
+            let out = document.getElementById('res_yield');
+            out.innerHTML = `<strong>Result:</strong> ${((act/theo)*100).toFixed(2)}% Yield`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateLimiting() {
+            let rA = smartParser(document.getElementById('mol_a').value) / smartParser(document.getElementById('coeff_a').value);
+            let rB = smartParser(document.getElementById('mol_b').value) / smartParser(document.getElementById('coeff_b').value);
+            if(isNaN(rA) || isNaN(rB)) return;
+            let res = rA < rB ? "Reactant A is Limiting" : "Reactant B is Limiting";
+            let out = document.getElementById('res_limiting');
+            out.innerHTML = `<strong>Analysis:</strong> ${res}`;
+            out.style.display = "block";
+        }
+
+        function calculateMoles() {
+            let m = smartParser(document.getElementById('conv_mass').value);
+            let mm = smartParser(document.getElementById('conv_mm').value);
+            if(isNaN(m) || isNaN(mm) || mm === 0) return;
+            let out = document.getElementById('res_moles');
+            out.innerHTML = `<strong>Amount:</strong> ${(m/mm).toFixed(4)} mol`;
+            out.style.display = "block";
+        }
+
+        function calculateGasMoles() {
+            let p = smartParser(document.getElementById('gas_p').value);
+            let v = smartParser(document.getElementById('gas_v').value);
+            let t = smartParser(document.getElementById('gas_t').value);
+            if(isNaN(p) || isNaN(v) || isNaN(t) || t === 0) return;
+            let n = (p * v) / (0.0821 * t);
+            let out = document.getElementById('res_gas_moles');
+            out.innerHTML = `<strong>Result:</strong> ${n.toFixed(5)} mol`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateEnthalpy() {
+            let p = smartParser(document.getElementById('heat_prod').value);
+            let r = smartParser(document.getElementById('heat_react').value);
+            if(isNaN(p) || isNaN(r)) return;
+            let out = document.getElementById('res_heat');
+            out.innerHTML = `<strong>ΔH:</strong> ${(p-r).toFixed(2)} kJ`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function checkBalance() {
+            let r = smartParser(document.getElementById('bal_r').value);
+            let p = smartParser(document.getElementById('bal_p').value);
+            if(isNaN(r) || isNaN(p)) return;
+            let out = document.getElementById('res_balance');
+            out.innerHTML = r === p ? "✅ Equation is Balanced!" : "❌ Imbalanced: Reactants and Products count differ.";
+            out.style.display = "block";
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
