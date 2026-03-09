@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DoU & Empirical Formula Solver | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        
+        /* NO-SWIPE HORIZONTAL FIX */
+        html, body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.6;
+            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+        }
+        
+        /* CLICKABLE HEADER */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header a:hover { filter: brightness(1.3); transform: scale(1.02); display: inline-block; }
+
+        .container-narrow { max-width: 750px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); word-wrap: break-word;
+        }
+
+        /* TABS */
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; transition: 0.3s; cursor: pointer;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 213, 0.3); }
+
+        /* INPUTS & PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 10px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.8) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.45) !important; opacity: 1; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 18px;
+            background: rgba(0, 255, 213, 0.05); border-radius: 15px; border-left: 5px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 1.1rem; border: 1px solid var(--border); margin: 15px 0; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 12px; }
+        
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        table { color: #f8fafc !important; border-color: var(--border) !important; font-size: 0.85rem; }
+        th { color: var(--accent); }
+
+        #footer-container { margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 style="color:var(--accent); font-weight:800;">Degree of Unsaturation (DoU)</h4>
+            <p class="theory-text">
+                The **Degree of Unsaturation** (also known as Double Bond Equivalent or DBE) is a calculation used in organic chemistry to determine the total number of rings and $\pi$ bonds in a molecule based on its molecular formula.
+            </p>
+            <div class="formula-box text-center">
+                $DoU = C + 1 + \frac{N}{2} - \frac{H}{2} - \frac{X}{2}$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-dou', this)">DoU Calculator</button>
+            <button class="pill-tab" onclick="switchTab('calc-empirical', this)">Empirical Formula</button>
+        </div>
+
+        <div id="calc-dou" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">DBE / DoU Solver</h5>
+            <div class="row">
+                <div class="col-6">
+                    <label class="form-label">Carbons (C)</label>
+                    <input type="text" id="inp_c" class="form-control" placeholder="0">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Hydrogens (H)</label>
+                    <input type="text" id="inp_h" class="form-control" placeholder="0">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Nitrogens (N)</label>
+                    <input type="text" id="inp_n" class="form-control" placeholder="0">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Halogens (X)</label>
+                    <input type="text" id="inp_x" class="form-control" placeholder="F, Cl, Br, I">
+                </div>
+            </div>
+            <button onclick="calculateDoU()" class="btn-calc">Calculate Degrees</button>
+            <div id="res_dou" class="result-display"></div>
+        </div>
+
+        <div id="calc-empirical" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Empirical Formula Finder</h5>
+            <p class="theory-text" style="font-size: 0.8rem; text-align: center;">Enter mass percentages to find the simplest ratio.</p>
+            <div class="row g-2">
+                <div class="col-4"><label class="form-label">C %</label><input type="text" id="emp_c" class="form-control" placeholder="e.g. 40"></div>
+                <div class="col-4"><label class="form-label">H %</label><input type="text" id="emp_h" class="form-control" placeholder="e.g. 6.7"></div>
+                <div class="col-4"><label class="form-label">O %</label><input type="text" id="emp_o" class="form-control" placeholder="e.g. 53.3"></div>
+            </div>
+            <button onclick="calculateEmpirical()" class="btn-calc" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Find Empirical Ratio</button>
+            <div id="res_emp" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Key Aspects & Atom Rules</h5>
+            <p class="theory-text">
+                Understanding how different atoms affect the saturation of a molecule is vital for structure elucidation:
+                <ul>
+                    <li><strong>Group 14 (C, Si):</strong> Each carbon increases the required hydrogen count for saturation.</li>
+                    <li><strong>Group 15 (N, P):</strong> These atoms are trivalent; they effectively add "half" a carbon to the formula.</li>
+                    <li><strong>Group 16 (O, S):</strong> Ignored in the DBE formula as they do not change the H-count required for saturation.</li>
+                    <li><strong>Group 17 (F, Cl, Br, I):</strong> These replace hydrogens; thus, they are subtracted similarly to H.</li>
+                </ul>
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Interpretation Table</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>DoU Value</th><th>Structural Possibilities</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>1 Double Bond ($\pi$) OR 1 Ring</td></tr>
+                        <tr><td>2</td><td>2 Double Bonds OR 2 Rings OR 1 Triple Bond OR (1 Ring + 1 $\pi$)</td></tr>
+                        <tr><td>4</td><td>Benzene ring (3 Double Bonds + 1 Ring)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Solved Examples</h5>
+            <div class="theory-text">
+                <strong>Example 1: Benzene ($C_6H_6$)</strong><br>
+                $DoU = 6 + 1 + 0 - \frac{6}{2} = 4$. (3 $\pi$ bonds + 1 ring).
+            </div>
+            <hr style="border-color:var(--border)">
+            <div class="theory-text">
+                <strong>Example 2: Pyridine ($C_5H_5N$)</strong><br>
+                $DoU = 5 + 1 + 0.5 - 2.5 = 4$.
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 style="color:var(--accent);">Scientific Research Application</h5>
+            <p class="theory-text">
+                In **Mass Spectrometry (MS)** and **NMR**, the Degree of Unsaturation is the first step in identifying unknown compounds. For instance, finding a DoU of 5 for $C_{10}H_{12}O$ immediately points to an aromatic ring plus one extra site of unsaturation (likely a carbonyl group).
+            </p>
+        </div>
+
+        <h5 class="text-center mb-4" style="color:var(--accent);">Frequently Asked Questions</h5>
+        <div class="row g-3">
+            <script>
+                const faqs = [
+                    ["What does a DoU of 0 mean?", "It indicates the molecule is fully saturated (no rings or multiple bonds)."],
+                    ["Why is Oxygen ignored?", "Oxygen is divalent and doesn't change the H-count needed for saturation."],
+                    ["Can DoU be a fraction?", "No. Real molecules must have integer values for degrees of unsaturation."],
+                    ["DBE of a Triple Bond?", "A triple bond equals 2 degrees of unsaturation."],
+                    ["Is a ring unsaturation?", "Yes, creating a ring removes 2 hydrogens, counting as 1 degree."],
+                    ["Does Silicon follow Carbon rules?", "Yes, Silicon is in Group 14 and follows the same rules."],
+                    ["Formula for saturation?", "For acyclic alkanes, it is $C_nH_{2n+2}$."],
+                    ["How to treat Phosphorus?", "Treat Phosphorus (P) the same as Nitrogen (N)."],
+                    ["Unsaturated compound definition?", "A compound with at least one double bond, triple bond, or ring."],
+                    ["Does DoU give exact structure?", "No, it only limits the possibilities of rings and bonds."],
+                    ["DoU of 4 or higher?", "Strongly suggests an aromatic (benzene-like) system."],
+                    ["Can I use this for ions?", "Yes, but adjust the H-count to account for the formal charge."],
+                    ["Is Sulfur ignored?", "Yes, Group 16 elements like Sulfur are typically ignored."],
+                    ["Inorganic molecules?", "It is primarily used for organic covalent molecules."],
+                    ["DBE of Naphthalene ($C_{10}H_8$)?", "7 (2 rings + 5 double bonds)."],
+                    ["What are Halogens?", "Elements like F, Cl, Br, and I (X in the formula)."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`
+                        <div class="col-12">
+                            <div class="glass-card mb-0" style="padding:15px 20px;">
+                                <p class="mb-1"><strong>${f[0]}</strong></p>
+                                <small class="text-secondary">${f[1]}</small>
+                            </div>
+                        </div>
+                    `);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser for scientific notation
+        function smartParser(v) {
+            if (!v || v.trim()==="") return 0;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calculateDoU() {
+            let c = smartParser(document.getElementById('inp_c').value);
+            let h = smartParser(document.getElementById('inp_h').value);
+            let n = smartParser(document.getElementById('inp_n').value);
+            let x = smartParser(document.getElementById('inp_x').value);
+            let dou = c + 1 + (n / 2) - (h / 2) - (x / 2);
+            let out = document.getElementById('res_dou');
+            out.innerHTML = `<strong>Result:</strong> ${dou} Degrees <br><small>Total Rings + $\pi$ bonds: ${dou}</small>`;
+            out.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        function calculateEmpirical() {
+            let pc = smartParser(document.getElementById('emp_c').value);
+            let ph = smartParser(document.getElementById('emp_h').value);
+            let po = smartParser(document.getElementById('emp_o').value);
+            
+            let mc = pc / 12.01;
+            let mh = ph / 1.008;
+            let mo = po / 16.00;
+            
+            let min = Math.min(mc > 0 ? mc : Infinity, mh > 0 ? mh : Infinity, mo > 0 ? mo : Infinity);
+            
+            let rc = Math.round(mc / min);
+            let rh = Math.round(mh / min);
+            let ro = Math.round(mo / min);
+            
+            let formula = (rc > 0 ? "C<sub>"+rc+"</sub>" : "") + (rh > 0 ? "H<sub>"+rh+"</sub>" : "") + (ro > 0 ? "O<sub>"+ro+"</sub>" : "");
+            let out = document.getElementById('res_emp');
+            out.innerHTML = `<strong>Empirical Formula:</strong> ${formula}`;
+            out.style.display = "block";
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) {
+                    const data = await response.text();
+                    document.getElementById('footer-container').innerHTML = data;
+                }
+            } catch (error) { console.error('Footer error:', error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
