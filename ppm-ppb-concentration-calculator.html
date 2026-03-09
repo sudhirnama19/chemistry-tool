@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ppm & ppb Concentration Calculator | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(15, 23, 42, 0.9);
+        }
+        
+        html, body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+        }
+        
+        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); word-wrap: break-word; overflow: hidden;
+        }
+
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 14px; border-radius: 50px; font-weight: 700; font-size: 0.65rem; transition: 0.3s; cursor: pointer;
+            text-transform: uppercase;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 213, 0.4); }
+
+        /* FIX: INVISIBLE PLACEHOLDERS */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
+        .form-control {
+            background: var(--input-bg) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; opacity: 1; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 16px;
+            border-radius: 14px; font-weight: 800; margin-top: 25px; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+
+        .result-display {
+            display: none; margin-top: 25px; padding: 20px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 18px; border-left: 6px solid var(--accent);
+        }
+
+        /* FIX: FORMULA OVERFLOW */
+        .formula-box { 
+            background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.1rem; 
+            border: 1px solid var(--border); margin: 20px 0; text-align: center;
+            overflow-x: auto; white-space: nowrap;
+        }
+
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 18px; margin-bottom: 15px;
+        }
+
+        .example-box { 
+            border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 25px; 
+            background: rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">Trace Concentration: Understanding ppm & ppb</h4>
+            <p class="theory-text">
+                In analytical chemistry and environmental science, <strong>Parts Per Million (ppm)</strong> and <strong>Parts Per Billion (ppb)</strong> are units used to describe extremely dilute concentrations. They represent the ratio of the mass of a solute to the total mass of the solution.
+            </p>
+            <div class="formula-box">
+                $ \text{ppm} = \frac{\text{Mass Solute}}{\text{Total Mass}} \times 10^6 \quad | \quad \text{ppb} = \frac{\text{Mass Solute}}{\text{Total Mass}} \times 10^9 $
+            </div>
+            <p class="theory-text">
+                For aqueous solutions at standard density ($1g/mL$), $1 ppm$ is equivalent to $1 mg/L$, and $1 ppb$ is equivalent to $1 \mu g/L$.
+            </p>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('to-ppm', this)">Mass to ppm/ppb</button>
+            <button class="pill-tab" onclick="switchTab('from-ppm', this)">ppm/ppb to Mass</button>
+            <button class="pill-tab" onclick="switchTab('mol-ppm', this)">Molarity to ppm</button>
+            <button class="pill-tab" onclick="switchTab('conversion', this)">Unit Converter</button>
+        </div>
+
+        <div id="to-ppm" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Calculate ppm & ppb from Mass</h5>
+            <label class="form-label">Mass of Solute ($mg$ or $g$)</label>
+            <input type="text" id="mass_solute" class="form-control" placeholder="e.g. 5.0">
+            
+            <label class="form-label">Unit of Solute</label>
+            <select id="unit_solute" class="form-control">
+                <option value="1">Grams (g)</option>
+                <option value="0.001" selected>Milligrams (mg)</option>
+                <option value="0.000001">Micrograms (µg)</option>
+            </select>
+
+            <label class="form-label">Total Mass/Volume of Solution ($L$ or $kg$)</label>
+            <input type="text" id="mass_total" class="form-control" placeholder="e.g. 1.0">
+            
+            <button onclick="calcToPpm()" class="btn-calc">Convert to Trace Units</button>
+            <div id="res_to_ppm" class="result-display"></div>
+        </div>
+
+        <div id="from-ppm" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Find Required Solute Mass</h5>
+            <label class="form-label">Desired Concentration (ppm)</label>
+            <input type="text" id="val_ppm" class="form-control" placeholder="e.g. 50">
+            <label class="form-label">Total Solution Volume ($L$)</label>
+            <input type="text" id="vol_l" class="form-control" placeholder="e.g. 2.5">
+            <button onclick="calcFromPpm()" class="btn-calc">Calculate Mass Needed</button>
+            <div id="res_from_ppm" class="result-display"></div>
+        </div>
+
+        <div id="mol-ppm" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Molarity to ppm Solver</h5>
+            <label class="form-label">Molarity ($M$ or $mol/L$)</label>
+            <input type="text" id="val_molar" class="form-control" placeholder="e.g. 1.5e-4">
+            <label class="form-label">Molar Mass ($g/mol$)</label>
+            <input type="text" id="val_mw" class="form-control" placeholder="e.g. 58.44">
+            <button onclick="calcMolPpm()" class="btn-calc">Process Conversion</button>
+            <div id="res_mol_ppm" class="result-display"></div>
+        </div>
+
+        <div id="conversion" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">ppm $\leftrightarrow$ ppb $\leftrightarrow$ % Converter</h5>
+            <label class="form-label">Enter Value in ppm</label>
+            <input type="text" id="conv_val" class="form-control" placeholder="e.g. 1.0">
+            <button onclick="quickConv()" class="btn-calc">Convert All Units</button>
+            <div id="res_conv" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Key Aspects & Interpretation</h5>
+            <p class="theory-text">
+                When interpreting ppm and ppb, context is critical. These units are <strong>dimensionless ratios</strong>. 
+            </p>
+            <ul class="theory-text">
+                <li><strong>Rules for Water:</strong> Because $1 Liter$ of water weighs approximately $1 kg$, we assume $1 ppm = 1 mg/L$. This rule breaks down for heavy solvents or concentrated acids.</li>
+                <li><strong>Rules for Gases:</strong> In air quality, ppm is usually calculated by volume (ppmv). This calculator focuses on <em>mass-based</em> liquid concentrations.</li>
+                <li><strong>Sensitivity:</strong> 1 ppb is equivalent to one second in nearly 32 years. This level of precision requires high-end analytical equipment like ICP-MS.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">How It Works: Practical Examples</h5>
+            <div class="example-box">
+                <p><strong>Example 1: Lead in Water</strong><br>
+                A $500 mL$ sample of water contains $0.0075 mg$ of lead. What is the ppm?<br>
+                1. Total Mass = $0.5 kg$.<br>
+                2. $ppm = 0.0075 mg / 0.5 L = 0.015 ppm$.<br>
+                3. $ppb = 0.015 \times 1000 = 15 ppb$.</p>
+            </div>
+            <div class="example-box">
+                <p><strong>Example 2: Preparing a Standard</strong><br>
+                How much $NaCl$ ($MW=58.44$) is needed for $1L$ of a $1000 ppm$ solution?<br>
+                $1000 ppm = 1000 mg/L$. Therefore, $1000 mg$ (or $1 gram$) of $NaCl$ is required.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Applications in Scientific Research</h5>
+            <p class="theory-text">
+                <strong>Environmental Toxicology:</strong> Researchers monitor heavy metals like Mercury and Arsenic in groundwater. EPA limits are often set in ppb; for instance, the limit for lead in drinking water is $15 ppb$.
+            </p>
+            <p class="theory-text">
+                <strong>Pharmacology:</strong> In drug testing, impurities must be kept at sub-ppm levels to ensure safety. Stoichiometric calculations determine if trace reagents have been successfully washed away.
+            </p>
+            <p class="theory-text">
+                <strong>Semiconductor Tech:</strong> Silicon wafers must have "dopant" levels controlled at the ppb level. Even a single atom out of a billion can change the electrical conductivity of a chip.
+            </p>
+        </div>
+
+        <h5 class="text-center mb-3 h-accent">ppm & ppb Knowledge Base (FAQ)</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["Is 1 ppm equal to 1 mg/L?", "Yes, for aqueous solutions where density is approximately 1.00 g/mL."],
+                    ["How many ppb are in 1 ppm?", "There are 1,000 parts per billion in 1 part per million."],
+                    ["What is ppm in percentage?", "1 ppm is equal to 0.0001%."],
+                    ["What does 'Trace Level' mean?", "Concentrations usually below 100 ppm, requiring sensitive detection."],
+                    ["Why use ppb instead of Molarity?", "For very dilute solutions, Molarity results in many leading zeros (e.g., 0.0000001M), making ppb easier to read."],
+                    ["How do you convert % to ppm?", "Multiply the percentage by 10,000."],
+                    ["What is ppmv?", "Parts per million by volume, used for gases."],
+                    ["Is ppm mass or volume based?", "In chemistry, it's usually mass/mass. In environmental air, it's volume/volume."],
+                    ["What is 1 ppb in time?", "1 ppb is roughly 1 second in 31.7 years."],
+                    ["How is ppm used in soil?", "Usually as mg of solute per kg of dry soil."],
+                    ["Can ppm be negative?", "No, concentration is always a positive ratio."],
+                    ["What is ppt?", "Parts per trillion ($10^{-12}$), even smaller than ppb."],
+                    ["What is the EPA limit for Lead?", "The action level is 15 ppb in drinking water."],
+                    ["Does boiling water change ppm?", "Yes, it increases ppm because water evaporates while solutes remain."],
+                    ["How to calculate ppm from density?", "ppm = (Mass Solute / (Volume × Density)) × 10^6."],
+                    ["Why is ppm important in pools?", "To measure chlorine levels safely (usually 1-3 ppm)."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700;">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function calcToPpm() {
+            let mS = smartParser(document.getElementById('mass_solute').value);
+            let uS = parseFloat(document.getElementById('unit_solute').value);
+            let mT = smartParser(document.getElementById('mass_total').value);
+            if(isNaN(mS) || isNaN(mT) || mT === 0) return;
+            
+            let massInGrams = mS * uS;
+            let ratio = massInGrams / mT;
+            let ppm = ratio * 1e6;
+            let ppb = ratio * 1e9;
+            
+            display('res_to_ppm', `
+                Concentration: <strong>${ppm.toFixed(4)} ppm</strong><br>
+                Concentration: <strong>${ppb.toFixed(2)} ppb</strong>
+            `);
+        }
+
+        function calcFromPpm() {
+            let p = smartParser(document.getElementById('val_ppm').value);
+            let v = smartParser(document.getElementById('vol_l').value);
+            if(isNaN(p) || isNaN(v)) return;
+            let mg = p * v;
+            display('res_from_ppm', `Required Mass: <strong>${mg.toFixed(3)} mg</strong> (${(mg/1000).toFixed(5)} g)`);
+        }
+
+        function calcMolPpm() {
+            let m = smartParser(document.getElementById('val_molar').value);
+            let mw = smartParser(document.getElementById('val_mw').value);
+            if(isNaN(m) || isNaN(mw)) return;
+            let ppm = m * mw * 1000;
+            display('res_mol_ppm', `Concentration: <strong>${ppm.toFixed(2)} ppm (mg/L)</strong>`);
+        }
+
+        function quickConv() {
+            let p = smartParser(document.getElementById('conv_val').value);
+            if(isNaN(p)) return;
+            display('res_conv', `
+                ppb: <strong>${(p * 1000).toLocaleString()}</strong><br>
+                Percentage: <strong>${(p / 10000).toFixed(6)} %</strong><br>
+                Molar Basis: <strong>${(p / 1e6).toExponential(2)} ratio</strong>
+            `);
+        }
+
+        function display(id, html) {
+            let el = document.getElementById(id); el.innerHTML = html; el.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
+            } catch (error) { console.error(error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
