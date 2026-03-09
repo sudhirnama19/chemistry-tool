@@ -136,6 +136,88 @@
 .tech-list { list-style: none; padding: 0; margin: 0; }
 .tech-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
 .tech-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+
+
+
+        /* Container for the guide section */
+.how-to-guide-wrapper {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box; /* Fixes the overlapping issue */
+    margin: 20px 0;
+}
+
+/* The Subtle Glass Card */
+.glass-card-guide {
+    background: rgba(30, 41, 59, 0.7); /* Matches your dark theme */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px; /* Matches the rounded corners in your screenshot */
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+}
+
+.guide-header {
+    color: #ffffff;
+    font-size: 1.3rem;
+    margin-top: 0;
+    border-left: 4px solid #38bdf8; /* The blue accent bar */
+    padding-left: 12px;
+    margin-bottom: 15px;
+}
+
+.symbol-list {
+    margin: 20px 0;
+}
+
+.symbol-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.symbol-box {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.symbol-desc {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+}
+
+.example-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.example-container h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: #f8fafc;
+}
+
+.guide-code {
+    background: rgba(244, 114, 182, 0.15);
+    color: #f472b6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
         
     </style>
 </head>
@@ -205,6 +287,41 @@
                 <canvas id="phChart"></canvas>
             </div>
         </div>
+
+
+
+        <section class="how-to-guide-wrapper">
+    <div class="glass-card-guide">
+        <h2 class="guide-header">Guide: Entering Values</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem;">Our calculators use a <strong>smartParser</strong> to handle scientific notation.</p>
+        
+        <div class="symbol-list">
+            <div class="symbol-row">
+                <div class="symbol-box">^</div>
+                <div class="symbol-desc"><strong>Exponent:</strong> <code>10^5</code> means 10<sup>5</sup></div>
+            </div>
+            
+            <div class="symbol-row">
+                <div class="symbol-box">*</div>
+                <div class="symbol-desc"><strong>Multiply:</strong> <code>10*1</code> means 10 multiplied by 1.</div>
+            </div>
+            
+            <div class="symbol-row">
+                <div class="symbol-box">e</div>
+                <div class="symbol-desc"><strong>Scientific:</strong> <code>1.8e-5</code> means 1.8 × 10<sup>-5</sup></div>
+            </div>
+        </div>
+
+        <div class="example-container">
+            <h3>Practical Examples:</h3>
+            <ul style="padding-left: 20px; color: #94a3b8; font-size: 0.9rem; margin: 0;">
+                <li style="margin-bottom: 8px;"><strong>Positive:</strong> Enter <span class="guide-code">10^2</span> for 100.</li>
+                <li style="margin-bottom: 8px;"><strong>Negative:</strong> Enter <span class="guide-code">-5</span> for acidic values.</li>
+                <li><strong>Complex:</strong> Enter <span class="guide-code">10^-7</span> for neutral pH.</li>
+            </ul>
+        </div>
+    </div>
+</section>
 
         <div class="content-section">
     <section class="info-section">
