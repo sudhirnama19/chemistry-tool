@@ -10,83 +10,166 @@
     
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']], 
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1); 
+            --input-bg: rgba(15, 23, 42, 0.9);
+        }
         
+        /* PREVENT SCROLL & OVERFLOW */
         html, body { 
             background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
-            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
-            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            line-height: 1.7;
+            max-width: 100vw; 
+            overflow-x: hidden; 
+            margin: 0; 
+            padding: 0;
         }
         
         .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
-        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+        .container-narrow { 
+            max-width: 850px; 
+            margin: auto; 
+            padding: 15px; 
+            width: 100%;
+            box-sizing: border-box; 
+        }
 
         .glass-card { 
-            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); word-wrap: break-word; overflow: hidden;
+            background: var(--glass); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); 
+            word-wrap: break-word; 
+            overflow: hidden; /* Contains children */
         }
 
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
         .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
-        .formula-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.1rem; border: 1px solid var(--border); margin: 20px 0; text-align: center; }
 
-        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; }
-        .form-control {
-            background: rgba(15, 23, 42, 0.9) !important; color: white !important;
-            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        /* FIX: FORMULA OVERFLOW */
+        .formula-box { 
+            background: rgba(0,0,0,0.4); 
+            padding: 20px; 
+            border-radius: 15px; 
+            font-size: 1.1rem; 
+            border: 1px solid var(--border); 
+            margin: 20px 0; 
+            text-align: center;
+            overflow-x: auto; /* Allows horizontal swipe for long math */
+            white-space: nowrap;
         }
+
+        /* FIX: INVISIBLE PLACEHOLDER TEXT */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
+        .form-control {
+            background: var(--input-bg) !important; 
+            color: white !important;
+            border: 1px solid #334155 !important; 
+            border-radius: 12px; 
+            padding: 12px;
+            font-size: 1rem;
+        }
+        /* High contrast placeholder styling */
+        .form-control::placeholder { 
+            color: rgba(255, 255, 255, 0.5) !important; 
+            opacity: 1; /* Browser override */
+        }
+        .form-control:-ms-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+        .form-control::-ms-input-placeholder { color: rgba(255, 255, 255, 0.5) !important; }
 
         .btn-calc {
             background: linear-gradient(135deg, #0ea5e9, var(--accent));
-            color: #0b0f1a; border: none; width: 100%; padding: 16px;
-            border-radius: 14px; font-weight: 800; margin-top: 25px; text-transform: uppercase;
-            letter-spacing: 1px; transition: 0.3s;
+            color: #0b0f1a; 
+            border: none; 
+            width: 100%; 
+            padding: 16px;
+            border-radius: 14px; 
+            font-weight: 800; 
+            margin-top: 25px; 
+            text-transform: uppercase;
+            letter-spacing: 1px; 
+            transition: 0.3s;
         }
 
         .result-display {
-            display: none; margin-top: 25px; padding: 20px;
-            background: rgba(0, 255, 213, 0.08); border-radius: 18px; border-left: 6px solid var(--accent);
+            display: none; 
+            margin-top: 25px; 
+            padding: 20px;
+            background: rgba(0, 255, 213, 0.08); 
+            border-radius: 18px; 
+            border-left: 6px solid var(--accent);
+            overflow-x: auto;
         }
 
+        /* FIX: FAQ CONTENT OVERFLOW */
         .faq-card {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            border-radius: 18px; padding: 18px; margin-bottom: 15px;
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border);
+            border-radius: 18px; 
+            padding: 18px; 
+            margin-bottom: 15px;
+            word-wrap: break-word;
         }
 
         .example-box { 
-            border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 25px; 
-            background: rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; overflow-x: auto;
+            border-left: 3px solid var(--accent); 
+            padding: 15px; 
+            margin-bottom: 25px; 
+            background: rgba(255,255,255,0.02); 
+            border-radius: 0 12px 12px 0; 
+            overflow-x: auto; /* Handles long calculation lines */
+        }
+
+        @media (max-width: 600px) {
+            .glass-card { padding: 15px; }
+            .formula-box { font-size: 0.9rem; }
+            .main-header h1 { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
 
-    <header class="main-header">
-        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    <header class="main-header" id="top">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
     </header>
 
     <div class="container-narrow">
         
         <div class="glass-card">
-            <h4 class="h-accent">Stoichiometry: The Math of Chemical Reactions</h4>
+            <h4 class="h-accent">Stoichiometry: The Quantitative Heart of Chemistry</h4>
             <p class="theory-text">
-                <strong>Stoichiometry</strong> (from the Greek <em>stoicheion</em> "element" and <em>metron</em> "measure") is the quantitative study of the relationships between reactants and products in a chemical reaction. It allows chemists to predict exactly how much of a substance is needed to react with another, or how much product will be generated.
+                <strong>Stoichiometry</strong> is the mathematical framework used to calculate the quantities of reactants and products in chemical reactions. Based on the <em>Law of Conservation of Mass</em>, it ensures that every atom present in the reactants is accounted for in the products.
             </p>
             <div class="formula-box">
-                $\text{Mass (A)} \rightarrow \text{Moles (A)} \xrightarrow{\text{Ratio}} \text{Moles (B)} \rightarrow \text{Mass (B)}$
+                $ \text{Mass}_A \xrightarrow{/ MW_A} \text{Mole}_A \xrightarrow{\text{Ratio}} \text{Mole}_B \xrightarrow{\times MW_B} \text{Mass}_B $
             </div>
             <p class="theory-text">
-                The fundamental laws governing stoichiometry are the <strong>Law of Conservation of Mass</strong> and the <strong>Law of Definite Proportions</strong>. Every stoichiometric calculation relies on a balanced chemical equation.
+                By bridging the gap between microscopic atoms and macroscopic grams, stoichiometry allows scientists to predict yields, determine purity, and optimize industrial production.
             </p>
         </div>
 
@@ -94,84 +177,92 @@
             <h5 class="text-center h-accent">Mass-to-Mass Stoichiometry Solver</h5>
             
             <label class="form-label">Known Mass ($g$)</label>
-            <input type="text" id="mass_in" class="form-control" placeholder="e.g. 5.0">
+            <input type="text" id="mass_in" class="form-control" placeholder="Enter value (e.g. 10.5)">
             
             <label class="form-label">Molar Mass of Given Substance ($g/mol$)</label>
-            <input type="text" id="mw_given" class="form-control" placeholder="e.g. 18.015">
+            <input type="text" id="mw_given" class="form-control" placeholder="Molar mass (e.g. 18.015)">
             
             <div class="row">
                 <div class="col-6">
                     <label class="form-label">Coeff (Given)</label>
-                    <input type="text" id="coef_given" class="form-control" placeholder="e.g. 2">
+                    <input type="text" id="coef_given" class="form-control" placeholder="Coefficient 1">
                 </div>
                 <div class="col-6">
                     <label class="form-label">Coeff (Desired)</label>
-                    <input type="text" id="coef_target" class="form-control" placeholder="e.g. 1">
+                    <input type="text" id="coef_target" class="form-control" placeholder="Coefficient 2">
                 </div>
             </div>
 
             <label class="form-label">Molar Mass of Desired Substance ($g/mol$)</label>
-            <input type="text" id="mw_target" class="form-control" placeholder="e.g. 32.00">
+            <input type="text" id="mw_target" class="form-control" placeholder="Target mass (e.g. 44.01)">
             
             <button onclick="calculateStoic()" class="btn-calc">Calculate Theoretical Yield</button>
             <div id="res_stoic" class="result-display"></div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Key Aspects & Rules of Stoichiometry</h5>
-            <p class="theory-text">To master stoichiometry, one must follow these absolute rules:</p>
+            <h5 class="h-accent">Interpretation & Rules of Application</h5>
+            <p class="theory-text">
+                To correctly apply stoichiometry in a laboratory or research setting, follow these foundational rules:
+            </p>
             <ul class="theory-text">
-                <li><strong>Balance First:</strong> You cannot perform stoichiometry without a balanced chemical equation. The coefficients represent the molar ratios.</li>
-                <li><strong>The Mole Bridge:</strong> You cannot convert grams of one substance directly to grams of another. You must cross the "mole bridge" using molar mass.</li>
-                <li><strong>Limiting Reactants:</strong> In practical scenarios, one reactant usually runs out first. This is the Limiting Reactant, and it dictates the theoretical yield.</li>
-                <li><strong>Dimensional Analysis:</strong> Always track units to ensure grams cancel out to moles, and moles cancel out to target grams.</li>
+                <li><strong>The Balance Rule:</strong> A reaction must be balanced before any calculation. Coefficients define the "Molar Ratio."</li>
+                <li><strong>The Mole Bridge:</strong> You cannot convert Mass A to Mass B directly. You must convert Mass A to Moles A first.</li>
+                <li><strong>Significant Figures:</strong> Results should never be more precise than the least precise measurement used in the input.</li>
+                <li><strong>Limiting Reactant:</strong> If multiple reactants are provided, the one that produces the <em>least</em> amount of product is the limiting factor.</li>
             </ul>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">How It Works: Step-by-Step Solved Examples</h5>
+            <h5 class="h-accent">How It Works: Step-by-Step Examples</h5>
             <div class="example-box">
-                <p><strong>Example 1: Water Synthesis</strong><br>
-                Equation: $2H_2 + O_2 \rightarrow 2H_2O$. How many grams of $O_2$ are needed to react with $10g$ of $H_2$?<br>
-                1. Moles $H_2 = 10g / 2.016 g/mol = 4.96 \, mol$.<br>
-                2. Mole Ratio = $1 \, mol \, O_2 / 2 \, mol \, H_2 = 0.5$.<br>
-                3. Moles $O_2 = 4.96 \times 0.5 = 2.48 \, mol$.<br>
-                4. Mass $O_2 = 2.48 \times 32.00 = 79.36g$.</p>
+                <p><strong>Example 1: Combustion of Methane</strong><br>
+                $CH_4 + 2O_2 \rightarrow CO_2 + 2H_2O$<br>
+                How much $CO_2$ is produced from $16g$ of $CH_4$?<br>
+                1. Moles $CH_4 = 16g / 16.04 \, g/mol = 0.997 \, mol$.<br>
+                2. Mole Ratio ($CH_4:CO_2$) = $1:1$.<br>
+                3. Mass $CO_2 = 0.997 \, mol \times 44.01 \, g/mol = 43.88g$.</p>
             </div>
             <div class="example-box">
-                <p><strong>Example 2: Theoretical Yield</strong><br>
-                In the reaction $N_2 + 3H_2 \rightarrow 2NH_3$, starting with $28g$ of $N_2$:<br>
-                $(28g \, N_2) \times (1 \, mol / 28.02g) \times (2 \, mol \, NH_3 / 1 \, mol \, N_2) \times (17.03g / 1 \, mol) = 34.04g \, NH_3$.</p>
+                <p><strong>Example 2: Haber Process</strong><br>
+                $N_2 + 3H_2 \rightarrow 2NH_3$<br>
+                Starting with $10g$ of $H_2$:<br>
+                $(10g \, H_2) \div (2.016) \times (2/3 \text{ ratio}) \times (17.031) = 56.32g \, NH_3$.</p>
             </div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Stoichiometry in Scientific Research</h5>
+            <h5 class="h-accent">Application in Scientific Research</h5>
             <p class="theory-text">
-                In Green Chemistry, stoichiometry is used to calculate "Atom Economy"—measuring how much of the reactant atoms end up in the final product. In **Environmental Science**, researchers apply stoichiometry to determine the "Redfield Ratio" ($106:16:1$) of carbon, nitrogen, and phosphorus in phytoplankton to study ocean health. In **Aerospace Engineering**, precise stoichiometric ratios of fuel to oxidizer are required to ensure complete combustion in rocket engines, preventing engine failure or fuel waste.
+                Stoichiometry is not just a classroom exercise; it is the backbone of modern chemical engineering and biological research:
+            </p>
+            <p class="theory-text">
+                <strong>1. Pharmaceutical Synthesis:</strong> Research labs use stoichiometry to calculate the <em>Percent Yield</em> of new drug compounds. High-efficiency reactions minimize waste (Green Chemistry).<br><br>
+                <strong>2. Atmospheric Science:</strong> Researchers calculate stoichiometric ratios of pollutants like $NO_x$ and $SO_x$ to predict the formation of acid rain in specific geographic regions.<br><br>
+                <strong>3. Battery Research:</strong> In lithium-ion development, stoichiometry determines the exact ratio of lithium to cobalt in cathode materials to maximize energy density.
             </p>
         </div>
 
-        <h5 class="text-center mb-3 h-accent">Stoichiometry FAQ & Knowledge Base</h5>
+        <h5 class="text-center mb-3 h-accent">Detailed Knowledge Base & FAQ</h5>
         <div id="faq-container">
             <script>
                 const faqs = [
-                    ["What is Stoichiometry?", "It is the calculation of products and reactants in chemical reactions."],
-                    ["What is a Limiting Reactant?", "The reactant that is completely consumed first, stopping the reaction."],
-                    ["What is Theoretical Yield?", "The maximum amount of product that can be produced based on stoichiometry."],
-                    ["How do I find Percent Yield?", "$\text{Percent Yield} = (\text{Actual Yield} / \text{Theoretical Yield}) \times 100$."],
-                    ["What is Molar Mass?", "The mass in grams of one mole of a substance ($g/mol$)."],
-                    ["Can stoichiometry predict reaction speed?", "No, stoichiometry only predicts amounts; kinetics predicts speed."],
-                    ["What is Excess Reactant?", "The reactant that remains after the limiting reactant is used up."],
-                    ["Does pressure affect stoichiometry?", "In gas reactions, it affects volume (Ideal Gas Law), but the mole ratios remain constant."],
-                    ["What is the Redfield Ratio?", "A stoichiometric ratio of C, N, and P found in marine biomass."],
-                    ["Why must equations be balanced?", "To satisfy the Law of Conservation of Mass."],
-                    ["What is a Mole?", "A unit representing $6.022 \times 10^{23}$ particles."],
-                    ["What is an Empirical Formula?", "The simplest whole-number ratio of atoms in a compound."],
-                    ["Can I use grams in a mole ratio?", "No, ratios must always be in moles."],
-                    ["What is Atom Economy?", "A measure of efficiency in chemical processes."],
-                    ["What is Titration stoichiometry?", "Using a known concentration to find an unknown based on stoichiometric ratios."],
-                    ["Is it used in baking?", "Yes, recipes are essentially stoichiometric instructions for chemical changes."]
+                    ["What is the fundamental law of stoichiometry?", "It is the Law of Conservation of Mass, stating mass is neither created nor destroyed."],
+                    ["What is a Limiting Reactant?", "The reactant that runs out first and determines the maximum product yield."],
+                    ["What is Molar Ratio?", "The ratio between the coefficients of any two substances in a balanced equation."],
+                    ["Why is my actual yield lower than theoretical?", "Due to side reactions, incomplete reactions, or loss of product during filtration."],
+                    ["Can stoichiometry be used for gases?", "Yes, using the Ideal Gas Law ($PV=nRT$) to convert volumes to moles."],
+                    ["What is Atom Economy?", "A measure of how much of the starting material ends up in the final useful product."],
+                    ["How do I find Molar Mass?", "Sum the atomic weights of all atoms in the chemical formula from the Periodic Table."],
+                    ["What is a Mole?", "A unit representing $6.022 \times 10^{23}$ particles (Avogadro's Number)."],
+                    ["What is an Empirical Formula?", "The simplest whole-number ratio of elements in a compound."],
+                    ["What is Excess Reactant?", "The substance that remains after the limiting reactant is completely consumed."],
+                    ["Does temperature affect stoichiometry?", "No, the mass relationships remain constant, though reaction rates may change."],
+                    ["What is Percent Yield?", "Actual Yield divided by Theoretical Yield, multiplied by 100."],
+                    ["Is stoichiometry used in medicine?", "Yes, for calculating precise dosages based on molecular weight and body mass."],
+                    ["What is a Gravimetric Analysis?", "A technique using stoichiometry to find the amount of an analyte based on mass."],
+                    ["What is Titration stoichiometry?", "Using the volume of a known solution to find the concentration of an unknown."],
+                    ["What is a stoichiometric mixture?", "A mixture where all reactants are consumed exactly at the same time."]
                 ];
                 faqs.forEach(f => {
                     document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700;">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
@@ -183,7 +274,7 @@
     </div>
 
     <script>
-        // Smart Parser
+        // Smart Parser for handling scientific notation
         function smartParser(v) {
             if (!v || v.trim()==="") return NaN;
             let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
@@ -197,30 +288,36 @@
             let coefB = smartParser(document.getElementById('coef_target').value);
             let mwB = smartParser(document.getElementById('mw_target').value);
 
-            if(isNaN(massA) || isNaN(mwA) || isNaN(coefA) || isNaN(coefB) || isNaN(mwB) || mwA===0 || coefA===0) return;
+            if(isNaN(massA) || isNaN(mwA) || isNaN(coefA) || isNaN(coefB) || isNaN(mwB) || mwA===0 || coefA===0) {
+                alert("Please fill all fields with valid numbers.");
+                return;
+            }
 
-            // Step 1: Moles of A
             let molesA = massA / mwA;
-            // Step 2: Moles of B (Ratio)
             let molesB = molesA * (coefB / coefA);
-            // Step 3: Mass of B
             let massB = molesB * mwB;
 
             let res = document.getElementById('res_stoic');
             res.innerHTML = `
-                Moles of Given: <strong>${molesA.toFixed(4)} mol</strong><br>
-                Moles of Desired: <strong>${molesB.toFixed(4)} mol</strong><br>
-                <strong>Theoretical Yield: ${massB.toFixed(3)} grams</strong>
+                <div style="font-size: 0.9rem; color: #94a3b8;">Calculation Breakdown:</div>
+                Moles of Given: <strong>${molesA.toFixed(5)} mol</strong><br>
+                Moles of Desired: <strong>${molesB.toFixed(5)} mol</strong><br>
+                <hr style="border-color: var(--border);">
+                <span style="color: var(--accent); font-size: 1.1rem;">Theoretical Yield: <strong>${massB.toFixed(4)} grams</strong></span>
             `;
             res.style.display = "block";
-            MathJax.typesetPromise();
+            
+            // Re-render MathJax if any was injected
+            if(window.MathJax) MathJax.typesetPromise();
         }
 
         async function loadFooter() {
             try {
                 const response = await fetch('footer.html');
-                if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
-            } catch (error) { console.error(error); }
+                if (response.ok) { 
+                    document.getElementById('footer-container').innerHTML = await response.text(); 
+                }
+            } catch (error) { console.error("Footer load failed:", error); }
         }
         window.addEventListener('DOMContentLoaded', loadFooter);
     </script>
