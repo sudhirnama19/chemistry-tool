@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Beer-Lambert Law & Regression Suite | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
+        
+        /* NO-SWIPE HORIZONTAL FIX */
+        html, body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
+        }
+        
+        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); word-wrap: break-word; overflow: hidden;
+        }
+
+        .tab-frame { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .pill-tab {
+            background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid var(--border);
+            padding: 10px 14px; border-radius: 50px; font-weight: 700; font-size: 0.62rem; transition: 0.3s; cursor: pointer;
+            text-transform: uppercase;
+        }
+        .pill-tab.active { background: var(--accent); color: #0b0f1a; border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 213, 0.4); }
+
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; }
+        .form-control {
+            background: rgba(15, 23, 42, 0.9) !important; color: white !important;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.35) !important; }
+
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 16px;
+            border-radius: 14px; font-weight: 800; margin-top: 25px; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+
+        .result-display {
+            display: none; margin-top: 25px; padding: 20px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 18px; border-left: 6px solid var(--accent);
+        }
+
+        .formula-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.1rem; border: 1px solid var(--border); margin: 20px 0; text-align: center; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
+        
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 18px; margin-bottom: 15px;
+        }
+
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+
+        .example-box { 
+            border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 25px; 
+            background: rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; overflow-x: auto;
+        }
+
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Tools</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">The Beer-Lambert Law Master Suite</h4>
+            <p class="theory-text">
+                The most advanced analytical tool for spectrophotometry. Calculate metrics for pure samples or perform regression analysis on complex experimental datasets.
+            </p>
+            <div class="formula-box">
+                $A = \epsilon \cdot l \cdot c = -\log(T)$
+            </div>
+        </div>
+
+        <div class="tab-frame">
+            <button class="pill-tab active" onclick="switchTab('calc-a', this)">Absorbance</button>
+            <button class="pill-tab" onclick="switchTab('calc-c', this)">Conc (c)</button>
+            <button class="pill-tab" onclick="switchTab('calc-e', this)">Molar Abs (ε)</button>
+            <button class="pill-tab" onclick="switchTab('calc-t', this)">Transmittance</button>
+            <button class="pill-tab" onclick="switchTab('calc-curve', this)">Regression</button>
+            <button class="pill-tab" onclick="switchTab('calc-sample', this)">Unknown Solver</button>
+        </div>
+
+        <div id="calc-a" class="tab-panel active glass-card">
+            <h5 class="text-center mb-4">Find Absorbance (A)</h5>
+            <label class="form-label">Molar Absorptivity ($\epsilon$) [L·mol⁻¹·cm⁻¹]</label>
+            <input type="text" id="eps_a" class="form-control" placeholder="e.g. 5.6e4">
+            <label class="form-label">Path Length ($l$) [cm]</label>
+            <input type="text" id="len_a" class="form-control" placeholder="e.g. 1.0">
+            <label class="form-label">Concentration ($c$) [mol/L]</label>
+            <input type="text" id="con_a" class="form-control" placeholder="e.g. 1.2e-5">
+            <button onclick="runAbsorbance()" class="btn-calc">Process Absorbance</button>
+            <div id="res_a" class="result-display"></div>
+        </div>
+
+        <div id="calc-c" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Find Concentration (c)</h5>
+            <label class="form-label">Absorbance ($A$)</label>
+            <input type="text" id="abs_c" class="form-control" placeholder="e.g. 0.824">
+            <label class="form-label">Molar Absorptivity ($\epsilon$)</label>
+            <input type="text" id="eps_c" class="form-control" placeholder="e.g. 43500">
+            <label class="form-label">Path Length ($l$) [cm]</label>
+            <input type="text" id="len_c" class="form-control" placeholder="e.g. 1.0">
+            <button onclick="runConc()" class="btn-calc">Process Concentration</button>
+            <div id="res_c" class="result-display"></div>
+        </div>
+
+        <div id="calc-e" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Find Molar Absorptivity (ε)</h5>
+            <label class="form-label">Absorbance ($A$)</label>
+            <input type="text" id="abs_e" class="form-control" placeholder="e.g. 0.450">
+            <label class="form-label">Concentration ($c$) [mol/L]</label>
+            <input type="text" id="con_e" class="form-control" placeholder="e.g. 2.0e-5">
+            <label class="form-label">Path Length ($l$) [cm]</label>
+            <input type="text" id="len_e" class="form-control" placeholder="e.g. 1.0">
+            <button onclick="runEps()" class="btn-calc">Process ε</button>
+            <div id="res_e" class="result-display"></div>
+        </div>
+
+        <div id="calc-t" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Absorbance $\leftrightarrow$ Transmittance</h5>
+            <label class="form-label">Absorbance ($A$)</label>
+            <input type="text" id="abs_t" class="form-control" placeholder="e.g. 0.301">
+            <button onclick="runTrans()" class="btn-calc">Calculate %T</button>
+            <div id="res_t" class="result-display"></div>
+        </div>
+
+        <div id="calc-curve" class="tab-panel glass-card">
+            <h5 class="text-center mb-3">Calibration Regression Analysis</h5>
+            <div class="data-grid">
+                <div>
+                    <label class="form-label">Conc (x values)</label>
+                    <textarea id="curv_x" class="form-control" rows="4" placeholder="0.1 0.2 0.3 0.4"></textarea>
+                </div>
+                <div>
+                    <label class="form-label">Abs (y values)</label>
+                    <textarea id="curv_y" class="form-control" rows="4" placeholder="0.05 0.11 0.16 0.21"></textarea>
+                </div>
+            </div>
+            <button onclick="runRegression()" class="btn-calc">Find Line of Best Fit</button>
+            <div id="res_curve" class="result-display"></div>
+        </div>
+
+        <div id="calc-sample" class="tab-panel glass-card">
+            <h5 class="text-center mb-4">Solve Unknown Concentration ($x = \frac{y-b}{m}$)</h5>
+            <label class="form-label">Measured Absorbance of Sample ($y$)</label>
+            <input type="text" id="samp_y" class="form-control" placeholder="e.g. 0.45">
+            <label class="form-label">Calibration Slope ($m$)</label>
+            <input type="text" id="samp_m" class="form-control" placeholder="Get from Regression tab">
+            <label class="form-label">Y-Intercept ($b$)</label>
+            <input type="text" id="samp_b" class="form-control" placeholder="e.g. 0.002">
+            <button onclick="solveUnknown()" class="btn-calc" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">Solve Concentration</button>
+            <div id="res_samp" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Deep Scientific Context</h5>
+            <p class="theory-text">
+                The <strong>Beer-Lambert Law</strong> is the fundamental equation for UV-Vis spectrophotometry. In clinical environments, it is used to measure blood metabolites. In forensic labs, it identifies toxic substances. The accuracy of these measurements depends on the <strong>Molar Absorptivity</strong> ($\epsilon$), which varies based on solvent, pH, and temperature.
+            </p>
+            <p class="theory-text">
+                The <strong>Regression Analysis</strong> tab uses the least-squares method to minimize the sum of the squares of the vertical deviations. An $R^2$ value close to $1.0000$ indicates a highly reliable calibration curve, essential for minimizing uncertainty in analytical results.
+            </p>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Step-by-Step Solved Examples</h5>
+            <div class="example-box">
+                <p><strong>Example 1: Unknown from Calibration</strong><br>
+                If your regression is $y = 1250x + 0.005$ and your unknown sample reads $A = 0.505$:<br>
+                $x = (0.505 - 0.005) / 1250 = 0.0004 \, M$.</p>
+            </div>
+            <div class="example-box">
+                <p><strong>Example 2: Molar Extinction</strong><br>
+                A $0.001 M$ solution shows $A = 1.5$ in a $1cm$ cuvette.<br>
+                $\epsilon = 1.5 / (0.001 \times 1) = 1500 \, L \cdot mol^{-1} \cdot cm^{-1}$.</p>
+            </div>
+        </div>
+
+        <h5 class="text-center mb-3 h-accent">Advanced FAQ & Reference</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["What is the primary formula?", "The primary formula is $A = \epsilon \cdot l \cdot c$."],
+                    ["What is Molar Absorptivity?", "The intrinsic property of a substance to absorb light at a specific wavelength."],
+                    ["Why use 1cm cuvettes?", "It is the standard path length for laboratory consistency."],
+                    ["What are the limits of linearity?", "The law fails at concentrations $> 0.01M$ due to molecular interactions."],
+                    ["What is Stray Light?", "Light that reaches the detector without passing through the sample."],
+                    ["Why measure at λmax?", "Ensures maximum sensitivity and minimizes measurement error."],
+                    ["What is a Blank solution?", "Used to 'zero' the instrument and subtract background absorption."],
+                    ["Quartz vs. Glass?", "Quartz is required for UV (<340nm) as glass absorbs UV light."],
+                    ["Effect of temperature?", "Alters solvent volume or chemical equilibrium, affecting $A$."],
+                    ["DNA purity check?", "A 260/280 ratio of ~1.8 indicates pure DNA."],
+                    ["Is Absorbance unitless?", "Yes, it is a dimensionless quantity."],
+                    ["What is Transmittance?", "The ratio of transmitted light to incident light ($I/I_0$)."],
+                    ["Linear Regression?", "Used to find the relationship between concentration and absorbance."],
+                    ["R-squared (R²)?", "A measure of how well the regression line fits the data points."],
+                    ["What is Path Length?", "The distance light travels through the sample, usually 1cm."],
+                    ["Chromophores?", "Molecular regions responsible for light absorption."],
+                    ["Auxochromes?", "Functional groups that shift the absorption wavelength."],
+                    ["Hyperchromic shift?", "An increase in the intensity of light absorption."],
+                    ["Hypochromic shift?", "A decrease in the intensity of light absorption."],
+                    ["Standard Addition?", "A method used to account for matrix effects in complex samples."],
+                    ["Detection Limit?", "The lowest concentration that can be reliably detected."],
+                    ["Bathochromic shift?", "A shift of absorption to longer wavelengths (Red shift)."],
+                    ["Hypsochromic shift?", "A shift of absorption to shorter wavelengths (Blue shift)."],
+                    ["Cuvette Cleaning?", "Cuvettes must be lint-free and fingerprint-free for accuracy."],
+                    ["Matrix Effect?", "Components in a sample (other than the analyte) that affect absorbance."],
+                    ["Instrumental resolution?", "The ability to resolve two adjacent absorption peaks."],
+                    ["Polychromatic light?", "Light with multiple wavelengths; can cause non-linearity."],
+                    ["Electronic Transitions?", "Absorbance occurs when electrons move from ground to excited states."],
+                    ["Vibrational Relaxation?", "Non-radiative decay that occurs after photon absorption."],
+                    ["Isolbestic Point?", "A wavelength where two species have identical molar absorptivity."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700;">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Smart Parser
+        function smartParser(v) {
+            if (!v || v.trim()==="") return NaN;
+            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function runAbsorbance() {
+            let e = smartParser(document.getElementById('eps_a').value);
+            let l = smartParser(document.getElementById('len_a').value);
+            let c = smartParser(document.getElementById('con_a').value);
+            if(isNaN(e) || isNaN(l) || isNaN(c)) return;
+            display('res_a', `Absorbance (A): <strong>${(e * l * c).toFixed(4)}</strong>`);
+        }
+
+        function runConc() {
+            let a = smartParser(document.getElementById('abs_c').value);
+            let e = smartParser(document.getElementById('eps_c').value);
+            let l = smartParser(document.getElementById('len_c').value);
+            if(isNaN(a) || isNaN(e) || isNaN(l) || (e*l)===0) return;
+            display('res_c', `Concentration (c): <strong>${(a / (e * l)).toExponential(4)} mol/L</strong>`);
+        }
+
+        function runEps() {
+            let a = smartParser(document.getElementById('abs_e').value);
+            let c = smartParser(document.getElementById('con_e').value);
+            let l = smartParser(document.getElementById('len_e').value);
+            if(isNaN(a) || isNaN(c) || isNaN(l) || (c*l)===0) return;
+            display('res_e', `$\epsilon$: <strong>${(a / (c * l)).toFixed(2)} L·mol⁻¹·cm⁻¹</strong>`);
+        }
+
+        function runTrans() {
+            let a = smartParser(document.getElementById('abs_t').value);
+            if(isNaN(a)) return;
+            let t = Math.pow(10, -a);
+            display('res_t', `Transmittance (T): <strong>${t.toFixed(4)}</strong><br>Percent T: <strong>${(t*100).toFixed(2)}%</strong>`);
+        }
+
+        function runRegression() {
+            let xs = document.getElementById('curv_x').value.trim().split(/\s+/).map(Number);
+            let ys = document.getElementById('curv_y').value.trim().split(/\s+/).map(Number);
+            if(xs.length !== ys.length || xs.length < 2) return;
+            let n = xs.length, sumX=0, sumY=0, sumXY=0, sumX2=0, sumY2=0;
+            for(let i=0; i<n; i++) {
+                sumX += xs[i]; sumY += ys[i];
+                sumXY += xs[i]*ys[i]; sumX2 += xs[i]*xs[i]; sumY2 += ys[i]*ys[i];
+            }
+            let m = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+            let b = (sumY - m*sumX) / n;
+            let r = (n*sumXY - sumX*sumY) / Math.sqrt((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));
+            display('res_curve', `Equation: $y = ${m.toFixed(5)}x + ${b.toFixed(5)}$ <br> $R^2$: ${(r*r).toFixed(6)}`);
+        }
+
+        function solveUnknown() {
+            let y = smartParser(document.getElementById('samp_y').value);
+            let m = smartParser(document.getElementById('samp_m').value);
+            let b = smartParser(document.getElementById('samp_b').value);
+            if(isNaN(y) || isNaN(m) || isNaN(b) || m === 0) return;
+            let x = (y - b) / m;
+            display('res_samp', `Concentration (x): <strong>${x.toExponential(5)} mol/L</strong>`);
+        }
+
+        function display(id, html) {
+            let el = document.getElementById(id); el.innerHTML = html; el.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
+            } catch (error) { console.error(error); }
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
