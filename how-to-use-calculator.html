@@ -6,88 +6,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How to Use Chemistry Calculators</title>
     <style>
-        /* Base styles for the standalone page */
+        /* 1. Global Reset to prevent overlapping and overflow */
+        * {
+            box-sizing: border-box; 
+        }
+
         body {
-            background: #0f172a;
+            background: #0f172a; /* Deep dark background */
             color: #f1f5f9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: center;
         }
 
-        /* The Subtle Glass Card */
+        /* 2. The Subtle Glass Card */
         .glass-container {
-            background: rgba(30, 41, 59, 0.7); /* Matches your pH Master card */
+            background: rgba(30, 41, 59, 0.7); /* Subtle dark blue-grey */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+            border-radius: 24px; /* Matches the rounded corners in your screenshots */
             padding: 25px;
             width: 100%;
             max-width: 600px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            box-sizing: border-box; /* Fixes the overlapping/overflow issue */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
-        h2 { 
-            border-left: 4px solid #38bdf8; 
-            padding-left: 15px; 
-            font-size: 1.4rem;
+        /* 3. Typography & Accents */
+        h2.guide-title { 
+            color: #ffffff;
+            font-size: 1.5rem;
             margin-top: 0;
+            border-left: 4px solid #38bdf8; /* The cyan accent bar */
+            padding-left: 15px;
+            margin-bottom: 20px;
         }
 
-        .symbol-grid {
-            display: grid;
-            grid-template-columns: 60px 1fr;
-            gap: 15px;
-            margin: 20px 0;
+        .guide-intro {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* 4. Symbol List Layout (Fixes the "Floating" issue) */
+        .symbol-item {
+            display: flex;
             align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            border-radius: 12px;
         }
 
-        .symbol {
-            background: rgba(56, 189, 248, 0.2);
+        .symbol-badge {
+            background: rgba(56, 189, 248, 0.15); /* Subtle blue glow */
             color: #38bdf8;
-            font-weight: bold;
-            text-align: center;
-            padding: 8px 0;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 10px;
-            font-family: monospace;
-            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.3rem;
+            flex-shrink: 0; /* Prevents badge from squishing on mobile */
         }
 
-        .symbol-text {
+        .symbol-details {
             font-size: 0.95rem;
-            line-height: 1.5;
             color: #cbd5e1;
+            line-height: 1.4;
         }
 
+        /* 5. Example Box */
         .example-box {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 16px;
             padding: 20px;
-            margin-top: 20px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .example-box h3 {
             margin-top: 0;
             font-size: 1.1rem;
             color: #f8fafc;
+            margin-bottom: 15px;
         }
 
-        ul {
+        .example-list {
             padding-left: 20px;
-            margin-bottom: 0;
-        }
-
-        li {
-            margin-bottom: 10px;
+            margin: 0;
             color: #94a3b8;
         }
 
+        .example-list li {
+            margin-bottom: 10px;
+        }
+
         code { 
-            color: #f472b6; 
+            color: #f472b6; /* Pink accent for code snippets */
             background: rgba(244, 114, 182, 0.1);
             padding: 2px 6px;
             border-radius: 4px;
@@ -96,29 +118,37 @@
     </style>
 </head>
 <body>
+
     <div class="glass-container">
-        <h2>Guide: Entering Values</h2>
-        <p>Our calculators use a <strong>smartParser</strong> to interpret scientific notation and standard math symbols.</p>
+        <h2 class="guide-title">Guide: Entering Values</h2>
+        <p class="guide-intro">Our calculators use a <strong>smartParser</strong> to interpret scientific notation and standard math symbols.</p>
         
-        <div class="symbol-grid">
-            <div class="symbol">^</div> 
-            <div class="symbol-text"><strong>Exponent:</strong> Use for powers. <code>10^1</code> means 10 to the power of 1.</div>
+        <div class="symbol-list">
+            <div class="symbol-item">
+                <div class="symbol-badge">^</div>
+                <div class="symbol-details"><strong>Exponent:</strong> Use <code>10^1</code> for powers (10 to the power of 1).</div>
+            </div>
             
-            <div class="symbol">*</div> 
-            <div class="symbol-text"><strong>Multiply:</strong> <code>10*1</code> means 10 multiplied by 1.</div>
+            <div class="symbol-item">
+                <div class="symbol-badge">*</div>
+                <div class="symbol-details"><strong>Multiply:</strong> Use <code>10*1</code> to multiply values together.</div>
+            </div>
             
-            <div class="symbol">e</div> 
-            <div class="symbol-text"><strong>Scientific:</strong> <code>1.8e-5</code> is shorthand for $1.8 \times 10^{-5}$.</div>
+            <div class="symbol-item">
+                <div class="symbol-badge">e</div>
+                <div class="symbol-details"><strong>Scientific:</strong> <code>1.8e-5</code> is the standard shorthand for $1.8 \times 10^{-5}$.</div>
+            </div>
         </div>
 
         <div class="example-box">
             <h3>Practical Examples:</h3>
-            <ul>
+            <ul class="example-list">
                 <li><strong>Positive Exponents:</strong> Enter <code>10^2</code> for 100.</li>
-                <li><strong>Negative Integers:</strong> Enter <code>-5</code> for acidic calculations.</li>
-                <li><strong>Complex Powers:</strong> Enter <code>10^-7</code> for neutral pH water.</li>
+                <li><strong>Negative Integers:</strong> Enter <code>-5</code> for acidic/logarithmic scales.</li>
+                <li><strong>Complex Powers:</strong> Enter <code>10^-7</code> for neutral pH water calculations.</li>
             </ul>
         </div>
     </div>
+
 </body>
 </html>
