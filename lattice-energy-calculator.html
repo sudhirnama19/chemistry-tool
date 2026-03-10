@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lattice Energy & Solubility Suite | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: #161b22;
+        }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* Clickable Header */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        /* Card System */
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 30px; 
+            border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
+
+        /* Overflow Protection */
+        .formula-container, .table-container {
+            width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            background: rgba(0,0,0,0.3); border-radius: 15px; margin: 20px 0; padding: 15px;
+        }
+        .formula-container::-webkit-scrollbar, .table-container::-webkit-scrollbar { height: 4px; }
+        .formula-container::-webkit-scrollbar-thumb, .table-container::-webkit-scrollbar-thumb { background: var(--accent); }
+
+        .custom-table { width: 100%; min-width: 550px; border-collapse: collapse; font-size: 0.85rem; }
+        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
+
+        /* Inputs */
+        .form-label { color: var(--accent); font-size: 0.82rem; font-weight: 600; margin-top: 12px; display: block; }
+        .form-control {
+            background: var(--input-bg) !important; color: #fff !important; 
+            border: 1px solid #334155 !important; border-radius: 10px; padding: 10px;
+        }
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 20px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 15px; border: 1px solid var(--accent);
+        }
+
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 20px; margin-bottom: 15px;
+        }
+        
+        .instruction-box {
+            background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9;
+            padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">Lattice Energy & Born–Haber Cycle</h4>
+            <p class="theory-text">
+                <strong>Lattice Energy ($U$)</strong> is the energy released when gaseous ions combine to form one mole of a solid ionic crystal. To find this value, we use the <strong>Born–Haber Cycle</strong>, which links various thermodynamic processes through Hess's Law.
+            </p>
+            <div class="formula-container">
+                <div style="min-width: 500px; text-align: center;">
+                    $$\Delta H_f^\circ = \Delta H_{sub} + IE + \frac{1}{2}D + EA + U_{lattice}$$
+                    <p class="small mt-2 text-secondary">$\Delta H_f^\circ$: Formation | $U$: Lattice Energy | $EA$: Electron Affinity</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent text-center">Born–Haber Cycle Solver</h5>
+            
+            <div class="instruction-box">
+                <strong>Numeric Inputs:</strong> Use <code>*</code> for multiply, <code>^</code> for exponents (e.g., <code>10^2</code>), and <code>-</code> for negative values (e.g., Exothermic EA: <code>-348</code>).
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Heat of Formation ($\Delta H_f$)</label>
+                    <input type="text" id="hf" class="form-control" placeholder="-411">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Enthalpy of Sublimation ($\Delta H_s$)</label>
+                    <input type="text" id="hs" class="form-control" placeholder="107">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Bond Dissociation ($D$)</label>
+                    <input type="text" id="hd" class="form-control" placeholder="242">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ionization Energy ($IE$)</label>
+                    <input type="text" id="ie" class="form-control" placeholder="496">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Electron Affinity ($EA$)</label>
+                    <input type="text" id="ea" class="form-control" placeholder="-349">
+                </div>
+            </div>
+
+            <button onclick="calculateLattice()" class="btn-calc">Calculate Lattice Energy</button>
+            <div id="lattice-result" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Ionic Solubility Predictor</h5>
+            <p class="theory-text">
+                Solubility depends on the Enthalpy of Solution ($\Delta H_{sol}$), which is the sum of the **Lattice Energy** (breaking the crystal) and the **Hydration Energy** (forming bonds with water).
+            </p>
+            <div class="formula-container">
+                $$\Delta H_{sol} = \text{Hydration Energy} - \text{Lattice Energy}$$
+            </div>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Total Hydration Energy (kJ/mol)</label>
+                    <input type="text" id="hyd-energy" class="form-control" placeholder="-700">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Lattice Energy ($U$) (kJ/mol)</label>
+                    <input type="text" id="lat-energy-in" class="form-control" placeholder="-786">
+                </div>
+            </div>
+            
+            <button onclick="predictSolubility()" class="btn-calc" style="background: linear-gradient(135deg, #a855f7, #0ea5e9);">Predict Solubility</button>
+            <div id="sol-result" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Lattice Energy Research & Trends</h5>
+            <p class="theory-text">
+                Modern research in <strong>solid-state batteries</strong> relies on manipulating lattice energy to enhance ion conductivity. Higher lattice energy corresponds to stronger ionic bonds, typically resulting in higher melting points.
+            </p>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Compound</th>
+                            <th>Lattice Energy (kJ/mol)</th>
+                            <th>Radius Comparison</th>
+                            <th>Melting Point (°C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>NaCl</td><td>-786</td><td>Standard</td><td>801</td></tr>
+                        <tr><td>LiF</td><td>-1030</td><td>Very Small</td><td>845</td></tr>
+                        <tr><td>MgO</td><td>-3795</td><td>Divalent (+2/-2)</td><td>2852</td></tr>
+                        <tr><td>Al2O3</td><td>-15916</td><td>Trivalent</td><td>2072</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Solved Practice Example</h5>
+            <div style="border-left: 3px solid var(--accent); padding-left: 15px; font-style: italic; font-size: 0.9rem;">
+                <strong>Problem:</strong> Calculate $U$ for $KCl$ given $\Delta H_f = -437$, $\Delta H_s = 89$, $IE = 419$, $1/2 D = 121$, $EA = -349$.<br>
+                <strong>Solution:</strong> $U = \Delta H_f - (\Delta H_s + IE + 0.5D + EA)$<br>
+                $U = -437 - (89 + 419 + 121 - 349) = -717 \text{ kJ/mol}$
+            </div>
+        </div>
+
+        <h5 class="text-center h-accent mb-4">Lattice & Solubility FAQ</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["Why is Lattice Energy negative?", "It represents energy released when bonds are formed between gaseous ions."],
+                    ["How does charge affect $U$?", "$U$ is directly proportional to the product of charges ($Q_1 \times Q_2$)."],
+                    ["What is Hydration Energy?", "Energy released when gaseous ions are surrounded by water molecules."],
+                    ["What makes a salt insoluble?", "When the Lattice Energy is significantly higher than the Hydration Energy."],
+                    ["Can we measure Lattice Energy?", "No, it must be calculated via Born-Haber cycle or Kapustinskii equation."],
+                    ["What is the role of Hess's Law?", "It allows the calculation of energy based on the start and end points regardless of the path."],
+                    ["Why does MgO have such high $U$?", "Both Mg2+ and O2- have double the charge of Na+ and Cl-."],
+                    ["What is Sublimation?", "The process of a solid turning directly into a gas, requiring energy input."],
+                    ["How does ionic size affect solubility?", "Smaller ions have higher lattice energy but also higher hydration energy."],
+                    ["What is Electron Affinity?", "The energy change when an atom gains an electron."],
+                    ["Does lattice energy apply to CO2?", "No, CO2 is a molecular solid, not an ionic lattice."],
+                    ["What is the Madelung Constant?", "A geometric factor based on the crystal structure (e.g., Rock Salt vs Cesium Chloride)."],
+                    ["What is Enthalpy of Solution?", "The net energy change when a solute dissolves in a solvent."],
+                    ["Is the Born-Haber cycle only for NaCl?", "No, it can be applied to any ionic compound including oxides and nitrides."],
+                    ["Why is KF more soluble than LiF?", "KF has a lower lattice energy due to the larger size of the Potassium ion."],
+                    ["What is Bond Dissociation Energy?", "The energy needed to break a covalent bond, like the Cl-Cl bond in Cl2."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Integrated Smart Parser
+        function smartParser(v) {
+            if (!v || v.toString().trim()==="") return 0;
+            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+        }
+
+        function calculateLattice() {
+            const hf = smartParser(document.getElementById('hf').value);
+            const hs = smartParser(document.getElementById('hs').value);
+            const hd = smartParser(document.getElementById('hd').value);
+            const ie = smartParser(document.getElementById('ie').value);
+            const ea = smartParser(document.getElementById('ea').value);
+
+            const latticeEnergy = hf - (hs + (0.5 * hd) + ie + ea);
+
+            const resDiv = document.getElementById('lattice-result');
+            resDiv.innerHTML = `
+                <h6 style="color:var(--accent)">Born–Haber Result:</h6>
+                <div style="font-size:1.2rem; color: #fff;">$U = ${latticeEnergy.toFixed(2)} \text{ kJ/mol}$</div>
+                <small class="text-secondary">Calculation: ${hf} - (${hs} + ${(0.5*hd).toFixed(1)} + ${ie} + ${ea})</small>
+            `;
+            resDiv.style.display = "block";
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function predictSolubility() {
+            const hyd = smartParser(document.getElementById('hyd-energy').value);
+            const lat = smartParser(document.getElementById('lat-energy-in').value);
+            
+            // H_sol = Hydration - Lattice. Since Lattice is usually negative, we use - lat
+            const solEnthalpy = hyd - lat;
+            const resultDiv = document.getElementById('sol-result');
+            
+            let status = solEnthalpy < 0 ? "Exothermic (Likely Soluble)" : "Endothermic (Potentially Insoluble)";
+            let color = solEnthalpy < 0 ? "#00ffd5" : "#ff4d4d";
+
+            resultDiv.innerHTML = `
+                <h6 style="color:${color}">${status}</h6>
+                <div style="font-size:1.1rem; color:#fff;">$\Delta H_{sol} = ${solEnthalpy.toFixed(2)} \text{ kJ/mol}$</div>
+                <p class="small text-secondary mt-1">If $\Delta H_{sol}$ is negative, the process is energetically favorable.</p>
+            `;
+            resultDiv.style.display = "block";
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
+            } catch (e) {}
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
