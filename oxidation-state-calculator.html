@@ -108,12 +108,21 @@
     align-items: center;
 }
 
-/* Paragraph text within the guide */
-.theory-text {
-    font-size: 0.95rem;
-    color: #cbd5e1;
-    line-height: 1.7;
-    margin-bottom: 15px;
+/* Update your CSS to allow text wrapping instead of scrolling */
+.theory-text, .example-box {
+    overflow-x: hidden; /* Remove horizontal scroll */
+    white-space: normal !important; /* Allow text to wrap to the next line */
+    word-wrap: break-word; /* Force break long strings if necessary */
+    overflow-wrap: break-word;
+    line-height: 1.8; /* Improve readability when text wraps */
+}
+
+/* Ensure MathJax equations also wrap if they are too long */
+mjx-container {
+    max-width: 100% !important;
+    overflow-x: auto; /* Fallback for very long math formulas */
+    display: inline-block;
+    vertical-align: middle;
 }
 
 /* Inline code highlight (like for MgCl2) */
@@ -164,21 +173,7 @@ code {
     margin-right: 8px;
 }
 
-        /* Prevents long equations from breaking the card layout */
-.example-box, .theory-text {
-    overflow-x: auto;
-    white-space: nowrap; /* Keeps equation on one line */
-    padding-bottom: 5px; /* Space for the scrollbar */
-}
-
-/* Optional: Subtle scrollbar styling for better aesthetics */
-.example-box::-webkit-scrollbar {
-    height: 4px;
-}
-.example-box::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: 10px;
-}
+    
     </style>
 </head>
 <body>
