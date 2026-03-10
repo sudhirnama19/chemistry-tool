@@ -33,9 +33,9 @@
         }
 
         /* Clickable Header */
-        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
@@ -94,7 +94,7 @@
 <body>
 
     <header class="main-header">
-        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
     </header>
 
     <div class="container-narrow">
@@ -131,16 +131,19 @@
 
         <div class="glass-card">
             <h5 class="h-accent">How to Put Values in the Calculator</h5>
-            <p class="theory-text">To ensure the algorithm correctly parses your chemical species, follow these formatting guidelines:</p>
-            <div class="research-box">
-                <ul class="theory-text mb-0">
-                    <li><strong>Element Symbols:</strong> Always capitalize the first letter (e.g., use <code>Fe</code> for Iron, not <code>fe</code>).</li>
-                    <li><strong>Compounds:</strong> Combine elements and numbers directly (e.g., <code>H2O</code>, <code>C6H12O6</code>).</li>
-                    <li><strong>Equation Operators:</strong> Separate the two sides of the reaction with an equals sign (<code>=</code>) or an arrow (<code>-></code>).</li>
-                    <li><strong>Parentheses:</strong> You can use brackets for polyatomic ions, such as <code>Mg(OH)2</code>.</li>
-                </ul>
+            <p class="theory-text">To get accurate results, follow these detailed logic rules:</p>
+            <ul class="theory-text">
+                <li><strong>Case Sensitivity:</strong> Use <code>NaCl</code>, not <code>nacl</code>. Elements must start with a capital letter.</li>
+                <li><strong>Equation Sign:</strong> Use <code>=</code> or <code>-></code> to separate reactants and products.</li>
+                <li><strong>Spacing:</strong> Use <code>+</code> to separate different compounds (e.g., <code>H2 + O2</code>).</li>
+                <li><strong>Parentheses:</strong> Handles complex groups like <code>Ca(OH)2</code> automatically.</li>
+                <li><strong>Parentheses:</strong> You can use brackets for polyatomic ions, such as <code>Mg(OH)2</code>.</li>
+            </ul>
+            <div class="step-box bg-dark">
+                <strong>Example Input:</strong> <code>KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2</code>
             </div>
         </div>
+                
 
         <div class="glass-card">
             <h5 class="h-accent">Application in Scientific Research</h5>
