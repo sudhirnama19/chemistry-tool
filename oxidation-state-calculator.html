@@ -155,97 +155,107 @@
     </div>
 
     <script>
-        // Integrated Smart Parser
-        function smartParser(v) {
-            if (!v || v.toString().trim()==="") return 0;
-            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
-            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+        // Smart Parser for scientific notation and special characters
+function smartParser(v) {
+    if (!v || v.toString().trim() === "") return 0;
+    let s = v.toString().toLowerCase()
+        .replace(/x/g, '*')
+        .replace(/\^/g, '**')
+        .replace(/e/g, '*10**'); // Support for scientific notation like 1e-2
+    try { 
+        return Function('"use strict"; return (' + s + ')')(); 
+    } catch(e) { 
+        return 0; 
+    }
+}
+
+/**
+ * COMPREHENSIVE ELEMENT RULES
+ * Covers common states in Solid, Liquid, and Gas phases.
+ * Priority: Group 1 > Group 2 > F > H > O > Halogens
+ */
+const elementRules = {
+    // Group 1: Alkali Metals (Always +1)
+    'LI': 1, 'NA': 1, 'K': 1, 'RB': 1, 'CS': 1, 'FR': 1,
+    // Group 2: Alkaline Earth (Always +2)
+    'BE': 2, 'MG': 2, 'CA': 2, 'SR': 2, 'BA': 2, 'RA': 2,
+    // Halogens (Usually -1, especially with metals)
+    'F': -1, 'CL': -1, 'BR': -1, 'I': -1, 'AT': -1,
+    // Chalcogens
+    'O': -2, 'S': -2, 'SE': -2, 'TE': -2,
+    // Group 13 & 15
+    'H': 1, 'AL': 3, 'GA': 3, 'IN': 3, 'N': -3, 'P': -3,
+    // Common Transition Metals (Fixed/Default states)
+    'ZN': 2, 'CD': 2, 'AG': 1, 'SC': 3, 'NI': 2
+};
+
+function solveFormula() {
+    let formula = document.getElementById('chem_formula').value.trim();
+    // Use smartParser for the net charge input
+    let netCharge = smartParser(document.getElementById('net_charge').value);
+    
+    if (!formula) return;
+
+    let atomMap = parseFormula(formula);
+    
+    // RULE: If it's a single element (e.g., O2, S8, Fe, Cl2) and charge is 0
+    if (atomMap.size === 1 && netCharge === 0) {
+        displayFinalResult(Array.from(atomMap.keys())[0], 0, "Pure Elemental State Rule applied.");
+        return;
+    }
+
+    // Heuristic to find the "Unknown" (The central atom)
+    // We look for transition metals or elements NOT in the primary rules
+    let elements = Array.from(atomMap.keys());
+    let unknownElement = elements.find(el => !elementRules[el.toUpperCase()]) || elements[0];
+    let unknownQty = atomMap.get(unknownElement);
+
+    let totalKnownContribution = 0;
+    let breakdownHtml = "";
+
+    for (let [el, qty] of atomMap) {
+        if (el !== unknownElement) {
+            let state = elementRules[el.toUpperCase()] || 0;
+            totalKnownContribution += (state * qty);
+            breakdownHtml += `• ${el}: ${qty} atoms × (${state > 0 ? '+' : ''}${state})<br>`;
         }
+    }
 
-        // Standard Priorities: Element -> State
-        const rules = {
-            'F': -1, 'LI': 1, 'NA': 1, 'K': 1, 'RB': 1, 'CS': 1,
-            'BE': 2, 'MG': 2, 'CA': 2, 'SR': 2, 'BA': 2,
-            'O': -2, 'H': 1
-        };
+    // Algebra: (X * unknownQty) + totalKnownContribution = netCharge
+    let resultX = (netCharge - totalKnownContribution) / unknownQty;
+    
+    displayFinalResult(unknownElement, resultX, breakdownHtml, netCharge);
+}
 
-        function solveFormula() {
-            let formula = document.getElementById('chem_formula').value.trim();
-            let netCharge = smartParser(document.getElementById('net_charge').value);
-            
-            if (!formula) return;
+function displayFinalResult(target, value, details, net) {
+    let res = document.getElementById('res_ox');
+    res.innerHTML = `
+        <h6 style="color:var(--accent)">Calculation Breakdown:</h6>
+        <div style="font-size:0.85rem; color:#cbd5e1; margin-bottom:10px;">
+            ${details}
+            ${net !== undefined ? `<strong>Target Net Charge:</strong> ${net}` : ''}
+        </div>
+        <strong>Oxidation State of ${target}:</strong><br>
+        <span style="font-size:2.2rem; font-weight:800; color:var(--accent)">
+            ${value > 0 ? '+' : ''}${Number.isInteger(value) ? value : value.toFixed(2)}
+        </span>
+    `;
+    res.style.display = "block";
+    if (window.MathJax) MathJax.typesetPromise();
+}
 
-            // Step 1: Parse the formula into Map of atoms
-            let atomMap = parseFormula(formula);
-            
-            // Step 2: Identify Knowns vs Unknowns
-            let totalKnownContribution = 0;
-            let unknownElement = null;
-            let unknownQty = 0;
-            let breakdownHtml = "";
-
-            for (let [el, qty] of atomMap) {
-                let upperEl = el.toUpperCase();
-                if (rules[upperEl] !== undefined && !unknownElement) {
-                    // Logic: If we have multiple elements in rules, the first one encountered 
-                    // that isn't the primary candidate for "Unknown" is treated as known.
-                    // This is a simplification; in reality, we check all.
-                }
-            }
-
-            // More robust logic: Find the "Central" or "Metal" atom that isn't in rules
-            let elements = Array.from(atomMap.keys());
-            // Heuristic: The element NOT in our priority rules is the unknown.
-            // If all are in rules, the first one is the unknown.
-            unknownElement = elements.find(el => !rules[el.toUpperCase()]) || elements[0];
-            unknownQty = atomMap.get(unknownElement);
-
-            for (let [el, qty] of atomMap) {
-                if (el !== unknownElement) {
-                    let state = rules[el.toUpperCase()] || 0;
-                    totalKnownContribution += (state * qty);
-                    breakdownHtml += `${el}: ${qty} atoms × (${state > 0 ? '+' : ''}${state})<br>`;
-                }
-            }
-
-            // Calculation: (UnknownState * UnknownQty) + TotalKnown = NetCharge
-            let unknownState = (netCharge - totalKnownContribution) / unknownQty;
-
-            let res = document.getElementById('res_ox');
-            res.innerHTML = `
-                <h6 style="color:var(--accent)">Analysis Results:</h6>
-                <div style="font-size:0.9rem; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                    ${breakdownHtml}
-                    Net Charge: ${netCharge}
-                </div>
-                <strong>${unknownElement} Oxidation State:</strong><br>
-                <span style="font-size:2rem; font-weight:800; color:var(--accent)">
-                    ${unknownState > 0 ? '+' : ''}${unknownState % 1 === 0 ? unknownState : unknownState.toFixed(2)}
-                </span>
-            `;
-            res.style.display = "block";
-        }
-
-        function parseFormula(formula) {
-            let map = new Map();
-            // Simple regex to find Element + Quantity
-            let regex = /([A-Z][a-z]*)(\d*)/g;
-            let match;
-            while ((match = regex.exec(formula)) !== null) {
-                let el = match[1];
-                let qty = match[2] === "" ? 1 : parseInt(match[2]);
-                map.set(el, (map.get(el) || 0) + qty);
-            }
-            return map;
-        }
-
-        async function loadFooter() {
-            try {
-                const response = await fetch('footer.html');
-                if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
-            } catch (error) {}
-        }
-        window.addEventListener('DOMContentLoaded', loadFooter);
+function parseFormula(formula) {
+    let map = new Map();
+    // Regex matches Elements (Na, Cl, Fe) and their numbers (2, 4, etc)
+    let regex = /([A-Z][a-z]*)(\d*)/g;
+    let match;
+    while ((match = regex.exec(formula)) !== null) {
+        let el = match[1];
+        let qty = match[2] === "" ? 1 : parseInt(match[2]);
+        map.set(el, (map.get(el) || 0) + qty);
+    }
+    return map;
+}
     </script>
 </body>
 </html>
