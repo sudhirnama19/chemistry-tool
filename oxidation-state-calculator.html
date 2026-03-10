@@ -163,6 +163,22 @@ code {
 .fas {
     margin-right: 8px;
 }
+
+        /* Prevents long equations from breaking the card layout */
+.example-box, .theory-text {
+    overflow-x: auto;
+    white-space: nowrap; /* Keeps equation on one line */
+    padding-bottom: 5px; /* Space for the scrollbar */
+}
+
+/* Optional: Subtle scrollbar styling for better aesthetics */
+.example-box::-webkit-scrollbar {
+    height: 4px;
+}
+.example-box::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+}
     </style>
 </head>
 <body>
