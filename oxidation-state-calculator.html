@@ -173,6 +173,26 @@ code {
     margin-right: 8px;
 }
 
+
+        /* Remove accidental lines/underlines from chemical formulas and math */
+.theory-text, 
+.example-box, 
+mjx-container, 
+.h-accent {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* Specific fix for MathJax rendering lines */
+mjx-assistive-mml {
+    display: none !important;
+}
+
+/* Ensure no inherited link styles are causing the lines */
+.glass-card a, .glass-card span {
+    text-decoration: none !important;
+}
     
     </style>
 </head>
