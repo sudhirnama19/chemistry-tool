@@ -397,8 +397,76 @@
 .info-card:hover {
     border-color: rgba(255, 255, 255, 0.2);
 }
+
+
+
+
+
+
+        .search-container {
+    max-width: 650px;
+    margin: -20px auto 50px; /* Pulls it up closer to the hero */
+    padding: 0 20px;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#calcSearch {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 15px 20px 15px 50px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#calcSearch:focus {
+    border-color: var(--accent-cyan);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.search-message {
+    margin-top: 20px;
+    color: var(--text-dim);
+    font-style: italic;
+    text-align: center;
+}
+
+/* Smooth hide/show for filtered cards */
+.tool-card.hidden {
+    display: none !important;
+}
+        
     </style>
 </head>
+
+
+    <div class="search-container">
+    <div class="search-wrapper">
+        <input type="text" id="calcSearch" placeholder="Search for a calculator (e.g., pH, Molarity, Gibbs)..." autocomplete="off">
+        <div class="search-icon">🔍</div>
+    </div>
+    <div id="searchMessage" class="search-message" style="display: none;">No calculators found matching your search.</div>
+</div>
+
+    
 <body>
 
     <nav class="navbar navbar-expand-lg fixed-top">
