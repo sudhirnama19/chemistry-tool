@@ -2,445 +2,403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Matrix Equation Balancer | Chemistry Spark Lab</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Reaction Balancer | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: #161b22;
+        }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
 
-<script>
-window.MathJax = {
-tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},
-svg:{fontCache:'global'}
-};
-</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
 
-<style>
-:root{
---accent:#00ffd5;
---bg:#0b0f1a;
---glass:rgba(30,41,59,0.7);
---border:rgba(255,255,255,0.1);
-}
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
-body{
-background:radial-gradient(circle at top right,#1e293b,#0b0f1a);
-color:#f8fafc;
-font-family:'Inter',sans-serif;
-line-height:1.7;
-}
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 30px; 
+            border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
 
-.main-header{
-padding:25px;
-text-align:center;
-border-bottom:1px solid var(--border);
-}
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 
-.main-header a{text-decoration:none;color:var(--accent)}
-.main-header h1{font-size:1.3rem;font-weight:900;letter-spacing:2px;margin:0}
+        .form-control {
+            background-color: var(--input-bg) !important; 
+            color: #ffffff !important; 
+            border: 1px solid #334155 !important; 
+            border-radius: 12px; padding: 15px;
+            font-size: 1.1rem;
+        }
+        .form-control:focus { border-color: var(--accent) !important; box-shadow: 0 0 12px rgba(0, 255, 213, 0.2); }
 
-.container-narrow{
-max-width:850px;
-margin:auto;
-padding:15px;
-}
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-calc:hover { transform: translateY(-2px); opacity: 0.9; }
 
-.glass-card{
-background:var(--glass);
-backdrop-filter:blur(12px);
-border-radius:24px;
-padding:25px;
-margin-bottom:30px;
-border:1px solid var(--border);
-box-shadow:0 8px 32px rgba(0,0,0,0.5);
-}
+        .formula-container, .table-container, .step-box {
+            width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            background: rgba(0,0,0,0.3); border-radius: 15px; margin: 20px 0; padding: 15px;
+        }
 
-.h-accent{color:var(--accent);font-weight:800;margin-bottom:15px}
+        .custom-table { width: 100%; min-width: 550px; border-collapse: collapse; font-size: 0.85rem; }
+        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
 
-.form-control{
-background:#161b22!important;
-color:#fff!important;
-border:1px solid #334155!important;
-border-radius:12px;
-padding:18px;
-font-size:1.2rem;
-}
+        #balance-result { display: none; margin-top: 20px; animation: fadeIn 0.5s ease; }
+        .step-item { border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
 
-.btn-calc{
-background:linear-gradient(135deg,#0ea5e9,var(--accent));
-color:#0b0f1a;
-border:none;
-width:100%;
-padding:18px;
-border-radius:12px;
-font-weight:800;
-margin-top:20px;
-text-transform:uppercase;
-transition:0.3s;
-}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.btn-calc:hover{
-transform:translateY(-3px);
-box-shadow:0 10px 20px rgba(0,255,213,0.3);
-}
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 20px; margin-bottom: 15px;
+        }
 
-.result-box{
-display:none;
-background:rgba(0,0,0,0.5);
-border-radius:20px;
-padding:25px;
-margin-top:25px;
-border:1px solid var(--accent);
-}
-
-.correction-badge{
-background:rgba(255,193,7,0.1);
-color:#ffc107;
-padding:5px 15px;
-border-radius:50px;
-font-size:0.8rem;
-border:1px solid #ffc107;
-display:inline-block;
-margin-bottom:15px;
-}
-
-.step-item{
-border-left:3px solid var(--accent);
-padding-left:15px;
-margin-bottom:15px;
-font-size:0.9rem;
-}
-</style>
+        .correction-badge {
+            background: rgba(255, 193, 7, 0.1); color: #ffc107;
+            padding: 5px 15px; border-radius: 50px; font-size: 0.8rem;
+            border: 1px solid #ffc107; display: inline-block; margin-bottom: 15px;
+        }
+    </style>
 </head>
 
 <body>
-
-<header class="main-header">
-<a href="index.html"><h1>Advanced Chemistry Hub</h1></a>
-</header>
-
-<div class="container-narrow">
-
-<div class="glass-card">
-
-<h5 class="h-accent text-center">Matrix-Based Equation Balancer</h5>
-
-<p class="small text-secondary text-center mb-4">
-Balances reactions using Linear Algebra Null-Space solver.
-</p>
-
-<input type="text" id="eqInput" class="form-control"
-placeholder="e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2">
-
-<button onclick="solveEquation()" class="btn-calc">
-<i class="fa-solid fa-calculator me-2"></i> Solve via Linear Algebra
-</button>
-
-<div id="resultArea" class="result-box">
-
-<div id="correctionLog"></div>
-
-<h6 class="text-accent small text-uppercase fw-bold">
-Balanced Result
-</h6>
-
-<div id="balancedOutput" class="h3 text-white my-3"></div>
-
-<hr>
-
-<h6 class="text-accent small text-uppercase fw-bold">
-Mathematical Derivation
-</h6>
-
-<div id="mathSteps" class="text-secondary"></div>
-
-</div>
-</div>
-
-<div class="glass-card">
-
-<h5 class="h-accent">The Math Behind the Balancer</h5>
-
-<p class="small text-secondary">
-
-For a reaction like $aA + bB → cC + dD$ we build a matrix where each row
-represents an element.
-
-$$
-A \cdot x = 0
-$$
-
-The null-space solution gives stoichiometric coefficients.
-
-</p>
-
-</div>
-
-</div>
-
-<script>
-
-/* ---------- Math Utilities ---------- */
-
-function gcd(a,b){return b?gcd(b,a%b):Math.abs(a)}
-function lcm(a,b){return Math.abs(a*b)/gcd(a,b)}
-
-class Fraction{
-
-constructor(n,d=1){
-if(d===0)throw"div0"
-let g=gcd(n,d)
-this.n=n/g
-this.d=d/g
-if(this.d<0){this.n*=-1;this.d*=-1}
-}
-
-add(f){return new Fraction(this.n*f.d+f.n*this.d,this.d*f.d)}
-sub(f){return new Fraction(this.n*f.d-f.n*this.d,this.d*f.d)}
-mul(f){return new Fraction(this.n*f.n,this.d*f.d)}
-div(f){return new Fraction(this.n*f.d,this.d*f.n)}
-isZero(){return this.n===0}
-
-}
-
-/* ---------- Chemical Parser ---------- */
-
-function parseComp(formula){
-
-let stack=[{}]
-let i=0
-
-while(i<formula.length){
-
-if(formula[i]==="("){
-stack.push({})
-i++
-}
-
-else if(formula[i]===")"){
-i++
-let num=""
-while(/\d/.test(formula[i]))num+=formula[i++]
-
-let mult=parseInt(num||"1")
-
-let group=stack.pop()
-let top=stack[stack.length-1]
-
-for(let el in group)
-top[el]=(top[el]||0)+group[el]*mult
-}
-
-else{
-
-let el=formula[i++]
-
-if(/[a-z]/.test(formula[i]))
-el+=formula[i++]
-
-let num=""
-
-while(/\d/.test(formula[i]))
-num+=formula[i++]
-
-let count=parseInt(num||"1")
-
-let top=stack[stack.length-1]
-
-top[el]=(top[el]||0)+count
-
-}
-
-}
-
-return stack[0]
-
-}
-
-/* ---------- Verification ---------- */
-
-function verifyBalance(coeff,left,right){
-
-let L={},R={}
-
-left.forEach((c,i)=>{
-
-let p=parseComp(c)
-
-for(let e in p)
-L[e]=(L[e]||0)+p[e]*coeff[i]
-
-})
-
-right.forEach((c,i)=>{
-
-let p=parseComp(c)
-
-for(let e in p)
-R[e]=(R[e]||0)+p[e]*coeff[i+left.length]
-
-})
-
-return JSON.stringify(L)===JSON.stringify(R)
-
-}
-
-/* ---------- Main Solver ---------- */
-
-function solveEquation(){
-
-let input=document.getElementById("eqInput").value.trim()
-
-const log=document.getElementById("correctionLog")
-log.innerHTML=""
-
-if(input.includes("H20")){
-input=input.replace(/H20/g,"H2O")
-log.innerHTML+=`<div class="correction-badge">Corrected H20 → H2O</div>`
-}
-
-let parts=input.split(/[=→]/)
-
-if(parts.length!==2){
-alert("Use '=' sign")
-return
-}
-
-let left=parts[0].split("+").map(s=>s.trim())
-let right=parts[1].split("+").map(s=>s.trim())
-
-let all=[...left,...right]
-
-/* Collect Elements */
-
-let elements=new Set()
-
-all.forEach(c=>{
-Object.keys(parseComp(c)).forEach(e=>elements.add(e))
-})
-
-let elList=[...elements]
-
-/* Build Matrix */
-
-let matrix=elList.map(el=>{
-
-return all.map((c,i)=>{
-
-let p=parseComp(c)
-let val=p[el]||0
-
-return new Fraction(i<left.length?val:-val)
-
-})
-
-})
-
-let rows=matrix.length
-let cols=all.length
-
-/* Gaussian Elimination */
-
-let pivot=0
-
-for(let j=0;j<cols && pivot<rows;j++){
-
-let sel=pivot
-
-while(sel<rows && matrix[sel][j].isZero())
-sel++
-
-if(sel===rows)continue
-
-[matrix[pivot],matrix[sel]]=[matrix[sel],matrix[pivot]]
-
-let div=matrix[pivot][j]
-
-for(let k=j;k<cols;k++)
-matrix[pivot][k]=matrix[pivot][k].div(div)
-
-for(let i=0;i<rows;i++){
-
-if(i!==pivot){
-
-let factor=matrix[i][j]
-
-for(let k=j;k<cols;k++)
-matrix[i][k]=matrix[i][k].sub(
-factor.mul(matrix[pivot][k])
-)
-
-}
-
-}
-
-pivot++
-
-}
-
-/* Null Space Solution */
-
-let sol=Array.from({length:cols},()=>new Fraction(1))
-
-for(let i=pivot-1;i>=0;i--){
-
-let lead=matrix[i].findIndex(v=>!v.isZero())
-
-let sum=new Fraction(0)
-
-for(let j=lead+1;j<cols;j++)
-sum=sum.add(matrix[i][j].mul(sol[j]))
-
-sol[lead]=sum.mul(new Fraction(-1))
-
-}
-
-/* Integer Conversion */
-
-let common=1
-
-sol.forEach(f=>common=lcm(common,f.d))
-
-let coeff=sol.map(f=>Math.abs(f.n*(common/f.d)))
-
-let g=coeff.reduce((a,b)=>gcd(a,b))
-coeff=coeff.map(x=>x/g)
-
-/* Verify */
-
-if(!verifyBalance(coeff,left,right)){
-alert("Could not balance equation")
-return
-}
-
-/* Display */
-
-let resL=left.map((c,i)=>
-(coeff[i]===1?"":coeff[i])+c
-).join(" + ")
-
-let resR=right.map((c,i)=>
-(coeff[i+left.length]===1?"":coeff[i+left.length])+c
-).join(" + ")
-
-document.getElementById("balancedOutput").innerHTML=
-`${resL} → ${resR}`
-
-document.getElementById("mathSteps").innerHTML=
-`<div class="step-item">Matrix size ${rows}×${cols}</div>
-<div class="step-item">Gaussian elimination applied</div>
-<div class="step-item">Null-space vector calculated</div>
-<div class="step-item">Coefficients simplified</div>`
-
-document.getElementById("resultArea").style.display="block"
-
-MathJax.typesetPromise()
-
-}
-
-</script>
-
+    <header class="main-header">
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">What is Chemical Reaction Balancing?</h4>
+            <p class="theory-text">
+                Chemical reaction balancing is the process of ensuring the <strong>Law of Conservation of Mass</strong> is satisfied. This law states that atoms are neither created nor destroyed in a chemical reaction. Therefore, the number of atoms of each element must be equal on both the reactant and product sides.
+            </p>
+            <div class="formula-container text-center">
+                $$\text{Reactants (Atoms)} = \text{Products (Atoms)}$$
+                <p class="small text-secondary mt-2">Example: $2H_2 + O_2 \rightarrow 2H_2O$</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent text-center">Smart Equation Balancer</h5>
+            <div class="mb-3">
+                <label class="form-label text-secondary small">Enter Chemical Equation (e.g., H2 + O2 = H2O)</label>
+                <input type="text" id="equationInput" class="form-control" placeholder="Fe + Cl2 = FeCl3">
+            </div>
+            <button onclick="solveEquation()" class="btn-calc">Balance Equation & Show Steps</button>
+            
+            <div id="balance-result">
+                <div class="result-display px-3 py-4 border border-info rounded-4 bg-dark mt-3">
+                    <div id="correctionLog"></div>
+                    <h6 class="text-accent">Balanced Equation:</h6>
+                    <div id="balancedOutput" class="h4 text-white mb-4"></div>
+                    <hr class="border-secondary">
+                    <h6 class="text-accent">Mathematical Derivation:</h6>
+                    <div id="mathSteps" class="theory-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">How to Put Values in the Calculator</h5>
+            <p class="theory-text">To get accurate results, follow these detailed logic rules:</p>
+            <ul class="theory-text">
+                <li><strong>Case Sensitivity:</strong> Use <code>NaCl</code>, not <code>nacl</code>. Elements must start with a capital letter.</li>
+                <li><strong>Equation Sign:</strong> Use <code>=</code> or <code>-></code> to separate reactants and products.</li>
+                <li><strong>Spacing:</strong> Use <code>+</code> to separate different compounds (e.g., <code>H2 + O2</code>).</li>
+                <li><strong>Parentheses:</strong> Handles complex groups like <code>Ca(OH)2</code> automatically.</li>
+            </ul>
+            <div class="step-box bg-dark">
+                <strong>Example Input:</strong> <code>KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2</code>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Aspects & Uses of Reaction Balance</h5>
+            <div class="row theory-text">
+                <div class="col-md-6">
+                    <strong>1. Stoichiometry:</strong> Provides the molar ratios needed for quantitative analysis.
+                    <br><strong>2. Yield Calculation:</strong> Essential for determining the theoretical yield of a product.
+                </div>
+                <div class="col-md-6">
+                    <strong>3. Limiting Reactants:</strong> Helps identify which reactant will run out first.
+                    <br><strong>4. Gas Laws:</strong> Used to calculate gas volumes in combustion reactions.
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Rules for Balancing Equations</h5>
+            <ol class="theory-text">
+                <li>Never change the **subscripts** (the small numbers inside formulas).</li>
+                <li>Only change the **coefficients** (the numbers in front of formulas).</li>
+                <li>Balance complex molecules first, and save single elements (like $O_2$ or $H_2$) for last.</li>
+                <li>Check your work by counting atoms on both sides at the end.</li>
+            </ol>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Unbalanced</th>
+                            <th>Balanced</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>CH4 + O2 = CO2 + H2O</td><td>CH4 + 2O2 = CO2 + 2H2O</td><td>Combustion</td></tr>
+                        <tr><td>Fe + Cl2 = FeCl3</td><td>2Fe + 3Cl2 = 2FeCl3</td><td>Synthesis</td></tr>
+                        <tr><td>Al + HCl = AlCl3 + H2</td><td>2Al + 6HCl = 2AlCl3 + 3H2</td><td>Single Displacement</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Application in Scientific Research</h5>
+            <p class="theory-text">
+                In **Pharmaceutical Research**, reaction balancing is critical for synthesizing drug compounds with 99%+ purity. For example, in the production of Aspirin:
+            </p>
+            <div class="example-scroll">
+                <div style="min-width: 500px; border-left: 3px solid var(--accent); padding-left: 15px; font-style: italic;">
+                    $C_7H_6O_3 + C_4H_6O_3 \rightarrow C_9H_8O_4 + C_2H_4O_2$
+                    <p class="small mt-1">Research relies on this 1:1 molar ratio to minimize chemical waste (Green Chemistry).</p>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="text-center h-accent mb-4">Frequently Asked Questions</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["What is a coefficient?", "A number placed in front of a chemical formula in an equation."],
+                    ["Why can't I change subscripts?", "Changing subscripts changes the identity of the substance (e.g., H2O vs H2O2)."],
+                    ["What is the Law of Conservation of Mass?", "Matter is neither created nor destroyed during a chemical reaction."],
+                    ["What are the reactants?", "The substances you start with, located on the left side of the arrow."],
+                    ["What are products?", "The substances formed during the reaction, on the right side."],
+                    ["What is a skeleton equation?", "An unbalanced equation that just shows the chemical formulas."],
+                    ["Can coefficients be fractions?", "In final balanced equations, we usually use the smallest whole numbers."],
+                    ["How do I balance polyatomic ions?", "Treat them as a single unit if they appear unchanged on both sides."],
+                    ["What is a combustion reaction?", "A reaction where a substance reacts with oxygen, usually producing CO2 and H2O."],
+                    ["What is a limiting reactant?", "The reactant that is completely consumed first, stopping the reaction."],
+                    ["Does balancing apply to nuclear reactions?", "No, nuclear reactions involve mass-energy equivalence ($E=mc^2$)."],
+                    ["What if an equation can't be balanced?", "Check if the chemical formulas are written correctly first."],
+                    ["Is heat part of the balance?", "Heat is an energy change (Enthalpy), not a mass change, so it's not 'balanced' by atoms."],
+                    ["What does the arrow mean?", "It represents 'yields' or 'reacts to form'."],
+                    ["What is stoichiometry?", "The study of quantitative relationships in chemical reactions."],
+                    ["Why do we balance equations?", "To satisfy the laws of physics and perform accurate chemical experiments."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        /* ---------- Smart Parser Logic ---------- */
+        function smartParser(v) {
+            if (!v || v.toString().trim()==="") return 0;
+            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+        }
+
+        /* ---------- Math Utilities (Matrix Engine) ---------- */
+        function gcd(a, b) { return b ? gcd(b, a % b) : Math.abs(a); }
+        function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+
+        class Fraction {
+            constructor(n, d = 1) {
+                if (d === 0) throw "div0";
+                let g = gcd(n, d);
+                this.n = n / g;
+                this.d = d / g;
+                if (this.d < 0) { this.n *= -1; this.d *= -1; }
+            }
+            add(f) { return new Fraction(this.n * f.d + f.n * this.d, this.d * f.d); }
+            sub(f) { return new Fraction(this.n * f.d - f.n * this.d, this.d * f.d); }
+            mul(f) { return new Fraction(this.n * f.n, this.d * f.d); }
+            div(f) { return new Fraction(this.n * f.d, this.d * f.n); }
+            isZero() { return this.n === 0; }
+        }
+
+        /* ---------- Chemical Parser ---------- */
+        function parseComp(formula) {
+            let stack = [{}];
+            let i = 0;
+            while (i < formula.length) {
+                if (formula[i] === "(") {
+                    stack.push({});
+                    i++;
+                } else if (formula[i] === ")") {
+                    i++;
+                    let num = "";
+                    while (/\d/.test(formula[i])) num += formula[i++];
+                    let mult = parseInt(num || "1");
+                    let group = stack.pop();
+                    let top = stack[stack.length - 1];
+                    for (let el in group) top[el] = (top[el] || 0) + group[el] * mult;
+                } else {
+                    let el = formula[i++];
+                    if (/[a-z]/.test(formula[i])) el += formula[i++];
+                    let num = "";
+                    while (/\d/.test(formula[i])) num += formula[i++];
+                    let count = parseInt(num || "1");
+                    let top = stack[stack.length - 1];
+                    top[el] = (top[el] || 0) + count;
+                }
+            }
+            return stack[0];
+        }
+
+        /* ---------- Verification ---------- */
+        function verifyBalance(coeff, left, right) {
+            let L = {}, R = {};
+            left.forEach((c, i) => {
+                let p = parseComp(c);
+                for (let e in p) L[e] = (L[e] || 0) + p[e] * coeff[i];
+            });
+            right.forEach((c, i) => {
+                let p = parseComp(c);
+                for (let e in p) R[e] = (R[e] || 0) + p[e] * coeff[i + left.length];
+            });
+            return JSON.stringify(L) === JSON.stringify(R);
+        }
+
+        /* ---------- Main Solver (Updated Function Name to match your HTML) ---------- */
+        function solveEquation() {
+            let input = document.getElementById("equationInput").value.trim();
+            const resultArea = document.getElementById('balance-result');
+            const balancedOutput = document.getElementById('balancedOutput');
+            const mathSteps = document.getElementById('mathSteps');
+            const log = document.getElementById("correctionLog");
+            
+            log.innerHTML = "";
+            if (input.includes("H20")) {
+                input = input.replace(/H20/g, "H2O");
+                log.innerHTML += `<div class="correction-badge">Corrected H20 → H2O</div>`;
+            }
+
+            let parts = input.split(/[=→]/);
+            if (parts.length !== 2) {
+                alert("Please use '=' or '->' to separate sides.");
+                return;
+            }
+
+            let left = parts[0].split("+").map(s => s.trim());
+            let right = parts[1].split("+").map(s => s.trim());
+            let all = [...left, ...right];
+
+            let elements = new Set();
+            all.forEach(c => {
+                Object.keys(parseComp(c)).forEach(e => elements.add(e));
+            });
+            let elList = [...elements];
+
+            // Build Matrix
+            let matrix = elList.map(el => {
+                return all.map((c, i) => {
+                    let p = parseComp(c);
+                    let val = p[el] || 0;
+                    return new Fraction(i < left.length ? val : -val);
+                });
+            });
+
+            let rows = matrix.length;
+            let cols = all.length;
+            let pivot = 0;
+
+            // Gaussian Elimination
+            for (let j = 0; j < cols && pivot < rows; j++) {
+                let sel = pivot;
+                while (sel < rows && matrix[sel][j].isZero()) sel++;
+                if (sel === rows) continue;
+                [matrix[pivot], matrix[sel]] = [matrix[sel], matrix[pivot]];
+                let div = matrix[pivot][j];
+                for (let k = j; k < cols; k++) matrix[pivot][k] = matrix[pivot][k].div(div);
+                for (let i = 0; i < rows; i++) {
+                    if (i !== pivot) {
+                        let factor = matrix[i][j];
+                        for (let k = j; k < cols; k++) matrix[i][k] = matrix[i][k].sub(factor.mul(matrix[pivot][k]));
+                    }
+                }
+                pivot++;
+            }
+
+            // Null Space Solution
+            let sol = Array.from({ length: cols }, () => new Fraction(1));
+            for (let i = pivot - 1; i >= 0; i--) {
+                let lead = matrix[i].findIndex(v => !v.isZero());
+                let sum = new Fraction(0);
+                for (let j = lead + 1; j < cols; j++) sum = sum.add(matrix[i][j].mul(sol[j]));
+                sol[lead] = sum.mul(new Fraction(-1));
+            }
+
+            // Integer Conversion
+            let common = 1;
+            sol.forEach(f => common = lcm(common, f.d));
+            let coeff = sol.map(f => Math.abs(f.n * (common / f.d)));
+            let g = coeff.reduce((a, b) => gcd(a, b));
+            coeff = coeff.map(x => x / g);
+
+            // Verify
+            if (!verifyBalance(coeff, left, right)) {
+                alert("Could not balance equation. Please check formula validity.");
+                return;
+            }
+
+            // Display Output
+            let resL = left.map((c, i) => (coeff[i] === 1 ? "" : coeff[i]) + c).join(" + ");
+            let resR = right.map((c, i) => (coeff[i + left.length] === 1 ? "" : coeff[i + left.length]) + c).join(" + ");
+
+            balancedOutput.innerHTML = `${resL} → ${resR}`;
+            mathSteps.innerHTML = `
+                <div class="step-item"><strong>Matrix Analysis:</strong> Built ${rows}×${cols} conservation matrix.</div>
+                <div class="step-item"><strong>Linear Solver:</strong> Gaussian elimination applied to solve stoichiometric null-space.</div>
+                <div class="step-item"><strong>Simplification:</strong> Coefficients integerized via LCM (${common}) and simplified via GCD.</div>
+                <div class="step-item"><strong>Final Check:</strong> Mass conservation verified for all elements.</div>`;
+
+            resultArea.style.display = "block";
+            MathJax.typesetPromise();
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
+            } catch (e) {}
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
 </body>
 </html>
