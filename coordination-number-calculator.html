@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coordination Number Calculator & Theory | Chemistry Spark Lab</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root { 
+            --accent: #00ffd5; 
+            --bg: #0b0f1a; 
+            --glass: rgba(30, 41, 59, 0.7); 
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: #161b22;
+        }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
+            color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* Clickable Header */
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
+
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 30px; 
+            border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
+
+        /* Responsive Table Fix */
+        .table-container { width: 100%; overflow-x: auto; margin: 20px 0; border-radius: 12px; }
+        .custom-table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.85rem; }
+        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; text-align: left; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
+
+        /* Calculator UI */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
+        .form-control, .form-select {
+            background: var(--input-bg) !important; color: #fff !important; 
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        }
+        .btn-calc {
+            background: linear-gradient(135deg, #0ea5e9, var(--accent));
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+        }
+
+        .result-display {
+            display: none; margin-top: 20px; padding: 20px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 15px; border: 1px solid var(--accent);
+        }
+
+        .faq-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 18px; padding: 20px; margin-bottom: 15px;
+        }
+
+        .badge-dent { background: rgba(0, 255, 213, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
+    </header>
+
+    <div class="container-narrow">
+        
+        <div class="glass-card">
+            <h4 class="h-accent">What is Coordination Number (CN)?</h4>
+            <p class="theory-text">
+                The <strong>Coordination Number</strong> of a central metal atom in a complex is defined as the total number of ligand donor atoms to which the metal is directly bonded. It is not necessarily equal to the number of ligands, as some ligands (polydentate) can form multiple bonds.
+            </p>
+            <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; text-align:center;">
+                <p class="mb-1">Primary Formula:</p>
+                $$\text{CN} = \sum (\text{Number of Ligands} \times \text{Denticity})$$
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent text-center">Ligand Binding Solver</h5>
+            
+            <div id="ligand-rows">
+                <div class="row g-2 mb-2">
+                    <div class="col-7">
+                        <label class="form-label">Ligand Type</label>
+                        <select class="form-select denticity-input">
+                            <option value="1">Monodentate (Cl-, NH3, H2O)</option>
+                            <option value="2">Bidentate (en, ox2-)</option>
+                            <option value="3">Tridentate (dien)</option>
+                            <option value="4">Tetradentate (trien)</option>
+                            <option value="6">Hexadentate (EDTA4-)</option>
+                        </select>
+                    </div>
+                    <div class="col-5">
+                        <label class="form-label">Quantity</label>
+                        <input type="text" class="form-control quantity-input" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="addLigandRow()" class="btn btn-sm btn-outline-info mt-2">
+                <i class="fas fa-plus"></i> Add Another Ligand
+            </button>
+
+            <button onclick="calculateCN()" class="btn-calc">Determine Coordination Number</button>
+            
+            <div id="cn-result" class="result-display"></div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Rules for Determination</h5>
+            <ul class="theory-text">
+                <li><strong>Sigma Only:</strong> Only $\sigma$-bonds are counted. $\pi$-bonds in metal-carbonyls do not increase the CN.</li>
+                <li><strong>Denticity Factor:</strong> A chelating ligand like ethylenediamine (en) counts as 2 because it has two donor sites.</li>
+                <li><strong>Geometry Link:</strong> CN 4 usually implies Tetrahedral or Square Planar, while CN 6 implies Octahedral.</li>
+            </ul>
+            <h6 class="text-white mt-4">Solved Example:</h6>
+            <div style="border-left: 3px solid var(--accent); padding-left: 15px; font-style: italic;">
+                Complex: $[Co(en)_2Cl_2]^+$ <br>
+                Ligands: 2 $\times$ en (Bidentate) + 2 $\times$ Cl (Monodentate)<br>
+                Calculation: $(2 \times 2) + (2 \times 1) = 6$<br>
+                <strong>Coordination Number = 6</strong>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Scientific Research & Industrial Uses</h5>
+            <p class="theory-text">
+                Coordination numbers are critical in <strong>Pharmacology</strong>. For instance, the anti-cancer drug <em>Cisplatin</em> has a CN of 4, allowing it to fit into the major groove of DNA to inhibit tumor growth.
+            </p>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Application</th>
+                            <th>CN Range</th>
+                            <th>Example Complex</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Bio-imaging</td><td>CN 7-9</td><td>Lanthanide Probes</td></tr>
+                        <tr><td>Catalysis</td><td>CN 4-5</td><td>Wilkinson’s Catalyst</td></tr>
+                        <tr><td>Metalloproteins</td><td>CN 4-6</td><td>Hemoglobin (Fe-Heme)</td></tr>
+                        <tr><td>Nuclear Chemistry</td><td>CN 8-12</td><td>Actinide Extractions</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="h-accent">Top Coordination Compounds Reference</h5>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Complex Name</th>
+                            <th>Formula</th>
+                            <th>CN</th>
+                            <th>Geometry</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Potassium Ferrocyanide</td><td>$[Fe(CN)_6]^{4-}$</td><td>6</td><td>Octahedral</td></tr>
+                        <tr><td>Nickel Tetracarbonyl</td><td>$[Ni(CO)_4]$</td><td>4</td><td>Tetrahedral</td></tr>
+                        <li>Zeise's Salt</td><td>$[PtCl_3(\eta^2-C_2H_4)]^-$</td><td>4</td><td>Square Planar</td></tr>
+                        <tr><td>EDTA Complex</td><td>$[Ca(EDTA)]^{2-}$</td><td>6</td><td>Octahedral</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h5 class="text-center h-accent mb-4">Coordination Number FAQ</h5>
+        <div id="faq-container">
+            <script>
+                const faqs = [
+                    ["What is the difference between CN and Valency?", "Valency refers to oxidation state (charge), while CN refers to the number of physical bonds (linkages)."],
+                    ["Can CN be odd?", "Yes, CN 5 and 7 are common in transition metal chemistry, though even numbers are more stable."],
+                    ["Does EDTA always give CN 6?", "Usually, yes, as it is a hexadentate ligand that wraps entirely around a metal ion."],
+                    ["What is the highest known CN?", "Coordination numbers as high as 16 have been observed in some actinide organometallic complexes."],
+                    ["How does CN affect color?", "CN changes the orbital splitting energy (Δ), which determines the light absorbed."],
+                    ["Is CN the same as the number of ligands?", "No. One hexadentate ligand equals 1 ligand but a CN of 6."],
+                    ["What is CN in solid-state chemistry?", "It refers to the number of nearest-neighbor atoms in a crystal lattice (e.g., NaCl has CN 6)."],
+                    ["Why is CN 6 the most common?", "It provides the most stable octahedral symmetry for 3d transition metals."],
+                    ["What is a coordination sphere?", "The central metal and its ligands, enclosed in brackets in a formula."],
+                    ["Can CN change during a reaction?", "Yes, in dissociative or associative mechanisms during catalysis."],
+                    ["What is 'denticity'?", "The number of donor atoms a single ligand uses to bond to the metal."],
+                    ["How do you calculate CN for bridged complexes?", "You count the bonds from the bridging ligands to each metal center separately."],
+                    ["Does pressure affect CN?", "High pressure can force atoms closer, increasing the coordination number."],
+                    ["What is an ambidentate ligand?", "A ligand that can bond via two different atoms (like SCN-), but only uses one at a time for CN."],
+                    ["Are π-electrons counted in CN?", "In standard CFT, no. Only the atoms directly sigma-bonded are counted."],
+                    ["What is a chelate?", "A ring structure formed when a polydentate ligand bonds to a metal, usually increasing stability."]
+                ];
+                faqs.forEach(f => {
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                });
+            </script>
+        </div>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <script>
+        // Integrated Smart Parser
+        function smartParser(v) {
+            if (!v || v.toString().trim()==="") return 0;
+            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+        }
+
+        function addLigandRow() {
+            const container = document.getElementById('ligand-rows');
+            const row = document.createElement('div');
+            row.className = "row g-2 mb-2";
+            row.innerHTML = `
+                <div class="col-7">
+                    <select class="form-select denticity-input">
+                        <option value="1">Monodentate</option>
+                        <option value="2">Bidentate</option>
+                        <option value="3">Tridentate</option>
+                        <option value="4">Tetradentate</option>
+                        <option value="6">Hexadentate</option>
+                    </select>
+                </div>
+                <div class="col-5">
+                    <input type="text" class="form-control quantity-input" placeholder="Qty">
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function calculateCN() {
+            const denticities = document.querySelectorAll('.denticity-input');
+            const quantities = document.querySelectorAll('.quantity-input');
+            let totalCN = 0;
+
+            denticities.forEach((d, index) => {
+                const dent = parseInt(d.value);
+                const qty = smartParser(quantities[index].value);
+                totalCN += (dent * qty);
+            });
+
+            const resDiv = document.getElementById('cn-result');
+            let geometry = "Variable";
+            if(totalCN === 2) geometry = "Linear";
+            if(totalCN === 4) geometry = "Tetrahedral / Square Planar";
+            if(totalCN === 6) geometry = "Octahedral";
+
+            resDiv.innerHTML = `
+                <h6 style="color:var(--accent)">Calculated Coordination Number: ${totalCN}</h6>
+                <p class="theory-text mb-0">Predicted Primary Geometry: <strong>${geometry}</strong></p>
+                <small class="text-secondary">Based on effective donor atoms.</small>
+            `;
+            resDiv.style.display = "block";
+        }
+
+        async function loadFooter() {
+            try {
+                const response = await fetch('footer.html');
+                if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
+            } catch (e) {}
+        }
+        window.addEventListener('DOMContentLoaded', loadFooter);
+    </script>
+</body>
+</html>
