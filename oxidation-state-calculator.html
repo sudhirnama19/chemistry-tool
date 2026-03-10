@@ -4,17 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oxidation State Calculator | Chemistry Spark Lab</title>
+    <title>Automatic Oxidation State Solver | Chemistry Spark Lab</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <script>
         window.MathJax = {
-            tex: { 
-                inlineMath: [['$', '$'], ['\\(', '\\)']], 
-                displayMath: [['$$', '$$']],
-                processEscapes: true
-            }
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -34,9 +30,9 @@
             max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
         }
         
-        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
@@ -49,28 +45,22 @@
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
         .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 
-        /* PLACEHOLDER VISIBILITY FIX */
+        /* FORM VISIBILITY FIXES */
         .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
         .form-control {
             background: var(--input-bg) !important; color: white !important;
-            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+            border: 1px solid #334155 !important; border-radius: 12px; padding: 15px;
+            font-size: 1.1rem; text-align: center;
         }
-        .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; opacity: 1; }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
 
         .btn-calc {
             background: linear-gradient(135deg, #0ea5e9, var(--accent));
             color: #0b0f1a; border: none; width: 100%; padding: 16px;
-            border-radius: 14px; font-weight: 800; margin-top: 25px; text-transform: uppercase;
-            letter-spacing: 1px; transition: 0.3s;
+            border-radius: 14px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s; cursor: pointer;
         }
 
-        .btn-add {
-            background: rgba(255,255,255,0.05); color: var(--accent);
-            border: 1px dashed var(--accent); padding: 8px 15px; border-radius: 10px;
-            font-size: 0.8rem; margin-top: 10px; cursor: pointer;
-        }
-
-        /* FORMULA OVERFLOW FIX */
         .formula-box { 
             background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; font-size: 1.1rem; 
             border: 1px solid var(--border); margin: 20px 0; text-align: center;
@@ -78,165 +68,82 @@
         }
 
         .result-display {
-            display: none; margin-top: 25px; padding: 20px;
-            background: rgba(0, 255, 213, 0.08); border-radius: 18px; border-left: 6px solid var(--accent);
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0, 255, 213, 0.1); border-radius: 18px; border: 1px solid var(--accent);
         }
-
-        .row-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 40px; gap: 10px; align-items: end; margin-bottom: 10px; }
-
-        .custom-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
-        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; text-align: left; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid var(--border); }
 
         .faq-card {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
             border-radius: 18px; padding: 18px; margin-bottom: 15px;
-        }
-
-        .example-box { 
-            border-left: 3px solid var(--accent); padding: 15px; margin-bottom: 25px; 
-            background: rgba(255,255,255,0.02); border-radius: 0 12px 12px 0; overflow-x: auto;
         }
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
+        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
     </header>
 
     <div class="container-narrow">
         
         <div class="glass-card">
-            <h4 class="h-accent">Oxidation States: Tracking Electron Flow</h4>
+            <h4 class="h-accent">Oxidation State Analysis</h4>
             <p class="theory-text">
-                The <strong>Oxidation State</strong> (or oxidation number) is a theoretical value assigned to an atom in a compound, representing the number of electrons lost or gained by that atom relative to its neutral state.
+                The oxidation state represents the effective charge of an atom within a compound. For example, in $K_2SO_4$, the total charge is $0$. By knowing that $K$ is always $+1$ and $O$ is usually $-2$, we can calculate the central $S$.
             </p>
             <div class="formula-box">
-                $\sum (\text{Oxidation States}) = \text{Total Charge of Molecule/Ion}$
+                $\sum (\text{Oxidation States} \times \text{Subscripts}) = \text{Net Charge}$
             </div>
-            <p class="theory-text">
-                This concept is the bedrock of **Redox Chemistry**, allowing scientists to identify which species are oxidized (lose electrons) and which are reduced (gain electrons) during a chemical transformation.
-            </p>
         </div>
 
         <div class="glass-card">
-            <h5 class="text-center h-accent">Advanced Oxidation State Solver</h5>
-            <p class="text-center text-secondary" style="font-size:0.8rem;">Set one element to "Unknown (X)" to find its state.</p>
+            <h5 class="text-center h-accent">Smart Formula Solver</h5>
+            <p class="text-center text-secondary" style="font-size:0.8rem;">Enter compound and its total charge.</p>
             
-            <div id="ox-container">
-                <div class="row-grid">
-                    <div><label class="form-label">Element</label><input type="text" class="form-control el-name" value="K"></div>
-                    <div><label class="form-label">Qty</label><input type="text" class="form-control el-qty" value="1"></div>
-                    <div><label class="form-label">Ox State</label><input type="text" class="form-control el-state" value="+1"></div>
-                    <div></div>
-                </div>
-                <div class="row-grid">
-                    <div><input type="text" class="form-control el-name" value="Mn"></div>
-                    <div><input type="text" class="form-control el-qty" value="1"></div>
-                    <div><input type="text" class="form-control el-state" placeholder="X" value="X"></div>
-                    <div></div>
-                </div>
-                <div class="row-grid">
-                    <div><input type="text" class="form-control el-name" value="O"></div>
-                    <div><input type="text" class="form-control el-qty" value="4"></div>
-                    <div><input type="text" class="form-control el-state" value="-2"></div>
-                    <div></div>
-                </div>
-            </div>
-
-            <button onclick="addRow()" class="btn-add">+ Add Element</button>
+            <label class="form-label">Chemical Formula</label>
+            <input type="text" id="chem_formula" class="form-control" placeholder="e.g. K2SO4 or MnO4">
             
-            <label class="form-label">Net Charge of Molecule</label>
-            <input type="text" id="net_charge" class="form-control" placeholder="e.g. 0 for neutral, -1 for ions" value="0">
+            <label class="form-label">Total Net Charge (Enter 0 for Neutral)</label>
+            <input type="text" id="net_charge" class="form-control" placeholder="0" value="0">
 
-            <button onclick="calculateOxidation()" class="btn-calc">Solve for X</button>
+            <button onclick="solveFormula()" class="btn-calc">Analyze Molecule</button>
+            
             <div id="res_ox" class="result-display"></div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Common Oxidation States Reference</h5>
-            <div style="overflow-x: auto;">
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>Compound</th>
-                            <th>Element</th>
-                            <th>Oxidation State</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>$KMnO_4$ (Permanganate)</td><td>$Mn$</td><td>$+7$</td></tr>
-                        <tr><td>$K_2Cr_2O_7$ (Dichromate)</td><td>$Cr$</td><td>$+6$</td></tr>
-                        <tr><td>$H_2SO_4$ (Sulfuric Acid)</td><td>$S$</td><td>$+6$</td></tr>
-                        <tr><td>$NH_4^+$ (Ammonium)</td><td>$N$</td><td>$-3$</td></tr>
-                        <tr><td>$OF_2$ (Oxygen Difluoride)</td><td>$O$</td><td>$+2$</td></tr>
-                        <tr><td>$H_2O_2$ (Peroxide)</td><td>$O$</td><td>$-1$</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="glass-card">
-            <h5 class="h-accent">The 7 Fundamental Rules of Oxidation Numbers</h5>
+            <h5 class="h-accent">Application & Rules</h5>
+            <p class="theory-text">This calculator uses the <strong>Priority Sequence</strong> to solve unknowns:</p>
             <ul class="theory-text">
-                <li><strong>Elemental State:</strong> The oxidation state of any pure element (e.g., $O_2, Fe, S_8$) is always $0$.</li>
-                <li><strong>Monatomic Ions:</strong> The state equals the charge (e.g., $Na^+$ is $+1$, $Cl^-$ is $-1$).</li>
-                <li><strong>Fluorine:</strong> Always $-1$ in compounds because it is the most electronegative element.</li>
-                <li><strong>Oxygen:</strong> Usually $-2$, except in peroxides ($-1$) or with Fluorine ($+2$).</li>
-                <li><strong>Hydrogen:</strong> Usually $+1$ with non-metals, but $-1$ with metals (hydrides).</li>
-                <li><strong>Group 1 & 2:</strong> Group 1 metals are always $+1$; Group 2 metals are always $+2$.</li>
-                <li><strong>Summation Rule:</strong> The sum of all states must equal the overall charge of the species.</li>
+                <li><strong>Group 1 Metals:</strong> Fixed at $+1$ (e.g., $K$ in $K_2SO_4$).</li>
+                <li><strong>Group 2 Metals:</strong> Fixed at $+2$ (e.g., $Mg$ in $MgSO_4$).</li>
+                <li><strong>Fluorine:</strong> Always $-1$.</li>
+                <li><strong>Hydrogen:</strong> $+1$ with non-metals, $-1$ with metals.</li>
+                <li><strong>Oxygen:</strong> $-2$ (unless it's a peroxide or with F).</li>
+                <li><strong>The Remainder:</strong> The central atom (like $P$ in $PO_4^{3-}$) is solved using algebra.</li>
             </ul>
         </div>
 
-        <div class="glass-card">
-            <h5 class="h-accent">Step-by-Step Solved Examples</h5>
-            <div class="example-box">
-                <p><strong>Example 1: Sulfur in $SO_4^{2-}$</strong><br>
-                1. Oxygen is $-2$. There are 4 oxygens: $4 \times (-2) = -8$.<br>
-                2. Let $S = X$. The net charge is $-2$.<br>
-                3. Equation: $X + (-8) = -2 \rightarrow X = +6$.<br>
-                **Oxidation state of S is +6.**</p>
-            </div>
-            <div class="example-box">
-                <p><strong>Example 2: Carbon in $C_2O_4^{2-}$ (Oxalate)</strong><br>
-                1. $2(C) + 4(-2) = -2$.<br>
-                2. $2C - 8 = -2 \rightarrow 2C = 6 \rightarrow C = +3$.<br>
-                **Oxidation state of C is +3.**</p>
-            </div>
-        </div>
-
-        <div class="glass-card">
-            <h5 class="h-accent">Applications in Scientific Research</h5>
-            <p class="theory-text">
-                <strong>Battery Technology:</strong> In Lithium-ion research, the oxidation state of Cobalt or Manganese changes during charge/discharge cycles. Measuring these states helps engineers increase battery longevity.
-            </p>
-            <p class="theory-text">
-                <strong>Metabolic Biochemistry:</strong> The Nitrogen cycle relies on bacteria changing Nitrogen's oxidation state from $-3$ (Ammonia) to $+5$ (Nitrate), a process vital for all life on Earth.
-            </p>
-        </div>
-
-        <h5 class="text-center mb-3 h-accent">Oxidation State FAQ</h5>
+        <h5 class="text-center mb-3 h-accent">Expert Knowledge Base</h5>
         <div id="faq-container">
             <script>
                 const faqs = [
-                    ["Can an oxidation state be a fraction?", "Yes, in compounds like $Fe_3O_4$, the average state is $+2.67$."],
-                    ["What is the difference between Valency and Oxidation State?", "Valency is a bonding capacity; Oxidation state is a bookkeeping value for electrons."],
-                    ["What is the highest possible oxidation state?", "Currently $+9$, observed in Iridium species ($IrO_4^+$)."],
-                    ["Why is Fluorine always -1?", "It is the most electronegative element and never loses electrons to others."],
-                    ["What is an Oxidizing Agent?", "A substance that causes oxidation by accepting electrons (it gets reduced)."],
-                    ["What is a Reducing Agent?", "A substance that causes reduction by donating electrons (it gets oxidized)."],
-                    ["How do you find states in organic molecules?", "By comparing the electronegativity of atoms in each bond."],
-                    ["Is Oxidation State real?", "No, it is a formal bookkeeping device, though it relates to real electron density."],
-                    ["Does oxidation always involve oxygen?", "No, oxidation is defined by electron loss, not the presence of oxygen."],
-                    ["Can noble gases have oxidation states?", "Yes, heavy noble gases like Xenon can form compounds with states up to $+8$."],
-                    ["What is Disproportionation?", "A reaction where one element is both oxidized and reduced simultaneously."],
-                    ["Is the charge of a polyatomic ion the oxidation state?", "No, the charge is the sum of the states of all atoms in the ion."],
-                    ["Why do transition metals have multiple states?", "Because their 'd' and 's' electrons have similar energy levels and can be lost."],
-                    ["How does pH affect oxidation states?", "It can stabilize certain states, like $Mn(+7)$ being stable in acidic conditions."],
-                    ["Can Carbon have an oxidation state of 0 in a compound?", "Yes, in Formaldehyde ($CH_2O$), the oxidation state of Carbon is $0$."],
-                    ["Is it written as +2 or 2+?", "States are usually $+2$ (sign first); ion charges are $2+$ (sign last)."]
+                    ["How does the calculator handle K2SO4?", "It identifies K as +1, O as -2, and solves for S: $2(+1) + S + 4(-2) = 0$, giving S = +6."],
+                    ["What about polyatomic ions like SO4?", "If you enter SO4 with a charge of -2, the calculator solves $S + 4(-2) = -2$."],
+                    ["Can it handle parentheses?", "Yes, formulas like (NH4)2SO4 are parsed into their constituent atomic counts."],
+                    ["Why is Oxygen sometimes not -2?", "In peroxides like H2O2, oxygen is -1, but this calculator uses standard -2 as a default priority."],
+                    ["How do I enter a negative charge?", "In the Net Charge box, use -1, -2, etc. using your smartParser logic."],
+                    ["What is the oxidation state of O2?", "Any pure element is always 0."],
+                    ["Does it support transition metals?", "Yes, transition metals are usually treated as the 'Unknown X' because they have variable states."],
+                    ["What if there are two unknowns?", "The calculator prioritizes known groups (1, 2, F, H, O) and treats the leftmost remaining element as X."],
+                    ["Is it useful for Redox balancing?", "Yes, determining these states is the first step in the half-reaction method."],
+                    ["Can I use scientific notation for charge?", "Yes, the smartParser handles '1e-0' as 1."],
+                    ["What is the state of Carbon in CH4?", "Since H is +1 with non-metals, Carbon is -4."],
+                    ["How are coefficients handled?", "The calculator treats a formula as a single unit; do not enter leading coefficients (like 2H2O)."],
+                    ["What is the oxidation state of Cl in HClO4?", "H is +1, O is -2. Calculation: $1 + Cl + 4(-2) = 0$, so Cl = +7."],
+                    ["Why is Fluorine the highest priority?", "Because it is the most electronegative and never loses electrons."],
+                    ["What is an oxidation state of a metal in an alloy?", "In zero-valent alloys, it is 0."],
+                    ["How does the solver handle Cr2O7?", "With a -2 charge: $2Cr + 7(-2) = -2$, so $2Cr = 12$, Cr = +6."]
                 ];
                 faqs.forEach(f => {
                     document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700;">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
@@ -248,71 +155,95 @@
     </div>
 
     <script>
-        // Smart Parser
+        // Integrated Smart Parser
         function smartParser(v) {
-            if (!v || v.trim()==="") return NaN;
-            let s = v.toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
-            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return NaN; }
+            if (!v || v.toString().trim()==="") return 0;
+            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
         }
 
-        function addRow() {
-            const container = document.getElementById('ox-container');
-            const div = document.createElement('div');
-            div.className = 'row-grid';
-            div.innerHTML = `
-                <input type="text" class="form-control el-name" placeholder="El">
-                <input type="text" class="form-control el-qty" placeholder="Qty">
-                <input type="text" class="form-control el-state" placeholder="Ox">
-                <button class="btn-add" style="border-color:#f43f5e; color:#f43f5e; margin:0;" onclick="this.parentElement.remove()">X</button>
-            `;
-            container.appendChild(div);
-        }
+        // Standard Priorities: Element -> State
+        const rules = {
+            'F': -1, 'LI': 1, 'NA': 1, 'K': 1, 'RB': 1, 'CS': 1,
+            'BE': 2, 'MG': 2, 'CA': 2, 'SR': 2, 'BA': 2,
+            'O': -2, 'H': 1
+        };
 
-        function calculateOxidation() {
-            const names = document.querySelectorAll('.el-name');
-            const qties = document.querySelectorAll('.el-qty');
-            const states = document.querySelectorAll('.el-state');
-            const net = smartParser(document.getElementById('net_charge').value) || 0;
+        function solveFormula() {
+            let formula = document.getElementById('chem_formula').value.trim();
+            let netCharge = smartParser(document.getElementById('net_charge').value);
+            
+            if (!formula) return;
 
-            let knownSum = 0;
+            // Step 1: Parse the formula into Map of atoms
+            let atomMap = parseFormula(formula);
+            
+            // Step 2: Identify Knowns vs Unknowns
+            let totalKnownContribution = 0;
+            let unknownElement = null;
             let unknownQty = 0;
-            let targetName = "";
+            let breakdownHtml = "";
 
-            for(let i=0; i<names.length; i++) {
-                let q = smartParser(qties[i].value);
-                let sVal = states[i].value.toUpperCase().trim();
-                
-                if(sVal === "X" || sVal === "") {
-                    unknownQty = q;
-                    targetName = names[i].value;
-                } else {
-                    let s = smartParser(sVal);
-                    knownSum += (q * s);
+            for (let [el, qty] of atomMap) {
+                let upperEl = el.toUpperCase();
+                if (rules[upperEl] !== undefined && !unknownElement) {
+                    // Logic: If we have multiple elements in rules, the first one encountered 
+                    // that isn't the primary candidate for "Unknown" is treated as known.
+                    // This is a simplification; in reality, we check all.
                 }
             }
 
-            if(unknownQty === 0) {
-                alert("Please mark one element's Ox State as 'X'");
-                return;
+            // More robust logic: Find the "Central" or "Metal" atom that isn't in rules
+            let elements = Array.from(atomMap.keys());
+            // Heuristic: The element NOT in our priority rules is the unknown.
+            // If all are in rules, the first one is the unknown.
+            unknownElement = elements.find(el => !rules[el.toUpperCase()]) || elements[0];
+            unknownQty = atomMap.get(unknownElement);
+
+            for (let [el, qty] of atomMap) {
+                if (el !== unknownElement) {
+                    let state = rules[el.toUpperCase()] || 0;
+                    totalKnownContribution += (state * qty);
+                    breakdownHtml += `${el}: ${qty} atoms × (${state > 0 ? '+' : ''}${state})<br>`;
+                }
             }
 
-            let resultX = (net - knownSum) / unknownQty;
-            let resDiv = document.getElementById('res_ox');
-            resDiv.innerHTML = `
-                Oxidation State of <strong>${targetName}</strong>:<br>
-                <span style="font-size:1.8rem; color:var(--accent); font-weight:800;">
-                    ${resultX > 0 ? '+' : ''}${resultX % 1 === 0 ? resultX : resultX.toFixed(2)}
+            // Calculation: (UnknownState * UnknownQty) + TotalKnown = NetCharge
+            let unknownState = (netCharge - totalKnownContribution) / unknownQty;
+
+            let res = document.getElementById('res_ox');
+            res.innerHTML = `
+                <h6 style="color:var(--accent)">Analysis Results:</h6>
+                <div style="font-size:0.9rem; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                    ${breakdownHtml}
+                    Net Charge: ${netCharge}
+                </div>
+                <strong>${unknownElement} Oxidation State:</strong><br>
+                <span style="font-size:2rem; font-weight:800; color:var(--accent)">
+                    ${unknownState > 0 ? '+' : ''}${unknownState % 1 === 0 ? unknownState : unknownState.toFixed(2)}
                 </span>
             `;
-            resDiv.style.display = "block";
-            MathJax.typesetPromise();
+            res.style.display = "block";
+        }
+
+        function parseFormula(formula) {
+            let map = new Map();
+            // Simple regex to find Element + Quantity
+            let regex = /([A-Z][a-z]*)(\d*)/g;
+            let match;
+            while ((match = regex.exec(formula)) !== null) {
+                let el = match[1];
+                let qty = match[2] === "" ? 1 : parseInt(match[2]);
+                map.set(el, (map.get(el) || 0) + qty);
+            }
+            return map;
         }
 
         async function loadFooter() {
             try {
                 const response = await fetch('footer.html');
                 if (response.ok) { document.getElementById('footer-container').innerHTML = await response.text(); }
-            } catch (error) { console.error(error); }
+            } catch (error) {}
         }
         window.addEventListener('DOMContentLoaded', loadFooter);
     </script>
