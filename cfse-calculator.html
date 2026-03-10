@@ -50,7 +50,7 @@
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
         .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 
-        /* FIX: Formula Overflow Protection */
+        /* Formula Overflow Protection */
         .formula-container {
             background: rgba(0,0,0,0.4); 
             padding: 20px; 
@@ -64,11 +64,31 @@
         .formula-container::-webkit-scrollbar { height: 4px; }
         .formula-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-        /* FIX: Input & Field Visibility */
+        /* Table Overflow Fix (Specifically for Gemstone Table) */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 12px;
+        }
+        .table-container::-webkit-scrollbar { height: 5px; }
+        .table-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .custom-table { 
+            width: 100%; 
+            min-width: 550px; /* Prevents columns from squashing on mobile */
+            border-collapse: collapse; 
+            font-size: 0.85rem; 
+        }
+        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; text-align: left; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
+
+        /* Input & Field Visibility Fixes */
         .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
         .form-control, .form-select {
             background: var(--input-bg) !important; 
-            color: #ffffff !important; /* Forces visible text in dark mode */
+            color: #ffffff !important; 
             border: 1px solid #334155 !important; 
             border-radius: 12px; 
             padding: 14px;
@@ -97,10 +117,6 @@
         .diagram-container { display: flex; justify-content: space-around; margin: 25px 0; flex-wrap: wrap; gap: 20px; }
         .splitting-box { text-align: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid var(--border); flex: 1; min-width: 280px; }
         
-        .custom-table { width: 100%; margin: 20px 0; border-collapse: collapse; font-size: 0.85rem; }
-        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; text-align: left; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
-
         .faq-card {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
             border-radius: 18px; padding: 20px; margin-bottom: 15px;
@@ -210,15 +226,18 @@
         <div class="glass-card">
             <h5 class="h-accent">Application: Gemstone Coloration</h5>
             <p class="theory-text">CFSE directly determines the color of gemstones. When the $\Delta$ value shifts due to the "Crystal Field" of the host lattice, the absorbed wavelength changes, producing different colors from the same metal ion.</p>
-            <table class="custom-table">
-                <thead><tr><th>Gemstone</th><th>Metal Ion</th><th>Host Lattice</th><th>Observed Color</th></tr></thead>
-                <tbody>
-                    <tr><td>Ruby</td><td>$Cr^{3+}$</td><td>$Al_2O_3$ (Corundum)</td><td>Deep Red</td></tr>
-                    <tr><td>Emerald</td><td>$Cr^{3+}$</td><td>$Be_3Al_2(SiO_3)_6$</td><td>Vivid Green</td></tr>
-                    <tr><td>Amethyst</td><td>$Fe^{3+}$</td><td>$SiO_2$ (Quartz)</td><td>Violet</td></tr>
-                    <tr><td>Jade</td><td>$Cr^{3+}/Fe^{2+}$</td><td>Silicate matrix</td><td>Green/White</td></tr>
-                </tbody>
-            </table>
+            
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead><tr><th>Gemstone</th><th>Metal Ion</th><th>Host Lattice</th><th>Observed Color</th></tr></thead>
+                    <tbody>
+                        <tr><td>Ruby</td><td>$Cr^{3+}$</td><td>$Al_2O_3$ (Corundum)</td><td>Deep Red</td></tr>
+                        <tr><td>Emerald</td><td>$Cr^{3+}$</td><td>$Be_3Al_2(SiO_3)_6$</td><td>Vivid Green</td></tr>
+                        <tr><td>Amethyst</td><td>$Fe^{3+}$</td><td>$SiO_2$ (Quartz)</td><td>Violet</td></tr>
+                        <tr><td>Jade</td><td>$Cr^{3+}/Fe^{2+}$</td><td>Silicate matrix</td><td>Green/White</td></tr>
+                    </tbody>
+                </table>
+            </div>
             <p class="theory-text small">Note: Ruby and Emerald both use $Cr^{3+}$, but the different lattice environments change the $\Delta$ value, shifting the color from Red to Green.</p>
         </div>
 
