@@ -405,14 +405,18 @@
 
         .search-container {
     max-width: 650px;
-    margin: -20px auto 50px; /* Pulls it up closer to the hero */
+    margin: 20px auto 50px; /* Adjust top margin if still overlapping */
     padding: 0 20px;
+    position: relative;
+    z-index: 10; /* Ensures it stays above background gradients */
 }
 
+/* Ensure the wrapper doesn't collapse */
 .search-wrapper {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 #calcSearch {
