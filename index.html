@@ -758,24 +758,32 @@
         <footer class="text-center">
             <p class="footer-text">
                 © 2023-2026 Chemistry Spark Publication. Engineered for Excellence.<br>
-                <a href="https://sudhirnama.in" target="_blank" class="footer-link">Developed by Sudhir Nama</a>
+                <a href="https://sudhirnama.in" target="_blank" rel="noopener noreferrer" class="footer-link">Developed by Sudhir Nama</a>
             </p>
         </footer>
     </main>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.tool-card');
+    window.addEventListener('DOMContentLoaded', () => {
+        // Change '.tool-card' to '.calc-card' to match your directory
+        const cards = document.querySelectorAll('.calc-card');
+        
+        // Add a check to see if cards actually exist before running the loop
+        if (cards.length > 0) {
             cards.forEach((card, index) => {
+                // Set initial state
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
+                
+                // Use a safer timeout
                 setTimeout(() => {
-                    card.style.transition = '0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, 60 * index);
             });
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>
