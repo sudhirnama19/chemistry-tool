@@ -3,15 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CFSE Calculator | Crystal Field Theory | Chemistry Spark Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced CFSE Calculator | Crystal Field Theory | Chemistry Spark Lab</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -22,55 +23,94 @@
             --bg: #0b0f1a; 
             --glass: rgba(30, 41, 59, 0.7); 
             --border: rgba(255, 255, 255, 0.1);
+            --input-bg: #161b22;
         }
         
         body { 
             background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
             color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
-            margin: 0; padding: 0;
+            margin: 0; padding: 0; overflow-x: hidden;
         }
 
+        /* Header Styling */
         .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
 
-        .container-narrow { max-width: 850px; margin: auto; padding: 20px; }
+        .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
+        /* Card System */
         .glass-card { 
-            background: var(--glass); backdrop-filter: blur(12px);
-            border-radius: 24px; padding: 30px; margin-bottom: 30px; 
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 25px; margin-bottom: 30px; 
             border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            word-wrap: break-word; overflow-wrap: break-word;
+            overflow: hidden;
         }
 
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
         .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 
-        /* CALCULATOR STYLING */
-        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; }
-        .form-control, .form-select {
-            background: rgba(15, 23, 42, 0.9) !important; color: white !important;
-            border: 1px solid #334155 !important; border-radius: 12px; padding: 12px;
+        /* FIX: Formula Overflow Protection */
+        .formula-container {
+            background: rgba(0,0,0,0.4); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 20px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: block;
+            width: 100%;
         }
+        .formula-container::-webkit-scrollbar { height: 4px; }
+        .formula-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        /* FIX: Input & Field Visibility */
+        .form-label { color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 15px; display: block; }
+        .form-control, .form-select {
+            background: var(--input-bg) !important; 
+            color: #ffffff !important; /* Forces visible text in dark mode */
+            border: 1px solid #334155 !important; 
+            border-radius: 12px; 
+            padding: 14px;
+            font-size: 1rem;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+        
+        .spin-section-active { opacity: 1; transition: 0.4s; }
+        .spin-section-dimmed { opacity: 0.4; pointer-events: none; filter: grayscale(0.5); }
 
         .btn-calc {
             background: linear-gradient(135deg, #0ea5e9, var(--accent));
             color: #0b0f1a; border: none; width: 100%; padding: 16px;
             border-radius: 14px; font-weight: 800; margin-top: 25px; text-transform: uppercase;
+            cursor: pointer; transition: 0.3s;
         }
+        .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 255, 213, 0.3); }
 
         .result-display {
-            display: none; margin-top: 25px; padding: 20px;
-            background: rgba(0, 255, 213, 0.1); border-radius: 18px; border-left: 5px solid var(--accent);
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0, 255, 213, 0.08); border-radius: 18px; 
+            border: 1px solid var(--accent);
         }
 
-        .custom-table { width: 100%; margin: 20px 0; border-collapse: collapse; font-size: 0.9rem; }
-        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 10px; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+        /* Diagrams & Data Visuals */
+        .diagram-container { display: flex; justify-content: space-around; margin: 25px 0; flex-wrap: wrap; gap: 20px; }
+        .splitting-box { text-align: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid var(--border); flex: 1; min-width: 280px; }
+        
+        .custom-table { width: 100%; margin: 20px 0; border-collapse: collapse; font-size: 0.85rem; }
+        .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; text-align: left; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
 
         .faq-card {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
             border-radius: 18px; padding: 20px; margin-bottom: 15px;
+        }
+
+        .spectro-series {
+            font-family: serif; font-style: italic; font-size: 1.1rem;
+            text-align: center; color: var(--accent); padding: 15px;
+            background: rgba(255,255,255,0.05); border-radius: 12px;
+            overflow-x: auto; white-space: nowrap;
         }
     </style>
 </head>
@@ -85,91 +125,126 @@
         <div class="glass-card">
             <h4 class="h-accent">Crystal Field Stabilization Energy (CFSE)</h4>
             <p class="theory-text">
-                CFSE is the stability gained by a transition metal complex through the splitting of degenerate $d$-orbitals into sets of different energies ($t_{2g}$ and $e_g$) in the presence of a ligand field.
+                Crystal Field Stabilization Energy (CFSE) is the energy difference between the electronic configuration in a ligand field and that in an isotropic (spherical) field. It explains the thermodynamic stability, magnetic properties, and vibrant colors of transition metal complexes.
             </p>
-            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin: 15px 0;">
-                $\text{CFSE}_{oct} = [-0.4n(t_{2g}) + 0.6n(e_g)]\Delta_o + nP$<br>
-                $\text{CFSE}_{tet} = [-0.6n(e) + 0.4n(t_2)]\Delta_t$
+            <div class="formula-container">
+                <div style="min-width: 400px;">
+                    $$\text{CFSE}_{oct} = [-0.4n(t_{2g}) + 0.6n(e_g)]\Delta_o + nP$$
+                    $$\text{CFSE}_{tet} = [-0.6n(e) + 0.4n(t_2)]\Delta_t$$
+                </div>
             </div>
-            <p class="theory-text small">Where $n$ is the number of electrons, $\Delta$ is the splitting parameter, and $P$ is the pairing energy.</p>
+            <p class="theory-text small" style="text-align: center;">
+                $\Delta$: Crystal Field Splitting | $P$: Pairing Energy | $n$: Number of electrons in level
+            </p>
         </div>
 
         <div class="glass-card">
-            <h5 class="text-center h-accent">CFSE Quantum Solver</h5>
+            <h5 class="text-center h-accent">Quantum CFSE Solver</h5>
             
-            <label class="form-label">Geometry</label>
-            <select id="geo" class="form-select" onchange="toggleSpin()">
-                <option value="oct">Octahedral (Oh)</option>
-                <option value="tet">Tetrahedral (Td)</option>
+            <label class="form-label">Complex Geometry</label>
+            <select id="geo" class="form-select" onchange="updateUI()">
+                <option value="oct">Octahedral ($O_h$)</option>
+                <option value="tet">Tetrahedral ($T_d$)</option>
             </select>
 
-            <label class="form-label">Number of d-Electrons (1-10)</label>
+            <label class="form-label">Electronic State ($d^1$ - $d^{10}$)</label>
             <input type="number" id="d_elec" class="form-control" value="4" min="1" max="10">
 
-            <div id="spin_section">
-                <label class="form-label">Ligand Field Strength</label>
+            <div id="spin_wrapper" class="spin-section-active">
+                <label class="form-label">Field Strength (Spin State)</label>
                 <select id="field" class="form-select">
                     <option value="high">Weak Field (High Spin)</option>
                     <option value="low">Strong Field (Low Spin)</option>
                 </select>
             </div>
 
-            <label class="form-label">Pairing Energy (P) - Optional</label>
-            <input type="text" id="p_energy" class="form-control" placeholder="Use smartParser logic e.g. 15000">
+            <label class="form-label">Pairing Energy ($P$)</label>
+            <input type="text" id="p_energy" class="form-control" placeholder="e.g. 18000 or 2e4">
 
-            <button onclick="calculateCFSE()" class="btn-calc">Calculate Stability</button>
+            <button onclick="calculateCFSE()" class="btn-calc">Analyze Stability</button>
             
             <div id="cfse_res" class="result-display"></div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Interpretation & Splitting Rules</h5>
-            <p class="theory-text">
-                <strong>Octahedral Splitting:</strong> The $d_{z^2}$ and $d_{x^2-y^2}$ orbitals point directly at ligands, rising in energy ($e_g$), while others drop ($t_{2g}$).<br>
-                <strong>Tetrahedral Splitting:</strong> The reverse occurs. However, because ligands do not point directly at any orbital, $\Delta_t$ is always smaller ($\approx 4/9 \Delta_o$).
-            </p>
-            <table class="custom-table">
-                <thead><tr><th>Geometry</th><th>Lower Set</th><th>Upper Set</th><th>Splitting Ratio</th></tr></thead>
-                <tbody>
-                    <tr><td>Octahedral</td><td>$t_{2g}$ (3)</td><td>$e_g$ (2)</td><td>$-0.4$ / $+0.6$</td></tr>
-                    <tr><td>Tetrahedral</td><td>$e$ (2)</td><td>$t_2$ (3)</td><td>$-0.6$ / $+0.4$</td></tr>
-                </tbody>
-            </table>
+            <h5 class="h-accent text-center">Orbital Energy Splitting</h5>
+            <div class="diagram-container">
+                <div class="splitting-box">
+                    <h6 style="color: var(--accent);">Octahedral Field</h6>
+                    <svg viewBox="0 0 200 120" width="100%">
+                        <line x1="20" y1="60" x2="60" y2="60" stroke="#64748b" stroke-dasharray="4" />
+                        <line x1="120" y1="30" x2="180" y2="30" stroke="#00ffd5" stroke-width="3" />
+                        <line x1="120" y1="35" x2="180" y2="35" stroke="#00ffd5" stroke-width="3" />
+                        <text x="185" y="35" fill="#fff" font-size="10">$e_g$</text>
+                        <line x1="120" y1="85" x2="180" y2="85" stroke="#38bdf8" stroke-width="3" />
+                        <line x1="120" y1="90" x2="180" y2="90" stroke="#38bdf8" stroke-width="3" />
+                        <line x1="120" y1="95" x2="180" y2="95" stroke="#38bdf8" stroke-width="3" />
+                        <text x="185" y="95" fill="#fff" font-size="10">$t_{2g}$</text>
+                    </svg>
+                </div>
+                <div class="splitting-box">
+                    <h6 style="color: #38bdf8;">Tetrahedral Field</h6>
+                    <svg viewBox="0 0 200 120" width="100%">
+                        <line x1="20" y1="60" x2="60" y2="60" stroke="#64748b" stroke-dasharray="4" />
+                        <line x1="120" y1="30" x2="180" y2="30" stroke="#38bdf8" stroke-width="3" />
+                        <line x1="120" y1="35" x2="180" y2="35" stroke="#38bdf8" stroke-width="3" />
+                        <line x1="120" y1="40" x2="180" y2="40" stroke="#38bdf8" stroke-width="3" />
+                        <text x="185" y="40" fill="#fff" font-size="10">$t_2$</text>
+                        <line x1="120" y1="85" x2="180" y2="85" stroke="#00ffd5" stroke-width="3" />
+                        <line x1="120" y1="90" x2="180" y2="90" stroke="#00ffd5" stroke-width="3" />
+                        <text x="185" y="90" fill="#fff" font-size="10">$e$</text>
+                    </svg>
+                </div>
+            </div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Scientific Applications</h5>
-            <p class="theory-text">
-                <strong>Color Chemistry:</strong> The $\Delta$ value determines the wavelength of light absorbed. Research into OLEDs uses CFSE to tune the exact emission color of Iridium complexes.
-            </p>
-            <p class="theory-text">
-                <strong>Catalysis:</strong> CFSE explains the "Inertness" of $d^3$ and $low\text{-}spin\ d^6$ complexes (like $[Co(NH_3)_6]^{3+}$), which is vital for designing stable industrial catalysts.
-            </p>
+            <h5 class="h-accent">The Spectrochemical Series</h5>
+            <p class="theory-text">Ligands are ranked by their ability to split d-orbitals ($\Delta$). This series is vital for predicting if a complex will be High or Low spin.</p>
+            <div class="spectro-series">
+                $I^- < Br^- < S^{2-} < Cl^- < F^- < OH^- < Ox^{2-} < H_2O < NH_3 < en < NO_2^- < CN^- < CO$
+            </div>
+            <p class="text-center small text-secondary mt-2">Weak Field (High Spin) $\leftarrow \text{Series Range} \rightarrow$ Strong Field (Low Spin)</p>
         </div>
 
-        <h5 class="text-center h-accent">CFSE Expert FAQ</h5>
-        <div id="faq-box">
+        <div class="glass-card">
+            <h5 class="h-accent">Application: Gemstone Coloration</h5>
+            <p class="theory-text">CFSE directly determines the color of gemstones. When the $\Delta$ value shifts due to the "Crystal Field" of the host lattice, the absorbed wavelength changes, producing different colors from the same metal ion.</p>
+            <table class="custom-table">
+                <thead><tr><th>Gemstone</th><th>Metal Ion</th><th>Host Lattice</th><th>Observed Color</th></tr></thead>
+                <tbody>
+                    <tr><td>Ruby</td><td>$Cr^{3+}$</td><td>$Al_2O_3$ (Corundum)</td><td>Deep Red</td></tr>
+                    <tr><td>Emerald</td><td>$Cr^{3+}$</td><td>$Be_3Al_2(SiO_3)_6$</td><td>Vivid Green</td></tr>
+                    <tr><td>Amethyst</td><td>$Fe^{3+}$</td><td>$SiO_2$ (Quartz)</td><td>Violet</td></tr>
+                    <tr><td>Jade</td><td>$Cr^{3+}/Fe^{2+}$</td><td>Silicate matrix</td><td>Green/White</td></tr>
+                </tbody>
+            </table>
+            <p class="theory-text small">Note: Ruby and Emerald both use $Cr^{3+}$, but the different lattice environments change the $\Delta$ value, shifting the color from Red to Green.</p>
+        </div>
+
+        <h5 class="text-center h-accent mb-4">Crystal Field Expert FAQ</h5>
+        <div id="faq-container">
             <script>
                 const faqs = [
-                    ["What is the Spectrochemical Series?", "A list of ligands ordered by field strength, from I- (weak) to CO (strong)."],
-                    ["Why is High/Low spin only for d4-d7?", "Because for d1-d3 and d8-d10, there is only one possible electronic arrangement."],
-                    ["What is the Pairing Energy (P)?", "The energy required to force two electrons into the same orbital."],
-                    ["How does oxidation state affect CFSE?", "Higher oxidation states (e.g. Fe3+ vs Fe2+) increase Δ due to stronger ligand attraction."],
-                    ["Can CFSE be zero?", "Yes, for d0, d5 (high spin), and d10 complexes, the CFSE is 0."],
-                    ["Why is Δt always smaller than Δo?", "Fewer ligands (4 vs 6) and less direct overlap with orbitals."],
-                    ["What is the Jahn-Teller Effect?", "A distortion in nonlinear molecules to reduce energy, often seen in d9 Cu2+ complexes."],
-                    ["Is CFSE relevant to magnetism?", "Yes, high spin complexes are more likely to be paramagnetic (more unpaired electrons)."],
-                    ["How do you convert Δo to cm-1?", "Δ is often measured in wave numbers (cm-1) via UV-Vis spectroscopy."],
-                    ["What happens in a Square Planar field?", "The splitting is even more complex, typically seen in d8 metals like Pt2+."],
-                    ["Does ligand size matter?", "Yes, bulky ligands can decrease Δ due to steric repulsion."],
-                    ["What is the 'Bari' center?", "The average energy of the 5 d-orbitals before splitting occurs."],
-                    ["How is CFSE used in Bio-inorganic chemistry?", "It explains why certain metals like Zinc (d10) are used as structural centers while Iron (d6) is used for electron transfer."],
-                    ["What is the relation between Δt and Δo?", "$\Delta_t \approx 0.44 \Delta_o$."],
-                    ["Why are strong field ligands like Cyanide dangerous?", "They bind so strongly to Iron (high Δ) that they permanently block oxygen transport."],
-                    ["Can temperature affect spin state?", "Yes, 'Spin-Crossover' materials can switch between high and low spin with temperature changes."]
+                    ["Why is Tetrahedral CFSE smaller?", "Tetrahedral splitting is ~44% of octahedral because there are fewer ligands and none point directly at the orbitals."],
+                    ["What is High Spin vs Low Spin?", "High spin occurs with weak ligands where Δ < P. Low spin occurs with strong ligands where Δ > P."],
+                    ["Can CFSE be zero?", "Yes, for d0, d5 (high spin), and d10 complexes, the energy stabilization and destabilization cancel each other out."],
+                    ["What is the Spectrochemical Series?", "An experimentally determined list of ligands arranged by their ability to split d-orbital energy levels."],
+                    ["How does oxidation state affect Δ?", "Higher oxidation states pull ligands closer, increasing the orbital repulsion and thus increasing Δ."],
+                    ["What is the Bari-center?", "The average energy of d-orbitals in a spherical field, serving as the zero-point for CFSE calculations."],
+                    ["How is color related to CFSE?", "The energy gap Δ corresponds to light absorption in the visible spectrum. The remaining light is the observed color."],
+                    ["What is the Jahn-Teller Effect?", "A distortion in non-linear molecules to remove degeneracy, often seen in d9 Cu2+ complexes."],
+                    ["Why are 4d and 5d metals low spin?", "Because the 4d/5d orbitals are larger and overlap better with ligands, creating a massive Δ that always exceeds P."],
+                    ["What is Pairing Energy (P)?", "The electrostatic repulsion energy that must be overcome to place two electrons in the same orbital."],
+                    ["Is CFSE relevant to magnetism?", "Yes. CFSE determines the number of unpaired electrons, which directly correlates to the magnetic moment."],
+                    ["Can CFSE predict solubility?", "Indirectly, as it influences lattice energy and hydration energy of transition metal ions."],
+                    ["What is Spin-Crossover?", "A condition where a complex switches between high and low spin states due to heat, pressure, or light."],
+                    ["How is Δt calculated from Δo?", "Roughly Δt = (4/9) Δo, assuming the same metal and ligands are used."],
+                    ["Why is Cyanide a strong ligand?", "Because it participates in π-backbonding, which significantly increases the d-orbital splitting energy."],
+                    ["Does geometry change CFSE?", "Yes. For example, Square Planar complexes (d8) gain significantly more CFSE than tetrahedral ones."]
                 ];
                 faqs.forEach(f => {
-                    document.write(`<div class="faq-card"><strong>${f[0]}</strong><br><small class="text-secondary">${f[1]}</small></div>`);
+                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
                 });
             </script>
         </div>
@@ -178,16 +253,22 @@
     </div>
 
     <script>
-        // Smart Parser for Pairing Energy adjustments
+        // Smart Parser for Numeric & Scientific Inputs
         function smartParser(v) {
-            if (!v || v.toString().trim() === "") return 0;
-            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**');
+            if (!v || v.toString().trim()==="") return 0;
+            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
             try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
         }
 
-        function toggleSpin() {
+        function updateUI() {
             const geo = document.getElementById('geo').value;
-            document.getElementById('spin_section').style.opacity = (geo === 'tet') ? "0.3" : "1";
+            const wrapper = document.getElementById('spin_wrapper');
+            if (geo === 'tet') {
+                wrapper.classList.add('spin-section-dimmed');
+                document.getElementById('field').value = "high"; // Tet is almost always High Spin
+            } else {
+                wrapper.classList.remove('spin-section-dimmed');
+            }
         }
 
         function calculateCFSE() {
@@ -196,41 +277,43 @@
             const field = document.getElementById('field').value;
             const P = smartParser(document.getElementById('p_energy').value);
             
-            let cfse = 0; let pCount = 0; let config = "";
+            let cfse = 0; let pCount = 0; let config = ""; let type = "Δo";
 
             if (geo === 'oct') {
                 if (field === 'low' && d >= 4 && d <= 7) {
-                    // Low Spin Octahedral
                     let t2g = Math.min(d, 6);
                     let eg = Math.max(0, d - 6);
                     cfse = (-0.4 * t2g) + (0.6 * eg);
                     if (d==4) pCount=1; if (d==5) pCount=2; if (d==6) pCount=3; if (d==7) pCount=1;
-                    config = `t2g<sup>${t2g}</sup> eg<sup>${eg}</sup>`;
+                    config = `t_{2g}^{${t2g}} e_g^{${eg}}`;
                 } else {
-                    // High Spin Octahedral
                     let t2g = (d <= 3) ? d : (d <= 5) ? 3 : (d <= 8) ? d - 2 : 6;
                     let eg = d - t2g;
                     cfse = (-0.4 * t2g) + (0.6 * eg);
                     if (d==6) pCount=1; if (d==7) pCount=2; if (d==8) pCount=3; if (d==9) pCount=4; if (d==10) pCount=5;
-                    config = `t2g<sup>${t2g}</sup> eg<sup>${eg}</sup>`;
+                    config = `t_{2g}^{${t2g}} e_g^{${eg}}`;
                 }
             } else {
-                // Tetrahedral (Always High Spin)
+                type = "Δt";
                 let e = (d <= 2) ? d : (d <= 5) ? 2 : (d <= 7) ? d - 3 : 4;
                 let t2 = d - e;
                 cfse = (-0.6 * e) + (0.4 * t2);
-                config = `e<sup>${e}</sup> t2<sup>${t2}</sup>`;
+                config = `e^{${e}} t_2^{${t2}}`;
             }
 
             const resDiv = document.getElementById('cfse_res');
             resDiv.innerHTML = `
-                <h6 style="color:var(--accent)">Results for d<sup>${d}</sup> ${geo.toUpperCase()}:</h6>
-                Configuration: ${config}<br>
-                <strong>CFSE: ${cfse.toFixed(1)} Δ</strong><br>
-                ${P > 0 ? `Total Energy: ${cfse.toFixed(1)}Δ + ${(pCount * P).toLocaleString()} P` : `Pairing Factors: ${pCount}P`}
+                <h6 style="color:var(--accent)">Stability Results ($d^{${d}}$):</h6>
+                <div style="font-size:1.1rem; margin: 10px 0; color: #fff;">
+                    Electronic Configuration: $${config}$<br>
+                    <strong>CFSE = ${cfse.toFixed(1)} ${type}</strong>
+                </div>
+                <div style="font-size:0.85rem; color:#94a3b8; border-top:1px solid var(--border); padding-top:10px;">
+                    ${P > 0 ? `Total Energy: ${cfse.toFixed(1)}${type} + ${(pCount * P).toLocaleString()} P` : `Unpaired/Pairing Factor: ${pCount}P`}
+                </div>
             `;
             resDiv.style.display = "block";
-            if(window.MathJax) MathJax.typesetPromise();
+            if (window.MathJax) MathJax.typesetPromise();
         }
 
         async function loadFooter() {
@@ -239,7 +322,7 @@
                 if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
             } catch (e) {}
         }
-        window.addEventListener('DOMContentLoaded', loadFooter);
+        window.addEventListener('DOMContentLoaded', () => { loadFooter(); updateUI(); });
     </script>
 </body>
 </html>
