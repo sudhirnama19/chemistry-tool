@@ -1,10 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Advanced Reaction Balancer | Chemistry Spark Lab</title>
+    <title>Ultra Pro Reaction Balancer | Chemistry Spark Lab</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,87 +33,65 @@
             margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* Clickable Header */
-        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
-        /* Card System */
         .glass-card { 
             background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-radius: 24px; padding: 25px; margin-bottom: 30px; 
             border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word; overflow: hidden;
         }
 
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
         .theory-text { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 
-        /* Calculator UI - FIXED INVISIBLE TEXT */
         .form-control {
-            background-color: var(--input-bg) !important; 
+            background-color: #161b22 !important; 
             color: #ffffff !important; 
             border: 1px solid #334155 !important; 
-            border-radius: 12px; padding: 18px;
+            border-radius: 12px; padding: 15px;
             font-size: 1.1rem;
-            display: block;
-            width: 100%;
+            display: block; width: 100%;
         }
-        .form-control::placeholder { color: #64748b; }
-        .form-control:focus { border-color: var(--accent) !important; box-shadow: 0 0 12px rgba(0, 255, 213, 0.2); outline: none; }
+        .form-control::placeholder { color: #64748b !important; }
 
         .btn-calc {
             background: linear-gradient(135deg, #0ea5e9, var(--accent));
-            color: #0b0f1a; border: none; width: 100%; padding: 18px;
+            color: #0b0f1a; border: none; width: 100%; padding: 15px;
             border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
             transition: 0.3s;
         }
         .btn-calc:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* Overflow Protection */
-        .formula-container, .table-container, .step-box {
+        .formula-container, .table-container, .step-box, .research-box {
             width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
             background: rgba(0,0,0,0.3); border-radius: 15px; margin: 20px 0; padding: 15px;
-        }
-
-        /* FIXED MOBILE OVERLAP FOR RESEARCH SECTION */
-        .example-scroll {
-            width: 100%;
-            border-left: 3px solid var(--accent);
-            padding: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 0 15px 15px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            word-break: break-all;
         }
 
         .custom-table { width: 100%; min-width: 550px; border-collapse: collapse; font-size: 0.85rem; }
         .custom-table th { color: var(--accent); border-bottom: 2px solid var(--border); padding: 12px; }
         .custom-table td { padding: 12px; border-bottom: 1px solid var(--border); color: #cbd5e1; }
 
-        /* Result Display */
         #balance-result { display: none; margin-top: 20px; animation: fadeIn 0.5s ease; }
-        .step-item { border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px; background: rgba(0,255,213,0.03); padding: 10px 15px; border-radius: 0 10px 10px 0; }
+        .step-item { border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .faq-card {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            border-radius: 18px; padding: 20px; margin-bottom: 15px;
-        }
-
-        .correction-badge {
-            background: rgba(255, 193, 7, 0.1); color: #ffc107;
-            padding: 5px 15px; border-radius: 50px; font-size: 0.8rem;
-            border: 1px solid #ffc107; display: inline-block; margin-bottom: 15px;
+            border-radius: 18px; padding: 25px; margin-bottom: 15px;
         }
     </style>
 </head>
-
 <body>
+
     <header class="main-header">
-        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
     </header>
 
     <div class="container-narrow">
@@ -120,30 +99,29 @@
         <div class="glass-card">
             <h4 class="h-accent">What is Chemical Reaction Balancing?</h4>
             <p class="theory-text">
-                Chemical reaction balancing is the process of ensuring the <strong>Law of Conservation of Mass</strong> is satisfied. This law states that atoms are neither created nor destroyed in a chemical reaction. Therefore, the number of atoms of each element must be equal on both the reactant and product sides.
+                Chemical reaction balancing is the fundamental process of aligning a chemical equation so that the <strong>Law of Conservation of Mass</strong> is strictly obeyed. In a closed system, matter is neither created nor destroyed; hence, the quantity of each element on the reactant side (left) must exactly match the quantity on the product side (right).
             </p>
             <div class="formula-container text-center">
-                $$\text{Reactants (Atoms)} = \text{Products (Atoms)}$$
-                <p class="small text-secondary mt-2">Example: $2H_2 + O_2 \rightarrow 2H_2O$</p>
+                $$\sum \text{Atoms}_{\text{Reactants}} = \sum \text{Atoms}_{\text{Products}}$$
+                <p class="small text-secondary mt-2">Example: $2H_2 + O_2 \rightarrow 2H_2O$ (4 Hydrogen, 2 Oxygen on both sides)</p>
             </div>
         </div>
 
         <div class="glass-card">
             <h5 class="h-accent text-center">Smart Equation Balancer</h5>
             <div class="mb-3">
-                <label class="form-label text-secondary small">Enter Chemical Equation (e.g., H2 + O2 = H2O)</label>
-                <input type="text" id="equationInput" class="form-control" placeholder="Fe + Cl2 = FeCl3" style="color: white !important;">
+                <label class="form-label text-secondary small">Enter Chemical Equation (e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2)</label>
+                <input type="text" id="equationInput" class="form-control" placeholder="Type equation here..." style="color: white !important; background-color: #161b22 !important;">
             </div>
-            <button onclick="solveEquation()" class="btn-calc">Balance Equation & Show Steps</button>
+            <button onclick="balanceEquation()" class="btn-calc">Balance Equation & Show Steps</button>
             
             <div id="balance-result">
                 <div class="result-display px-3 py-4 border border-info rounded-4 bg-dark mt-3">
-                    <div id="correctionLog"></div>
-                    <h6 class="text-accent fw-bold small text-uppercase">Balanced Equation:</h6>
-                    <div id="balancedOutput" class="h3 text-white mb-4"></div>
+                    <h6 class="text-accent">Balanced Equation:</h6>
+                    <div id="balancedOutput" class="h4 text-white mb-4"></div>
                     <hr class="border-secondary">
-                    <h6 class="text-accent fw-bold small text-uppercase">Step-by-Step Logic:</h6>
-                    <div id="stepsOutput" class="theory-text mt-3"></div>
+                    <h6 class="text-accent">Analytical Logic:</h6>
+                    <div id="stepsOutput" class="theory-text"></div>
                 </div>
             </div>
         </div>
@@ -163,15 +141,14 @@
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Aspects & Uses of Reaction Balance</h5>
-            <div class="row theory-text">
-                <div class="col-md-6">
-                    <strong>1. Stoichiometry:</strong> Provides the molar ratios needed for quantitative analysis.
-                    <br><strong>2. Yield Calculation:</strong> Essential for determining the theoretical yield of a product.
-                </div>
-                <div class="col-md-6">
-                    <strong>3. Limiting Reactants:</strong> Helps identify which reactant will run out first.
-                    <br><strong>4. Gas Laws:</strong> Used to calculate gas volumes in combustion reactions.
+            <h5 class="h-accent">Application in Scientific Research</h5>
+            <p class="theory-text">
+                In modern chemical engineering and scientific research, reaction balancing is the backbone of <strong>Green Chemistry</strong>. By precisely balancing equations, researchers can calculate the <strong>Atom Economy</strong>, a metric that measures the efficiency of a chemical process in terms of the atoms wasted.
+            </p>
+            <div class="research-box">
+                <div style="font-style: italic; font-size: 0.9rem; color: var(--accent);">
+                    <strong>Research Example: Carbon Capture</strong><br>
+                    Researchers use the reaction $CO_2 + 2KOH \rightarrow K_2CO_3 + H_2O$ to scrub carbon dioxide from industrial exhaust. Accurate balancing ensures that the exact tonnage of Potassium Hydroxide is calculated to prevent environmental contamination from excess reagents.
                 </div>
             </div>
         </div>
@@ -179,236 +156,306 @@
         <div class="glass-card">
             <h5 class="h-accent">Rules for Balancing Equations</h5>
             <ol class="theory-text">
-                <li>Never change the **subscripts** (the small numbers inside formulas).</li>
-                <li>Only change the **coefficients** (the numbers in front of formulas).</li>
-                <li>Balance complex molecules first, and save single elements (like $O_2$ or $H_2$) for last.</li>
-                <li>Check your work by counting atoms on both sides at the end.</li>
+                <li><strong>Subscripts are Sacred:</strong> Never alter the small numbers within a formula; doing so changes the chemical identity of the substance.</li>
+                <li><strong>Coefficients Only:</strong> Adjust only the large numbers in front of the molecules.</li>
+                <li><strong>Odd-Even Rule:</strong> If you have an odd number of atoms on one side and even on the other, try multiplying the odd side by 2.</li>
             </ol>
             <div class="table-container">
                 <table class="custom-table">
                     <thead>
                         <tr>
-                            <th>Unbalanced</th>
-                            <th>Balanced</th>
-                            <th>Type</th>
+                            <th>Unbalanced Equation</th>
+                            <th>Balanced Result</th>
+                            <th>Reaction Type</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>CH4 + O2 = CO2 + H2O</td><td>CH4 + 2O2 = CO2 + 2H2O</td><td>Combustion</td></tr>
-                        <tr><td>Fe + Cl2 = FeCl3</td><td>2Fe + 3Cl2 = 2FeCl3</td><td>Synthesis</td></tr>
-                        <tr><td>Al + HCl = AlCl3 + H2</td><td>2Al + 6HCl = 2AlCl3 + 3H2</td><td>Single Displacement</td></tr>
+                        <tr><td>P4 + O2 = P2O5</td><td>P4 + 5O2 = 2P2O5</td><td>Synthesis</td></tr>
+                        <tr><td>C3H8 + O2 = CO2 + H2O</td><td>C3H8 + 5O2 = 3CO2 + 4H2O</td><td>Combustion</td></tr>
+                        <tr><td>KClO3 = KCl + O2</td><td>2KClO3 = 2KCl + 3O2</td><td>Decomposition</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="glass-card">
-            <h5 class="h-accent">Application in Scientific Research</h5>
-            <p class="theory-text">
-                In **Pharmaceutical Research**, reaction balancing is critical for synthesizing drug compounds with 99%+ purity.
-            </p>
-            <div class="example-scroll">
-                <div class="text-white" style="font-style: italic;">
-                    $C_7H_6O_3 + C_4H_6O_3 \rightarrow C_9H_8O_4 + C_2H_4O_2$
-                    <p class="small text-secondary mt-2 mb-0">Research relies on this 1:1 molar ratio to minimize chemical waste (Green Chemistry).</p>
-                </div>
-            </div>
-        </div>
-
-        <h5 class="text-center h-accent mb-4">Frequently Asked Questions</h5>
+        <h5 class="text-center h-accent mb-4">Detailed Reaction Balancing FAQ</h5>
         <div id="faq-container">
             <script>
                 const faqs = [
-                    ["What is a coefficient?", "A number placed in front of a chemical formula in an equation."],
-                    ["Why can't I change subscripts?", "Changing subscripts changes the identity of the substance (e.g., H2O vs H2O2)."],
-                    ["What is the Law of Conservation of Mass?", "Matter is neither created nor destroyed during a chemical reaction."],
-                    ["What are the reactants?", "The substances you start with, located on the left side of the arrow."],
-                    ["What are products?", "The substances formed during the reaction, on the right side."],
-                    ["What is a skeleton equation?", "An unbalanced equation that just shows the chemical formulas."],
-                    ["Can coefficients be fractions?", "In final balanced equations, we usually use the smallest whole numbers."],
-                    ["How do I balance polyatomic ions?", "Treat them as a single unit if they appear unchanged on both sides."],
-                    ["What is a combustion reaction?", "A reaction where a substance reacts with oxygen, usually producing CO2 and H2O."],
-                    ["What is a limiting reactant?", "The reactant that is completely consumed first, stopping the reaction."],
-                    ["Does balancing apply to nuclear reactions?", "No, nuclear reactions involve mass-energy equivalence ($E=mc^2$)."],
-                    ["What if an equation can't be balanced?", "Check if the chemical formulas are written correctly first."],
-                    ["Is heat part of the balance?", "Heat is an energy change (Enthalpy), not a mass change, so it's not 'balanced' by atoms."],
-                    ["What does the arrow mean?", "It represents 'yields' or 'reacts to form'."],
-                    ["What is stoichiometry?", "The study of quantitative relationships in chemical reactions."],
-                    ["Why do we balance equations?", "To satisfy the laws of physics and perform accurate chemical experiments."]
+                    ["Why is a balanced equation necessary for stoichiometry?", "A balanced equation provides the specific molar ratios between reactants and products. Without these ratios, it is impossible to calculate how many grams of a reactant are needed to produce a specific amount of product, leading to failed laboratory experiments and industrial waste."],
+                    ["What happens if I change the subscripts while balancing?", "Changing a subscript alters the chemical substance itself. For example, changing H2O (Water) to H2O2 (Hydrogen Peroxide) changes a life-sustaining liquid into a caustic bleaching agent. Balancing must only involve coefficients to keep the substances identical."],
+                    ["Does balancing an equation involve the states of matter?", "While symbols like (s), (l), (g), and (aq) are important for understanding the reaction environment, they do not change the number of atoms. Balancing focuses purely on the atomic count regardless of whether the substance is a solid or a gas."],
+                    ["How do I handle polyatomic ions that appear on both sides?", "The most efficient way to balance equations with polyatomic ions (like SO4 or NO3) is to treat the entire ion as a single unit or 'super-atom'. If you have one sulfate on the left and one on the right, they are already balanced relative to each other."],
+                    ["What is a limiting reactant in a balanced equation?", "The limiting reactant is the substance that is completely consumed first. Even in a perfectly balanced equation, if you do not provide the reactants in the exact molar ratio specified by the coefficients, one will run out, and the reaction will stop."],
+                    ["Can the coefficients in a balanced equation be fractions?", "In intermediate steps, fractions are often used. However, the final standard form of a chemical equation should use the lowest possible whole-number coefficients to represent discrete molecules or formula units accurately."],
+                    ["Is the mass of the electrons considered in balancing?", "No. Chemical reactions involve the rearrangement of electrons, but the mass of an electron is so negligible compared to protons and neutrons that it does not affect the mass balance required by the Law of Conservation of Mass."],
+                    ["Why do combustion reactions always seem harder to balance?", "Combustion reactions involve oxygen ($O_2$), which often ends up in two different product molecules ($CO_2$ and $H_2O$). This distribution requires a systematic approach, usually balancing Carbon first, then Hydrogen, and Oxygen last."],
+                    ["What is an 'atom economy' in green chemistry?", "Atom economy is a calculation derived from balanced equations: $(\text{Mass of Desired Product} / \text{Total Mass of Reactants}) \times 100$. High atom economy means the reaction is 'green' because most of the reactant atoms end up in the final product."],
+                    ["Does balancing an equation tell us how fast the reaction occurs?", "No. Balancing only provides information about the 'before' and 'after' states (Stoichiometry). The speed of the reaction (Kinetics) is determined by temperature, concentration, and catalysts, not the coefficients."],
+                    ["What is the difference between a skeleton equation and a balanced one?", "A skeleton equation simply lists the formulas of the reactants and products. It shows what is reacting but violates the Law of Conservation of Mass. A balanced equation corrects this by adding coefficients."],
+                    ["How do you balance redox reactions specifically?", "Redox reactions require balancing not just the atoms, but also the total charge. This is often done using the half-reaction method, ensuring the number of electrons lost equals the number of electrons gained."],
+                    ["Are there reactions that cannot be balanced?", "Any real chemical reaction can be balanced. If an equation appears 'unbalanceable,' it usually indicates an error in the chemical formulas or a missing product that was overlooked during the observation phase."],
+                    ["What is the significance of the arrow symbol?", "The arrow ($\rightarrow$) signifies a chemical change or 'yield'. It separates the starting materials from the new substances formed. A double arrow ($\rightleftharpoons$) indicates that the reaction is reversible and reaches equilibrium."],
+                    ["How does temperature affect a balanced equation?", "Temperature can shift the equilibrium or change the state of matter, but it does not change the balanced coefficients. The ratio of atoms required for the reaction to occur remains a constant physical property of the substances involved."],
+                    ["What is the role of catalysts in balancing?", "Catalysts speed up a reaction but are not consumed in the process. Therefore, they appear above the reaction arrow and do not factor into the mass balance coefficients of the reactants or products."]
                 ];
                 faqs.forEach(f => {
-                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                    document.write(`<div class="faq-card"><p class="mb-2" style="font-weight:700; color:var(--accent); font-size:1.05rem;">${f[0]}</p><p class="text-secondary mb-0" style="font-size:0.92rem; line-height:1.6;">${f[1]}</p></div>`);
                 });
             </script>
         </div>
+
         <div id="footer-container"></div>
     </div>
 
     <script>
-        /* ---------- Smart Parser Logic (March 6 Requirement) ---------- */
-        function smartParser(v) {
-            if (!v || v.toString().trim()==="") return 0;
-            let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
-            try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
-        }
 
-        /* ---------- Matrix Engine Utilities ---------- */
-        function gcd(a, b) { return b ? gcd(b, a % b) : Math.abs(a); }
-        function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+function parseFormula(formula) {
 
-        class Fraction {
-            constructor(n, d = 1) {
-                if (d === 0) throw "div0";
-                let g = gcd(n, d);
-                this.n = n / g;
-                this.d = d / g;
-                if (this.d < 0) { this.n *= -1; this.d *= -1; }
-            }
-            add(f) { return new Fraction(this.n * f.d + f.n * this.d, this.d * f.d); }
-            sub(f) { return new Fraction(this.n * f.d - f.n * this.d, this.d * f.d); }
-            mul(f) { return new Fraction(this.n * f.n, this.d * f.d); }
-            div(f) { return new Fraction(this.n * f.d, this.d * f.n); }
-            isZero() { return this.n === 0; }
-        }
+let stack=[{}];
+let i=0;
 
-        function parseComp(formula) {
-            let stack = [{}];
-            let i = 0;
-            while (i < formula.length) {
-                if (formula[i] === "(") { stack.push({}); i++; }
-                else if (formula[i] === ")") {
-                    i++;
-                    let num = "";
-                    while (/\d/.test(formula[i])) num += formula[i++];
-                    let mult = parseInt(num || "1");
-                    let group = stack.pop();
-                    let top = stack[stack.length - 1];
-                    for (let el in group) top[el] = (top[el] || 0) + group[el] * mult;
-                } else {
-                    let el = formula[i++];
-                    if (/[a-z]/.test(formula[i])) el += formula[i++];
-                    let num = "";
-                    while (/\d/.test(formula[i])) num += formula[i++];
-                    let count = parseInt(num || "1");
-                    let top = stack[stack.length - 1];
-                    top[el] = (top[el] || 0) + count;
-                }
-            }
-            return stack[0];
-        }
+while(i<formula.length){
 
-        /* ---------- Step-by-Step Generator Logic ---------- */
-        function generateSteps(left, right, coeff, elList) {
-            let steps = [];
-            
-            // Step 1: Initial State
-            let leftCounts = {}, rightCounts = {};
-            elList.forEach(el => {
-                leftCounts[el] = 0; rightCounts[el] = 0;
-                left.forEach(c => leftCounts[el] += (parseComp(c)[el] || 0));
-                right.forEach(c => rightCounts[el] += (parseComp(c)[el] || 0));
-            });
+if(formula[i]=="("){
 
-            let countStrL = elList.map(e => `${e}=${leftCounts[e]}`).join(", ");
-            let countStrR = elList.map(e => `${e}=${rightCounts[e]}`).join(", ");
-            steps.push(`<strong>Step 1:</strong> List atoms. Left: ${countStrL}. Right: ${countStrR}.`);
+stack.push({});
+i++;
 
-            // Step 2 & 3: Finding imbalances
-            let changedEl = elList.find(el => leftCounts[el] !== rightCounts[el] * coeff[left.length]) || elList[0];
-            steps.push(`<strong>Step 2:</strong> Balance ${changedEl} by applying matrix coefficients to the compounds.`);
-            steps.push(`<strong>Step 3:</strong> ${changedEl} is balanced. Adjusting remaining elements to satisfy the Law of Conservation.`);
+}
 
-            return steps.map(s => `<div class="step-item">${s}</div>`).join("");
-        }
+else if(formula[i]==")"){
 
-        function solveEquation() {
-            let input = document.getElementById("equationInput").value.trim();
-            const resultArea = document.getElementById('balance-result');
-            const balancedOutput = document.getElementById('balancedOutput');
-            const stepsOutput = document.getElementById('stepsOutput');
-            const log = document.getElementById("correctionLog");
-            
-            log.innerHTML = "";
-            if (input.includes("H20")) {
-                input = input.replace(/H20/g, "H2O");
-                log.innerHTML += `<div class="correction-badge">Corrected H20 → H2O</div>`;
-            }
+i++;
 
-            let parts = input.split(/[=→]/);
-            if (parts.length !== 2) {
-                alert("Please use '=' or '->' to separate reactants and products.");
-                return;
-            }
+let num="";
+while(i<formula.length && /\d/.test(formula[i])) num+=formula[i++];
 
-            let left = parts[0].split("+").map(s => s.trim());
-            let right = parts[1].split("+").map(s => s.trim());
-            let all = [...left, ...right];
+let mult=parseInt(num||"1");
 
-            let elements = new Set();
-            all.forEach(c => Object.keys(parseComp(c)).forEach(e => elements.add(e)));
-            let elList = [...elements];
+let top=stack.pop();
+let prev=stack[stack.length-1];
 
-            // Build Matrix
-            let matrix = elList.map(el => {
-                return all.map((c, i) => {
-                    let p = parseComp(c);
-                    let val = p[el] || 0;
-                    return new Fraction(i < left.length ? val : -val);
-                });
-            });
+for(let el in top){
+prev[el]=(prev[el]||0)+top[el]*mult;
+}
 
-            let rows = matrix.length, cols = all.length, pivot = 0;
+}
 
-            // Gaussian Elimination
-            for (let j = 0; j < cols && pivot < rows; j++) {
-                let sel = pivot;
-                while (sel < rows && matrix[sel][j].isZero()) sel++;
-                if (sel === rows) continue;
-                [matrix[pivot], matrix[sel]] = [matrix[sel], matrix[pivot]];
-                let div = matrix[pivot][j];
-                for (let k = j; k < cols; k++) matrix[pivot][k] = matrix[pivot][k].div(div);
-                for (let i = 0; i < rows; i++) {
-                    if (i !== pivot) {
-                        let factor = matrix[i][j];
-                        for (let k = j; k < cols; k++) matrix[i][k] = matrix[i][k].sub(factor.mul(matrix[pivot][k]));
-                    }
-                }
-                pivot++;
-            }
+else{
 
-            // Solver
-            let sol = Array.from({ length: cols }, () => new Fraction(1));
-            for (let i = pivot - 1; i >= 0; i--) {
-                let lead = matrix[i].findIndex(v => !v.isZero());
-                let sum = new Fraction(0);
-                for (let j = lead + 1; j < cols; j++) sum = sum.add(matrix[i][j].mul(sol[j]));
-                sol[lead] = sum.mul(new Fraction(-1));
-            }
+let el=formula[i++];
+while(i<formula.length && /[a-z]/.test(formula[i])) el+=formula[i++];
 
-            let common = 1;
-            sol.forEach(f => common = lcm(common, f.d));
-            let coeff = sol.map(f => Math.abs(f.n * (common / f.d)));
-            let g = coeff.reduce((a, b) => gcd(a, b));
-            coeff = coeff.map(x => x / g);
+let num="";
+while(i<formula.length && /\d/.test(formula[i])) num+=formula[i++];
 
-            // Construct Balanced String
-            let resL = left.map((c, i) => (coeff[i] === 1 ? "" : coeff[i]) + c).join(" + ");
-            let resR = right.map((c, i) => (coeff[i + left.length] === 1 ? "" : coeff[i + left.length]) + c).join(" + ");
+let count=parseInt(num||"1");
 
-            balancedOutput.innerHTML = `${resL} → ${resR}`;
-            stepsOutput.innerHTML = generateSteps(left, right, coeff, elList);
+let top=stack[stack.length-1];
+top[el]=(top[el]||0)+count;
 
-            resultArea.style.display = "block";
-            MathJax.typesetPromise();
-        }
+}
 
-        async function loadFooter() {
-            try {
-                const response = await fetch('footer.html');
-                if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
-            } catch (e) {}
-        }
-        window.addEventListener('DOMContentLoaded', loadFooter);
-    </script>
+}
+
+return stack[0];
+
+}
+
+function getAtoms(molecules,coeffs){
+
+let atoms={};
+
+for(let i=0;i<molecules.length;i++){
+
+let parsed=parseFormula(molecules[i]);
+
+for(let el in parsed){
+
+atoms[el]=(atoms[el]||0)+parsed[el]*coeffs[i];
+
+}
+
+}
+
+return atoms;
+
+}
+
+function gcd(a,b){
+return b?gcd(b,a%b):Math.abs(a);
+}
+
+function lcm(a,b){
+return Math.abs(a*b)/gcd(a,b);
+}
+
+function balanceEquation(){
+
+let input=document.getElementById("equationInput").value.trim();
+
+if(!input.includes("=")&&!input.includes("->")){
+alert("Use '=' or '->'");
+return;
+}
+
+input=input.replace("->","=");
+
+let sides=input.split("=");
+
+let left=sides[0].split("+").map(x=>x.trim());
+let right=sides[1].split("+").map(x=>x.trim());
+
+let mol=[...left,...right];
+
+let elements=new Set();
+
+let parsed=mol.map(m=>{
+let p=parseFormula(m);
+for(let e in p) elements.add(e);
+return p;
+});
+
+elements=[...elements];
+
+let matrix=[];
+
+for(let el of elements){
+
+let row=[];
+
+for(let i=0;i<mol.length;i++){
+
+let v=parsed[i][el]||0;
+
+if(i<left.length) row.push(v);
+else row.push(-v);
+
+}
+
+matrix.push(row);
+
+}
+
+let rows=matrix.length;
+let cols=matrix[0].length;
+
+for(let r=0;r<rows;r++){
+
+let pivot=matrix[r][r];
+
+if(!pivot) continue;
+
+for(let c=r;c<cols;c++) matrix[r][c]/=pivot;
+
+for(let r2=0;r2<rows;r2++){
+
+if(r2==r) continue;
+
+let factor=matrix[r2][r];
+
+for(let c=r;c<cols;c++) matrix[r2][c]-=factor*matrix[r][c];
+
+}
+
+}
+
+let sol=new Array(cols).fill(0);
+
+sol[cols-1]=1;
+
+for(let r=rows-1;r>=0;r--){
+
+let sum=0;
+
+for(let c=r+1;c<cols;c++) sum+=matrix[r][c]*sol[c];
+
+sol[r]=-sum/matrix[r][r];
+
+}
+
+let den=sol.map(x=>{
+let s=x.toString();
+if(!s.includes(".")) return 1;
+return Math.pow(10,s.split(".")[1].length);
+});
+
+let mult=den.reduce((a,b)=>lcm(a,b));
+
+sol=sol.map(x=>Math.round(x*mult));
+
+let g=sol.reduce((a,b)=>gcd(a,b));
+
+sol=sol.map(x=>x/g);
+
+displayResult(left,right,sol);
+
+generateChemistrySteps(left,right,sol);
+
+}
+
+function displayResult(left,right,coef){
+
+let L="";
+let R="";
+
+for(let i=0;i<left.length;i++){
+
+L+=(coef[i]>1?coef[i]:"")+left[i];
+
+if(i<left.length-1) L+=" + ";
+
+}
+
+for(let i=0;i<right.length;i++){
+
+R+=(coef[i+left.length]>1?coef[i+left.length]:"")+right[i];
+
+if(i<right.length-1) R+=" + ";
+
+}
+
+document.getElementById("balancedOutput").innerHTML=L+" → "+R;
+
+document.getElementById("balance-result").style.display="block";
+
+}
+
+function generateChemistrySteps(left,right,coef){
+
+let steps="";
+
+let atomsLeft=getAtoms(left,new Array(left.length).fill(1));
+let atomsRight=getAtoms(right,new Array(right.length).fill(1));
+
+steps+=`<div class="step-item"><b>Step 1: List atoms.</b><br>
+Left: ${JSON.stringify(atomsLeft)}<br>
+Right: ${JSON.stringify(atomsRight)}
+</div>`;
+
+steps+=`<div class="step-item"><b>Step 2: Balance metals first.</b><br>
+Adjust coefficients to equalize metal atoms on both sides.
+</div>`;
+
+steps+=`<div class="step-item"><b>Step 3: Balance non-metals (C, N, S etc).</b></div>`;
+
+steps+=`<div class="step-item"><b>Step 4: Balance Hydrogen atoms.</b></div>`;
+
+steps+=`<div class="step-item"><b>Step 5: Balance Oxygen atoms last.</b></div>`;
+
+let atomsFinalLeft=getAtoms(left,coef.slice(0,left.length));
+let atomsFinalRight=getAtoms(right,coef.slice(left.length));
+
+steps+=`<div class="step-item"><b>Final Atom Check:</b><br>
+Left: ${JSON.stringify(atomsFinalLeft)}<br>
+Right: ${JSON.stringify(atomsFinalRight)}
+</div>`;
+
+document.getElementById("stepsOutput").innerHTML=steps;
+
+}
+
+</script>
 </body>
 </html>
