@@ -765,19 +765,15 @@
 
     <script>
     window.addEventListener('DOMContentLoaded', () => {
-        // Targets your specific .tool-card class
         const cards = document.querySelectorAll('.tool-card');
         
-        // SEO Fix: Only run if cards exist on the current page
-        if (cards && cards.length > 0) {
+        // Safety check: Only run if cards actually exist to prevent console errors
+        if (cards.length > 0) {
             cards.forEach((card, index) => {
-                // Initial hidden state
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
-                
-                // Animate with a slight delay for each card
                 setTimeout(() => {
-                    card.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                    card.style.transition = '0.6s cubic-bezier(0.23, 1, 0.32, 1)';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, 60 * index);
