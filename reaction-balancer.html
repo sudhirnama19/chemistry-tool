@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultra Pro Reaction Balancer | Chemistry Spark Lab</title>
+    <title>Matrix Equation Balancer | Chemistry Spark Lab</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,12 +28,12 @@
         body { 
             background: radial-gradient(circle at top right, #1e293b, #0b0f1a);
             color: #f8fafc; font-family: 'Inter', sans-serif; line-height: 1.7;
-            margin: 0; padding: 0; overflow-x: hidden;
+            margin: 0; padding: 0;
         }
 
         .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
-        .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+        .main-header a { text-decoration: none; color: var(--accent); }
+        .main-header h1 { font-size: 1.3rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; }
 
@@ -45,7 +45,6 @@
 
         .h-accent { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
 
-        /* UI FOR THE BALANCER */
         .form-control {
             background-color: #161b22 !important; 
             color: #ffffff !important; 
@@ -53,20 +52,18 @@
             border-radius: 12px; padding: 18px;
             font-size: 1.2rem;
         }
-        .form-control::placeholder { color: #64748b !important; }
 
         .btn-calc {
             background: linear-gradient(135deg, #0ea5e9, var(--accent));
             color: #0b0f1a; border: none; width: 100%; padding: 18px;
             border-radius: 12px; font-weight: 800; margin-top: 20px; text-transform: uppercase;
-            transition: 0.3s; font-size: 1rem;
+            transition: 0.3s;
         }
         .btn-calc:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 213, 0.3); }
 
         .result-box {
             display: none; background: rgba(0,0,0,0.5); border-radius: 20px; 
             padding: 25px; margin-top: 25px; border: 1px solid var(--accent);
-            animation: fadeIn 0.6s ease;
         }
 
         .correction-badge {
@@ -75,185 +72,179 @@
             border: 1px solid #ffc107; display: inline-block; margin-bottom: 15px;
         }
 
-        .step-item { border-left: 3px solid var(--accent); padding-left: 15px; margin-bottom: 20px; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .faq-card {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            border-radius: 18px; padding: 25px; margin-bottom: 15px;
-        }
+        .step-item { border-left: 3px solid var(--accent); padding-left: 15px; margin-bottom: 15px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
+        <a href="index.html"><h1>Advanced Chemistry Hub</h1></a>
     </header>
 
     <div class="container-narrow">
-        
         <div class="glass-card">
-            <h5 class="h-accent text-center">Ultra Pro Equation Balancer</h5>
-            <p class="small text-secondary text-center mb-4">Enter any complex equation. Missing products or incorrect skeletons will be automatically corrected.</p>
+            <h5 class="h-accent text-center">Matrix-Based Equation Balancer</h5>
+            <p class="small text-secondary text-center mb-4">Solves equations using Gaussian Elimination and Null Space analysis.</p>
             
             <div class="mb-3">
-                <input type="text" id="eqInput" class="form-control" placeholder="CH4 + O2 = CO2 + H2O" autocomplete="off">
+                <input type="text" id="eqInput" class="form-control" placeholder="e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2" autocomplete="off">
             </div>
             
-            <button onclick="masterBalance()" class="btn-calc">
-                <i class="fa-solid fa-atom me-2"></i> Balance & Correct Reaction
+            <button onclick="solveEquation()" class="btn-calc">
+                <i class="fa-solid fa-calculator me-2"></i> Solve via Linear Algebra
             </button>
 
             <div id="resultArea" class="result-box">
-                <div id="correctionMsg"></div>
-                <h6 class="text-accent small text-uppercase fw-bold">Balanced Equation:</h6>
+                <div id="correctionLog"></div>
+                <h6 class="text-accent small text-uppercase fw-bold">Balanced Result:</h6>
                 <div id="balancedOutput" class="h3 text-white my-3"></div>
                 <hr style="border-color: rgba(255,255,255,0.1)">
-                <h6 class="text-accent small text-uppercase fw-bold">Mathematical Logic Steps:</h6>
-                <div id="logicOutput" class="small text-secondary"></div>
+                <h6 class="text-accent small text-uppercase fw-bold">Mathematical Derivation:</h6>
+                <div id="mathSteps" class="text-secondary"></div>
             </div>
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">The Matrix Solver Method</h5>
-            <p class="theory-text">
-                Unlike simple trial-and-error, this balancer uses <strong>Linear Algebra</strong>. Every chemical reaction is a system of equations where each element must satisfy:
-            </p>
-            <div class="text-center my-4 p-3 bg-dark rounded-3">
-                $$ \mathbf{A} \vec{x} = \vec{0} $$
-                <p class="small text-secondary mt-2">Where $A$ is the element matrix and $x$ is the vector of coefficients.</p>
-            </div>
+            <h5 class="h-accent">The Math Behind the Balancer</h5>
             <p class="small text-secondary">
-                This approach allows for the solving of complex redox reactions, such as the decomposition of nitrogen triiodide or the oxidation of potassium permanganate, which are impossible to solve by inspection.
+                For a reaction like $aA + bB \rightarrow cC + dD$, we build a matrix where each row represents an element (C, H, O, etc.). We solve for the vector $\vec{x} = [a, b, c, d]^T$ such that:
+                $$ \text{Matrix} \cdot \vec{x} = 0 $$
+                The coefficients must be the smallest integers, obtained by finding the **Least Common Multiple** of the denominators in the Reduced Row Echelon Form.
             </p>
         </div>
-
-        <h5 class="text-center h-accent mb-4">Pro Balancing FAQ</h5>
-        <div id="faq-container">
-            <script>
-                const faqs = [
-                    ["How does the engine handle incomplete reactions?", "The 'Correction Logic' checks for element conservation. If you enter 'KMnO4 + HCl = MnCl2', the engine detects missing Chlorine and Potassium products and adds them to make the reaction chemically valid."],
-                    ["Can it balance organic combustion?", "Yes. By identifying Carbon and Hydrogen ratios, it calculates the precise Oxygen demand (even if O2 is the only reactant provided)."],
-                    ["What is Gaussian Elimination in Chemistry?", "It is a mathematical technique to simplify the element matrix into 'Reduced Row Echelon Form,' which directly reveals the smallest whole-number coefficients."],
-                    ["Does it support parentheses like (NH4)2SO4?", "The recursive parser breaks down polyatomic ions into their constituent atoms before building the matrix."]
-                ];
-                faqs.forEach(f => {
-                    document.write(`<div class="faq-card"><strong>${f[0]}</strong><p class="small text-secondary mt-2">${f[1]}</p></div>`);
-                });
-            </script>
-        </div>
-
-        <div id="footer-container"></div>
     </div>
 
     <script>
         /**
-         * ULTRA PRO CHEMICAL SOLVER ENGINE
+         * FRACTION HANDLER & MATH TOOLS
          */
+        function gcd(a, b) { return b === 0 ? Math.abs(a) : gcd(b, a % b); }
+        function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
 
-        function parseMolecule(mol) {
-            const elementRegex = /([A-Z][a-z]*)(\d*)/g;
-            const bracketRegex = /\(([^)]+)\)(\d*)/g;
+        class Fraction {
+            constructor(n, d = 1) {
+                if (d === 0) throw "DivByZero";
+                let common = gcd(n, d);
+                this.n = n / common;
+                this.d = d / common;
+                if (this.d < 0) { this.n = -this.n; this.d = -this.d; }
+            }
+            add(f) { return new Fraction(this.n * f.d + f.n * this.d, this.d * f.d); }
+            sub(f) { return new Fraction(this.n * f.d - f.n * this.d, this.d * f.d); }
+            mul(f) { return new Fraction(this.n * f.n, this.d * f.d); }
+            div(f) { return new Fraction(this.n * f.d, this.d * f.n); }
+            isZero() { return this.n === 0; }
+        }
+
+        /**
+         * CHEMICAL PARSER
+         */
+        function parseComp(compound) {
+            const elRegex = /([A-Z][a-z]*)(\d*)/g;
+            const brRegex = /\(([^)]+)\)(\d*)/g;
             let counts = {};
 
-            // Handle Brackets (e.g., Ca(OH)2)
-            let bMatch;
-            while ((bMatch = bracketRegex.exec(mol)) !== null) {
-                let inside = bMatch[1];
-                let multiplier = parseInt(bMatch[2] || "1");
-                let subCounts = parseMolecule(inside);
-                for (let el in subCounts) {
-                    counts[el] = (counts[el] || 0) + (subCounts[el] * multiplier);
-                }
-                mol = mol.replace(bMatch[0], "");
+            let m;
+            while ((m = brRegex.exec(compound)) !== null) {
+                let sub = parseComp(m[1]);
+                let mult = parseInt(m[2] || "1");
+                for (let e in sub) counts[e] = (counts[e] || 0) + (sub[e] * mult);
+                compound = compound.replace(m[0], "");
             }
-
-            // Handle remaining elements
-            let eMatch;
-            while ((eMatch = elementRegex.exec(mol)) !== null) {
-                let el = eMatch[1];
-                let count = parseInt(eMatch[2] || "1");
-                counts[el] = (counts[el] || 0) + count;
+            while ((m = elRegex.exec(compound)) !== null) {
+                counts[m[1]] = (counts[m[1]] || 0) + parseInt(m[2] || "1");
             }
             return counts;
         }
 
-        function getGcd(a, b) { return b === 0 ? a : getGcd(b, a % b); }
-        function getLcm(a, b) { return (a * b) / getGcd(a, b); }
+        /**
+         * GAUSSIAN ELIMINATION ENGINE
+         */
+        function solveEquation() {
+            let input = document.getElementById('eqInput').value.trim();
+            const logBox = document.getElementById('correctionLog');
+            logBox.innerHTML = "";
 
-        function masterBalance() {
-            let rawInput = document.getElementById('eqInput').value.trim();
-            const resultArea = document.getElementById('resultArea');
-            const balancedOutput = document.getElementById('balancedOutput');
-            const logicOutput = document.getElementById('logicOutput');
-            const correctionMsg = document.getElementById('correctionMsg');
-
-            correctionMsg.innerHTML = "";
-            
-            // 1. AUTO-CORRECTION ENGINE
-            // Correcting CH4 + O2 -> CO2 + H2O (User's specific issue)
-            if (rawInput.toLowerCase() === "ch4 + o2 = co2 + h20") {
-                rawInput = "CH4 + O2 = CO2 + H2O"; // Fixed the 'zero' in H20
+            // AUTO-CORRECTION HEURISTICS
+            if (input.includes("H20")) { 
+                input = input.replace(/H20/g, "H2O"); 
+                logBox.innerHTML += `<div class="correction-badge">Corrected 'H20' to 'H2O'</div>`;
+            }
+            if (input.includes("KMnO4") && input.includes("HCl") && !input.includes("Cl2")) {
+                input += " + Cl2";
+                logBox.innerHTML += `<div class="correction-badge">Missing Redox Product: Added Cl2</div>`;
             }
 
-            // Logic to add missing products for common Redox
-            if (rawInput.includes("KMnO4") && rawInput.includes("HCl") && !rawInput.includes("Cl2")) {
-                rawInput += " + Cl2 + KCl";
-                correctionMsg.innerHTML = "<div class='correction-badge'>Auto-Corrected: Added Cl2 and KCl products</div>";
-            }
+            let parts = input.split(/[=→]/);
+            if (parts.length !== 2) return alert("Use '=' or '->'");
 
-            // 2. MATRIX SOLVER INITIALIZATION
-            let sides = rawInput.split(/[=→]/);
-            if (sides.length !== 2) { alert("Use '=' or '->'"); return; }
+            let left = parts[0].split('+').map(s => s.trim());
+            let right = parts[1].split('+').map(s => s.trim());
+            let all = [...left, ...right];
 
-            let left = sides[0].split('+').map(s => s.trim());
-            let right = sides[1].split('+').map(s => s.trim());
-            let allMols = [...left, ...right];
-
-            // Identify all elements
             let elements = new Set();
-            allMols.forEach(m => {
-                let p = parseMolecule(m);
-                Object.keys(p).forEach(el => elements.add(el));
+            all.forEach(c => Object.keys(parseComp(c)).forEach(e => elements.add(e)));
+            let elList = Array.from(elements);
+
+            // Build Matrix A (Rows: Elements, Cols: Compounds)
+            let matrix = elList.map(el => {
+                return all.map((c, i) => {
+                    let p = parseComp(c);
+                    let val = p[el] || 0;
+                    return new Fraction(i < left.length ? val : -val);
+                });
             });
-            let elementList = Array.from(elements);
 
-            // HARDCODED SOLVER FOR COMPLEX CASES (Demonstrating Matrix Result)
-            let coeffs = [];
-            let steps = "";
-
-            if (rawInput.includes("CH4")) {
-                coeffs = [1, 2, 1, 2];
-                steps = "<div class='step-item'><strong>Carbon Check:</strong> 1 atom on both sides.</div><div class='step-item'><strong>Hydrogen Check:</strong> 4 on left, 2 on right. Coefficient 2 applied to H2O.</div><div class='step-item'><strong>Oxygen Check:</strong> 4 on right, 2 on left. Coefficient 2 applied to O2.</div>";
-            } else if (rawInput.includes("KMnO4")) {
-                coeffs = [2, 16, 2, 2, 8, 5];
-                steps = "<div class='step-item'><strong>Redox Logic:</strong> Mn reduces (+7 to +2). Cl oxidizes (-1 to 0).</div><div class='step-item'><strong>Electron Balance:</strong> 10 electrons transferred per mole of KMnO4.</div>";
-            } else {
-                // Simplified Matrix Logic Display
-                coeffs = allMols.map(() => 1);
-                steps = "<div class='step-item'>Algorithm identified atomic vectors... System solved via Gaussian elimination.</div>";
+            // RREF
+            let rows = matrix.length;
+            let cols = all.length;
+            let pivot = 0;
+            for (let j = 0; j < cols && pivot < rows; j++) {
+                let sel = pivot;
+                while (sel < rows && matrix[sel][j].isZero()) sel++;
+                if (sel === rows) continue;
+                [matrix[pivot], matrix[sel]] = [matrix[sel], matrix[pivot]];
+                
+                let div = matrix[pivot][j];
+                for (let k = j; k < cols; k++) matrix[pivot][k] = matrix[pivot][k].div(div);
+                
+                for (let i = 0; i < rows; i++) {
+                    if (i !== pivot) {
+                        let factor = matrix[i][j];
+                        for (let k = j; k < cols; k++) matrix[i][k] = matrix[i][k].sub(factor.mul(matrix[pivot][k]));
+                    }
+                }
+                pivot++;
             }
 
-            // 3. DISPLAY RESULTS
-            let leftStr = left.map((m, i) => (coeffs[i] === 1 ? "" : coeffs[i]) + m).join(" + ");
-            let rightStr = right.map((m, i) => (coeffs[i + left.length] === 1 ? "" : coeffs[i + left.length]) + m).join(" + ");
+            // Extract Solution from Null Space
+            // Set last coefficient to 1 and backtrack
+            let sol = new Array(cols).fill(new Fraction(1));
+            for (let i = 0; i < pivot; i++) {
+                // Simplified for common unique solutions
+                sol[i] = matrix[i][cols - 1].mul(new Fraction(-1));
+            }
 
-            balancedOutput.innerHTML = `${leftStr} &rarr; ${rightStr}`;
-            logicOutput.innerHTML = steps;
-            resultArea.style.display = "block";
+            // Integerize coefficients
+            let commonLcm = 1;
+            sol.forEach(f => commonLcm = lcm(commonLcm, f.d));
+            let finalCoeffs = sol.map(f => Math.abs(f.n * (commonLcm / f.d)));
+
+            // Verification Step
+            if (finalCoeffs.some(c => c === 0 || isNaN(c))) {
+                alert("Equation could not be solved. Check formula validity.");
+                return;
+            }
+
+            // UI Display
+            let resL = left.map((c, i) => (finalCoeffs[i] === 1 ? "" : finalCoeffs[i]) + c).join(" + ");
+            let resR = right.map((c, i) => (finalCoeffs[i + left.length] === 1 ? "" : finalCoeffs[i + left.length]) + c).join(" + ");
             
-            // Re-render MathJax
+            document.getElementById('balancedOutput').innerHTML = `${resL} &rarr; ${resR}`;
+            document.getElementById('mathSteps').innerHTML = `<div class="step-item">Built matrix of size ${rows}x${cols}.</div><div class="step-item">Reduced to Row Echelon Form.</div><div class="step-item">LCM of denominators (${commonLcm}) used to integerize coefficients.</div>`;
+            document.getElementById('resultArea').style.display = "block";
             MathJax.typesetPromise();
         }
-
-        async function loadFooter() {
-            try {
-                const response = await fetch('footer.html');
-                if (response.ok) document.getElementById('footer-container').innerHTML = await response.text();
-            } catch (e) {}
-        }
-        window.addEventListener('DOMContentLoaded', loadFooter);
     </script>
 </body>
 </html>
