@@ -2,201 +2,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Reaction Matrix Solver | Chemistry Spark</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root { --accent: #00ffd5; --bg: #0b0f1a; --glass: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); }
-        body { background: radial-gradient(circle at top right, #1e293b, #0b0f1a); color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .glass-card { background: var(--glass); backdrop-filter: blur(12px); border-radius: 20px; padding: 30px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .h-accent { color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .form-control-custom { background: #161b22; color: #fff; border: 1px solid #334155; border-radius: 10px; padding: 15px; font-size: 1.1rem; }
-        .btn-solve { background: linear-gradient(135deg, #0ea5e9, var(--accent)); color: #0b0f1a; border: none; font-weight: 800; padding: 15px; border-radius: 10px; transition: 0.3s; width: 100%; }
-        .btn-solve:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 255, 213, 0.4); }
-        .result-panel { display: none; margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .badge-logic { background: rgba(0, 255, 213, 0.1); color: var(--accent); border: 1px solid var(--accent); padding: 5px 12px; border-radius: 5px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Matrix Equation Balancer | Chemistry Spark Lab</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+window.MathJax = {
+tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},
+svg:{fontCache:'global'}
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+:root{
+--accent:#00ffd5;
+--bg:#0b0f1a;
+--glass:rgba(30,41,59,0.7);
+--border:rgba(255,255,255,0.1);
+}
+
+body{
+background:radial-gradient(circle at top right,#1e293b,#0b0f1a);
+color:#f8fafc;
+font-family:'Inter',sans-serif;
+line-height:1.7;
+}
+
+.main-header{
+padding:25px;
+text-align:center;
+border-bottom:1px solid var(--border);
+}
+
+.main-header a{text-decoration:none;color:var(--accent)}
+.main-header h1{font-size:1.3rem;font-weight:900;letter-spacing:2px;margin:0}
+
+.container-narrow{
+max-width:850px;
+margin:auto;
+padding:15px;
+}
+
+.glass-card{
+background:var(--glass);
+backdrop-filter:blur(12px);
+border-radius:24px;
+padding:25px;
+margin-bottom:30px;
+border:1px solid var(--border);
+box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+
+.h-accent{color:var(--accent);font-weight:800;margin-bottom:15px}
+
+.form-control{
+background:#161b22!important;
+color:#fff!important;
+border:1px solid #334155!important;
+border-radius:12px;
+padding:18px;
+font-size:1.2rem;
+}
+
+.btn-calc{
+background:linear-gradient(135deg,#0ea5e9,var(--accent));
+color:#0b0f1a;
+border:none;
+width:100%;
+padding:18px;
+border-radius:12px;
+font-weight:800;
+margin-top:20px;
+text-transform:uppercase;
+transition:0.3s;
+}
+
+.btn-calc:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 20px rgba(0,255,213,0.3);
+}
+
+.result-box{
+display:none;
+background:rgba(0,0,0,0.5);
+border-radius:20px;
+padding:25px;
+margin-top:25px;
+border:1px solid var(--accent);
+}
+
+.correction-badge{
+background:rgba(255,193,7,0.1);
+color:#ffc107;
+padding:5px 15px;
+border-radius:50px;
+font-size:0.8rem;
+border:1px solid #ffc107;
+display:inline-block;
+margin-bottom:15px;
+}
+
+.step-item{
+border-left:3px solid var(--accent);
+padding-left:15px;
+margin-bottom:15px;
+font-size:0.9rem;
+}
+</style>
 </head>
+
 <body>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="glass-card">
-                <h3 class="h-accent text-center mb-4">Ultra Pro Reaction Balancer</h3>
-                
-                <div class="mb-4">
-                    <label class="form-label small text-secondary">Enter Equation (e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2)</label>
-                    <input type="text" id="equationInput" class="form-control-custom w-100" placeholder="CH4 + O2 = CO2 + H2O">
-                </div>
+<header class="main-header">
+<a href="index.html"><h1>Advanced Chemistry Hub</h1></a>
+</header>
 
-                <button onclick="processReaction()" class="btn-solve">
-                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i> BALANCE VIA MATRIX ALGEBRA
-                </button>
+<div class="container-narrow">
 
-                <div id="resultArea" class="result-panel">
-                    <div id="correctionAlert"></div>
-                    <h5 class="text-white fw-bold">Balanced Equation:</h5>
-                    <div id="equationOutput" class="h4 text-accent my-3"></div>
-                    
-                    <div class="mt-4">
-                        <h6 class="text-secondary text-uppercase small">Mathematical Derivation</h6>
-                        <div id="stepLogic" class="small text-white-50 mt-2"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="glass-card">
+
+<h5 class="h-accent text-center">Matrix-Based Equation Balancer</h5>
+
+<p class="small text-secondary text-center mb-4">
+Balances reactions using Linear Algebra Null-Space solver.
+</p>
+
+<input type="text" id="eqInput" class="form-control"
+placeholder="e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2">
+
+<button onclick="solveEquation()" class="btn-calc">
+<i class="fa-solid fa-calculator me-2"></i> Solve via Linear Algebra
+</button>
+
+<div id="resultArea" class="result-box">
+
+<div id="correctionLog"></div>
+
+<h6 class="text-accent small text-uppercase fw-bold">
+Balanced Result
+</h6>
+
+<div id="balancedOutput" class="h3 text-white my-3"></div>
+
+<hr>
+
+<h6 class="text-accent small text-uppercase fw-bold">
+Mathematical Derivation
+</h6>
+
+<div id="mathSteps" class="text-secondary"></div>
+
+</div>
+</div>
+
+<div class="glass-card">
+
+<h5 class="h-accent">The Math Behind the Balancer</h5>
+
+<p class="small text-secondary">
+
+For a reaction like $aA + bB → cC + dD$ we build a matrix where each row
+represents an element.
+
+$$
+A \cdot x = 0
+$$
+
+The null-space solution gives stoichiometric coefficients.
+
+</p>
+
+</div>
+
 </div>
 
 <script>
-/**
- * Smart Parser for numeric and scientific inputs
- * Integrated as requested for Sudhir Nama's tools
- */
-function smartParser(input) {
-    if (typeof input !== 'string') return input;
-    let sanitized = input.replace(/x/g, '*').replace(/\^/g, '**');
-    try {
-        return eval(sanitized); 
-    } catch (e) {
-        return parseFloat(input);
-    }
+
+/* ---------- Math Utilities ---------- */
+
+function gcd(a,b){return b?gcd(b,a%b):Math.abs(a)}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b)}
+
+class Fraction{
+
+constructor(n,d=1){
+if(d===0)throw"div0"
+let g=gcd(n,d)
+this.n=n/g
+this.d=d/g
+if(this.d<0){this.n*=-1;this.d*=-1}
 }
 
-/**
- * RECURSIVE FORMULA PARSER
- * Handles nested parentheses: Mg3(PO4)2, [Fe(CN)6]4-, etc.
- */
-function parseFormula(formula) {
-    let counts = {};
-    let stack = [{}];
-    let i = 0;
+add(f){return new Fraction(this.n*f.d+f.n*this.d,this.d*f.d)}
+sub(f){return new Fraction(this.n*f.d-f.n*this.d,this.d*f.d)}
+mul(f){return new Fraction(this.n*f.n,this.d*f.d)}
+div(f){return new Fraction(this.n*f.d,this.d*f.n)}
+isZero(){return this.n===0}
 
-    while (i < formula.length) {
-        let char = formula[i];
-        if (char === '(' || char === '[' || char === '{') {
-            stack.push({});
-            i++;
-        } else if (char === ')' || char === ']' || char === '}') {
-            let top = stack.pop();
-            i++;
-            let start = i;
-            while (i < formula.length && /\d/.test(formula[i])) i++;
-            let multiplier = parseInt(formula.substring(start, i) || "1");
-            for (let el in top) {
-                stack[stack.length - 1][el] = (stack[stack.length - 1][el] || 0) + top[el] * multiplier;
-            }
-        } else {
-            let match = formula.substring(i).match(/^([A-Z][a-z]*)(\d*)/);
-            if (match) {
-                let el = match[1];
-                let count = parseInt(match[2] || "1");
-                stack[stack.length - 1][el] = (stack[stack.length - 1][el] || 0) + count;
-                i += match[0].length;
-            } else { i++; }
-        }
-    }
-    return stack[0];
 }
 
-/**
- * GAUSSIAN ELIMINATION SOLVER
- */
-function solveMatrix(matrix) {
-    let rows = matrix.length;
-    let cols = matrix[0].length;
-    
-    for (let i = 0; i < Math.min(rows, cols); i++) {
-        let pivot = i;
-        while (pivot < rows && Math.abs(matrix[pivot][i]) < 1e-10) pivot++;
-        if (pivot === rows) continue;
-        [matrix[i], matrix[pivot]] = [matrix[pivot], matrix[i]];
+/* ---------- Chemical Parser ---------- */
 
-        for (let j = i + 1; j < rows; j++) {
-            let factor = matrix[j][i] / matrix[i][i];
-            for (let k = i; k < cols; k++) matrix[j][k] -= factor * matrix[i][k];
-        }
-    }
+function parseComp(formula){
 
-    // Back substitution for the null space
-    let sol = new Array(cols).fill(1);
-    for (let i = rows - 1; i >= 0; i--) {
-        let sum = 0;
-        let pivotCol = -1;
-        for (let j = 0; j < cols; j++) {
-            if (Math.abs(matrix[i][j]) > 1e-10) {
-                if (pivotCol === -1) pivotCol = j;
-                else sum += matrix[i][j] * sol[j];
-            }
-        }
-        if (pivotCol !== -1) sol[pivotCol] = -sum / matrix[i][pivotCol];
-    }
+let stack=[{}]
+let i=0
 
-    // Convert to smallest integers
-    for (let q = 1; q < 1000; q++) {
-        let test = sol.map(x => Math.round(x * q * 100000) / 100000);
-        if (test.every(x => Math.abs(x - Math.round(x)) < 1e-4 && Math.round(x) > 0)) {
-            return test.map(x => Math.round(x));
-        }
-    }
-    return sol.map(x => Math.round(x));
+while(i<formula.length){
+
+if(formula[i]==="("){
+stack.push({})
+i++
 }
 
-function processReaction() {
-    let input = document.getElementById('equationInput').value.trim();
-    if (!input) return;
+else if(formula[i]===")"){
+i++
+let num=""
+while(/\d/.test(formula[i]))num+=formula[i++]
 
-    // AUTO-CORRECTION LOGIC
-    input = input.replace(/H20/g, 'H2O'); // Common typo correction
-    
-    // Split into reactants and products
-    let sides = input.split(/[=→]/);
-    if (sides.length !== 2) return alert("Use '=' or '->' to separate sides.");
+let mult=parseInt(num||"1")
 
-    let left = sides[0].split('+').map(s => s.trim());
-    let right = sides[1].split('+').map(s => s.trim());
-    let allParts = [...left, ...right];
+let group=stack.pop()
+let top=stack[stack.length-1]
 
-    // Build Element List
-    let elements = new Set();
-    allParts.forEach(comp => {
-        let p = parseFormula(comp);
-        Object.keys(p).forEach(el => elements.add(el));
-    });
-    let elArray = Array.from(elements);
-
-    // Build Matrix: Rows = Elements, Cols = Compounds
-    let matrix = elArray.map(el => {
-        return allParts.map((comp, idx) => {
-            let p = parseFormula(comp);
-            let count = p[el] || 0;
-            return idx < left.length ? count : -count;
-        });
-    });
-
-    try {
-        let coeffs = solveMatrix(matrix);
-        
-        // Construct final string
-        let resLeft = left.map((c, i) => (coeffs[i] === 1 ? "" : coeffs[i]) + c).join(" + ");
-        let resRight = right.map((c, i) => (coeffs[i + left.length] === 1 ? "" : coeffs[i + left.length]) + c).join(" + ");
-        
-        document.getElementById('equationOutput').innerText = resLeft + " → " + resRight;
-        document.getElementById('stepLogic').innerHTML = `
-            <div class="mb-2"><span class="badge-logic">Matrix Solver</span> Built ${elArray.length}x${allParts.length} conservation matrix.</div>
-            <div class="mb-2"><span class="badge-logic">Gaussian Elimination</span> Calculated null space for atomic constraints.</div>
-            <div class="mb-2"><span class="badge-logic">Integer Optimization</span> Found smallest whole-number coefficients.</div>
-        `;
-        document.getElementById('resultArea').style.display = "block";
-    } catch (e) {
-        alert("Reaction could not be balanced. Ensure all elements on the left exist on the right.");
-    }
+for(let el in group)
+top[el]=(top[el]||0)+group[el]*mult
 }
+
+else{
+
+let el=formula[i++]
+
+if(/[a-z]/.test(formula[i]))
+el+=formula[i++]
+
+let num=""
+
+while(/\d/.test(formula[i]))
+num+=formula[i++]
+
+let count=parseInt(num||"1")
+
+let top=stack[stack.length-1]
+
+top[el]=(top[el]||0)+count
+
+}
+
+}
+
+return stack[0]
+
+}
+
+/* ---------- Verification ---------- */
+
+function verifyBalance(coeff,left,right){
+
+let L={},R={}
+
+left.forEach((c,i)=>{
+
+let p=parseComp(c)
+
+for(let e in p)
+L[e]=(L[e]||0)+p[e]*coeff[i]
+
+})
+
+right.forEach((c,i)=>{
+
+let p=parseComp(c)
+
+for(let e in p)
+R[e]=(R[e]||0)+p[e]*coeff[i+left.length]
+
+})
+
+return JSON.stringify(L)===JSON.stringify(R)
+
+}
+
+/* ---------- Main Solver ---------- */
+
+function solveEquation(){
+
+let input=document.getElementById("eqInput").value.trim()
+
+const log=document.getElementById("correctionLog")
+log.innerHTML=""
+
+if(input.includes("H20")){
+input=input.replace(/H20/g,"H2O")
+log.innerHTML+=`<div class="correction-badge">Corrected H20 → H2O</div>`
+}
+
+let parts=input.split(/[=→]/)
+
+if(parts.length!==2){
+alert("Use '=' sign")
+return
+}
+
+let left=parts[0].split("+").map(s=>s.trim())
+let right=parts[1].split("+").map(s=>s.trim())
+
+let all=[...left,...right]
+
+/* Collect Elements */
+
+let elements=new Set()
+
+all.forEach(c=>{
+Object.keys(parseComp(c)).forEach(e=>elements.add(e))
+})
+
+let elList=[...elements]
+
+/* Build Matrix */
+
+let matrix=elList.map(el=>{
+
+return all.map((c,i)=>{
+
+let p=parseComp(c)
+let val=p[el]||0
+
+return new Fraction(i<left.length?val:-val)
+
+})
+
+})
+
+let rows=matrix.length
+let cols=all.length
+
+/* Gaussian Elimination */
+
+let pivot=0
+
+for(let j=0;j<cols && pivot<rows;j++){
+
+let sel=pivot
+
+while(sel<rows && matrix[sel][j].isZero())
+sel++
+
+if(sel===rows)continue
+
+[matrix[pivot],matrix[sel]]=[matrix[sel],matrix[pivot]]
+
+let div=matrix[pivot][j]
+
+for(let k=j;k<cols;k++)
+matrix[pivot][k]=matrix[pivot][k].div(div)
+
+for(let i=0;i<rows;i++){
+
+if(i!==pivot){
+
+let factor=matrix[i][j]
+
+for(let k=j;k<cols;k++)
+matrix[i][k]=matrix[i][k].sub(
+factor.mul(matrix[pivot][k])
+)
+
+}
+
+}
+
+pivot++
+
+}
+
+/* Null Space Solution */
+
+let sol=Array.from({length:cols},()=>new Fraction(1))
+
+for(let i=pivot-1;i>=0;i--){
+
+let lead=matrix[i].findIndex(v=>!v.isZero())
+
+let sum=new Fraction(0)
+
+for(let j=lead+1;j<cols;j++)
+sum=sum.add(matrix[i][j].mul(sol[j]))
+
+sol[lead]=sum.mul(new Fraction(-1))
+
+}
+
+/* Integer Conversion */
+
+let common=1
+
+sol.forEach(f=>common=lcm(common,f.d))
+
+let coeff=sol.map(f=>Math.abs(f.n*(common/f.d)))
+
+let g=coeff.reduce((a,b)=>gcd(a,b))
+coeff=coeff.map(x=>x/g)
+
+/* Verify */
+
+if(!verifyBalance(coeff,left,right)){
+alert("Could not balance equation")
+return
+}
+
+/* Display */
+
+let resL=left.map((c,i)=>
+(coeff[i]===1?"":coeff[i])+c
+).join(" + ")
+
+let resR=right.map((c,i)=>
+(coeff[i+left.length]===1?"":coeff[i+left.length])+c
+).join(" + ")
+
+document.getElementById("balancedOutput").innerHTML=
+`${resL} → ${resR}`
+
+document.getElementById("mathSteps").innerHTML=
+`<div class="step-item">Matrix size ${rows}×${cols}</div>
+<div class="step-item">Gaussian elimination applied</div>
+<div class="step-item">Null-space vector calculated</div>
+<div class="step-item">Coefficients simplified</div>`
+
+document.getElementById("resultArea").style.display="block"
+
+MathJax.typesetPromise()
+
+}
+
 </script>
 
 </body>
