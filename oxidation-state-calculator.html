@@ -30,9 +30,9 @@
             max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
         }
         
-        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
@@ -76,12 +76,99 @@
             background: rgba(255,255,255,0.03); border: 1px solid var(--border);
             border-radius: 18px; padding: 18px; margin-bottom: 15px;
         }
+
+
+        /* --- Oxidation Guide Specific Styles --- */
+
+/* The main container for the guide */
+.container-narrow {
+    max-width: 850px;
+    margin: auto;
+    padding: 15px;
+}
+
+/* Glass effect for the guide cards */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7); /* Deep glass color */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Section titles with the cyan glow */
+.h-accent {
+    color: #00ffd5; /* Your accent color */
+    font-weight: 800;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+/* Paragraph text within the guide */
+.theory-text {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+/* Inline code highlight (like for MgCl2) */
+code {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00ffd5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+}
+
+/* Step number badges */
+.step-number {
+    background: #00ffd5;
+    color: #0b0f1a;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+/* Warning box for the capitalization rule */
+.warning-box {
+    background: rgba(244, 63, 94, 0.1); /* Soft red background */
+    border-left: 4px solid #f43f5e; /* Bright red border */
+    padding: 15px;
+    border-radius: 0 12px 12px 0;
+    margin: 15px 0;
+}
+
+/* Tip box for the smartParser explanation */
+.tip-box {
+    background: rgba(56, 189, 248, 0.1); /* Soft blue background */
+    border-left: 4px solid #38bdf8; /* Bright blue border */
+    padding: 15px;
+    border-radius: 0 12px 12px 0;
+    margin-top: 20px;
+}
+
+/* Spacing for icons */
+.fas {
+    margin-right: 8px;
+}
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
     </header>
 
     <div class="container-narrow">
@@ -110,6 +197,93 @@
             
             <div id="res_ox" class="result-display"></div>
         </div>
+
+
+        
+        <div class="container-narrow mt-5">
+    
+    <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold" style="color: var(--accent);">How to Use the Smart Solver</h2>
+        <p class="text-secondary">A step-by-step guide to mastering oxidation state calculations</p>
+    </div>
+
+    <div class="glass-card mb-4">
+        <h4 class="h-accent">
+            <span style="background: var(--accent); color: #0b0f1a; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; margin-right: 10px;">1</span>
+            Entering the Chemical Formula
+        </h4>
+        <p class="theory-text">Type your compound directly into the input field. <strong>The engine is strictly Case-Sensitive.</strong> This is crucial for the calculator to distinguish between different elements.</p>
+        
+        <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid #f43f5e; padding: 15px; border-radius: 0 12px 12px 0; margin: 15px 0;">
+            <p class="mb-0" style="font-size: 0.9rem; color: #fecdd3;">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Important Lettering Rule:</strong><br>
+                Chemical symbols must start with a <strong>CAPITAL</strong> letter. If the symbol has two letters, the second must be <strong>small</strong>.
+            </p>
+        </div>
+
+        <ul class="theory-text" style="list-style-type: none; padding-left: 10px;">
+            <li><i class="fas fa-times-circle" style="color: #f43f5e; margin-right: 8px;"></i> <strong>Incorrect:</strong> <span style="font-family: monospace;">MGCL2</span> (The calculator sees 4 separate elements: M, G, C, and L).</li>
+            <li><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 8px;"></i> <strong>Correct:</strong> <span style="font-family: monospace;">MgCl2</span> (The calculator correctly identifies Magnesium and Chlorine).</li>
+            <li><i class="fas fa-check-circle" style="color: var(--accent); margin-right: 8px;"></i> <strong>Complex Ions:</strong> Enter as <span style="font-family: monospace;">KMnO4</span> or <span style="font-family: monospace;">Cr2O7</span>.</li>
+        </ul>
+    </div>
+
+    <div class="glass-card mb-4">
+        <h4 class="h-accent">
+            <span style="background: var(--accent); color: #0b0f1a; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; margin-right: 10px;">2</span>
+            Setting the Net Charge
+        </h4>
+        <p class="theory-text">The "Net Charge" field determines the total charge. Our calculator uses a <strong>smartParser</strong> to handle scientific notation.</p>
+        
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 12px;">
+                    <strong style="color: var(--accent);">Neutral Molecules</strong><br>
+                    <small class="text-secondary">Enter <strong>0</strong> in the charge box.</small><br>
+                    <code>MgCl2 → 0</code>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 12px;">
+                    <strong style="color: var(--accent);">Ionic Species</strong><br>
+                    <small class="text-secondary">Enter the charge value (e.g., -2, +1).</small><br>
+                    <code>MnO4 → -1</code>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 15px; border-radius: 0 12px 12px 0; margin-top: 20px;">
+            <p class="mb-0" style="font-size: 0.9rem; color: #bae6fd;">
+                <strong><i class="fas fa-microchip"></i> Smart Logic:</strong> You can enter scientific notation (e.g., <code>1e-0</code>) or math expressions (e.g., <code>1-3</code>) thanks to the integrated <code>smartParser</code> logic.
+            </p>
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h4 class="h-accent">
+            <span style="background: var(--accent); color: #0b0f1a; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; margin-right: 10px;">3</span>
+            Practical Examples
+        </h4>
+        
+        <div style="border-left: 2px solid var(--accent); padding-left: 15px; margin-bottom: 25px;">
+            <h6 style="color: #fff; margin-bottom: 5px;">Example: Chlorine in $MgCl_2$</h6>
+            <p class="theory-text" style="font-size: 0.85rem;">
+                1. Input Formula: <span style="color: var(--accent);">MgCl2</span> (Note the small 'g' and 'l')<br>
+                2. Input Charge: <span style="color: var(--accent);">0</span><br>
+                3. Result: <strong>Mg</strong> is +2 (Group 2), so <strong>Cl</strong> is calculated as -1.
+            </p>
+        </div>
+
+        <div style="border-left: 2px solid var(--accent); padding-left: 15px;">
+            <h6 style="color: #fff; margin-bottom: 5px;">Example: Chromium in $Cr_2O_7^{2-}$</h6>
+            <p class="theory-text" style="font-size: 0.85rem;">
+                1. Input Formula: <span style="color: var(--accent);">Cr2O7</span><br>
+                2. Input Charge: <span style="color: var(--accent);">-2</span><br>
+                3. Algebra: $2Cr + 7(-2) = -2 \implies 2Cr = +12 \implies Cr = +6$.
+            </p>
+        </div>
+    </div>
+</div>
 
         <div class="glass-card">
             <h5 class="h-accent">Application & Rules</h5>
