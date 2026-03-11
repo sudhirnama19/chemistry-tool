@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Molar Mass & Formula Weight Calculator | Chemistry Spark Lab</title>
+    <meta name="description" content="Calculate Molar Mass, Percent Composition, and Element Breakdown. Comprehensive guide on Formula Mass with solved examples and scientific applications.">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --glass: rgba(30, 41, 59, 0.7); }
+        
+        body { 
+            background-color: var(--bg); 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Fixed Glassmorphism Header */
+        .main-header {
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            position: fixed; 
+            top: 0; 
+            width: 100%;
+            z-index: 1000;
+        }
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        /* Content Container - Fixed Layout Overlap */
+        .content-section { 
+            max-width: 1000px; 
+            margin: 120px auto 40px auto; 
+            padding: 20px 15px; 
+        }
+
+        /* Subtle Card Style */
+        .info-section { margin-top: 60px; }
+        .info-section h2, .info-section h3 { 
+            margin-bottom: 25px; 
+            border-left: 5px solid var(--accent); 
+            padding-left: 15px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        
+        .grid-layout { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        .info-card { 
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .info-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .example-box { 
+            background: rgba(0, 255, 213, 0.05); 
+            padding: 20px; border-radius: 10px; 
+            margin: 20px 0; border-left: 4px solid var(--accent);
+        }
+
+        /* Calculator Styling */
+        .solver-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(0, 255, 213, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 213, 0.15);
+        }
+        
+        /* Input Visibility Fix */
+        .form-control {
+            background-color: #0f172a !important;
+            color: #00ffd5 !important; /* Accent color for typed text */
+            border: 2px solid #334155 !important;
+            padding: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .form-control:focus {
+            background-color: #1e293b !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.3);
+            outline: none;
+        }
+        .form-control::placeholder { color: #475569; font-weight: 400; }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #007bff, var(--accent));
+            color: #0f172a; font-weight: 800; padding: 15px;
+            width: 100%; border-radius: 12px; border: none; margin-top: 25px;
+            text-transform: uppercase; letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-solve:hover { opacity: 0.9; transform: translateY(-2px); cursor: pointer; }
+
+        .result-display {
+            display: none; margin-top: 30px; padding: 25px;
+            background: rgba(15, 23, 42, 0.8); border-radius: 15px; border: 1px dashed var(--accent);
+        }
+
+        .card-q { color: var(--accent); font-weight: 700; margin-bottom: 12px; font-size: 1.15rem; }
+        .card-a { color: #cbd5e1; font-size: 0.95rem; }
+        
+        .tech-list { list-style: none; padding: 0; }
+        .tech-list li { margin-bottom: 12px; position: relative; padding-left: 25px; color: #cbd5e1; }
+        .tech-list li::before { content: "✔"; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
+        
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        table { width: 100%; color: white; border-collapse: collapse; background: rgba(30, 41, 59, 0.4); }
+        th, td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        th { background: rgba(0, 255, 213, 0.15); color: var(--accent); font-weight: 800; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .formula-text { font-family: 'Courier New', monospace; background: #000; padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Advanced Chemistry Calculators</a>
+    </header>
+
+    <div class="content-section">
+        <section id="intro">
+            <h2>Formula Mass and Molar Mass</h2>
+            <div class="info-card">
+                <p class="card-a">The <strong>Formula Mass</strong> of a substance is the sum of the atomic weights of all atoms present in its chemical formula. It is an essential value in stoichiometry that allows chemists to convert between the mass of a substance and the number of moles. While "Molecular Mass" is used for covalent compounds, "Formula Mass" is the standard term for ionic compounds like Sodium Chloride (NaCl) or Calcium Carbonate (CaCO3).</p>
+                <div class="example-box">
+                    <strong>The Core Calculation Logic:</strong>
+                    <p class="mt-2">Formula Weight = (Atomic Mass of Element A × Number of Atoms) + (Atomic Mass of Element B × Number of Atoms) + ...</p>
+                    <p class="small text-info mb-0">Units are typically expressed in Atomic Mass Units (amu) for single formula units, or Grams per Mole (g/mol) for bulk substances.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="solver-card">
+                <h3 class="text-center mb-4">Molar Mass Calculator</h3>
+                <div class="mb-3">
+                    <label class="form-label text-info fw-bold">Enter Chemical Formula</label>
+                    <input type="text" id="formulaInput" class="form-control" placeholder="Type H2SO4, NaOH, C6H12O6..." autocomplete="off">
+                </div>
+                <button onclick="calculateMass()" class="btn btn-solve">Analyze Compound</button>
+
+                <div id="results" class="result-display">
+                    <h4 id="resMolarMass" class="text-info fw-bold"></h4>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <h5 class="text-accent">Detailed Breakdown:</h5>
+                    <div id="resBreakdown" class="card-a"></div>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <h5 class="text-accent">Mass Percent Composition:</h5>
+                    <div id="resPercent" class="card-a"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>How to Use the Calculator (Logic & Rules)</h3>
+            <div class="info-card">
+                <p class="card-a">Our algorithm processes chemical symbols based on IUPAC standards. To ensure the highest accuracy, please follow these input guidelines:</p>
+                <ul class="tech-list card-a">
+                    <li><strong>Case Sensitivity:</strong> Capitalize the first letter of an element (e.g., <strong>Fe</strong> for Iron). Writing <strong>fe</strong> or <strong>FE</strong> may cause errors.</li>
+                    <li><strong>Subscripts:</strong> Numbers placed after an element apply to that specific element. Example: <span class="formula-text">H2O</span> implies two Hydrogen atoms.</li>
+                    <li><strong>Parentheses:</strong> Used to group ions. In <span class="formula-text">Ca(OH)2</span>, the 2 multiplies both the Oxygen and the Hydrogen inside.</li>
+                    <li><strong>Dots for Hydrates:</strong> For hydrated salts, use a dot or space. Example: <span class="formula-text">CuSO4.5H2O</span>.</li>
+                </ul>
+                <div class="example-box">
+                    <strong>Solved Example: Magnesium Nitrate Mg(NO3)2</strong>
+                    <br>• Magnesium (Mg): 1 × 24.305 = 24.305
+                    <br>• Nitrogen (N): 2 × 14.007 = 28.014
+                    <br>• Oxygen (O): 6 × 15.999 = 95.994
+                    <br><strong>Total Formula Mass = 148.313 g/mol</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Reference Table: 40+ Daily & Industrial Compounds</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Compound</th>
+                            <th>Formula</th>
+                            <th>Mass (g/mol)</th>
+                            <th>Common Use</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reference-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Application in Scientific Research</h3>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <div class="card-q">Quantitative Analysis</div>
+                    <p class="card-a">Researchers use formula mass to calculate the molarity of solutions, which is critical for ensuring reaction reproducibility in clinical trials.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Mass Spectrometry</div>
+                    <p class="card-a">In proteomics, the exact formula mass helps scientists identify unknown proteins by comparing molecular fragments to theoretical weights.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Industrial Scalability</div>
+                    <p class="card-a">Chemical engineers use these weights to determine the 'Theoretical Yield'—the maximum amount of product a factory can produce from raw materials.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Expert FAQ & Troubleshooting</h3>
+            <div class="grid-layout" id="faq-grid">
+                </div>
+        </section>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script>
+/**
+ * Chemistry Spark Lab - Universal Molar Mass Engine
+ * Integrated with smartParser [2026-03-06]
+ * Full 118 Element Logic + Auto-Populating Tables & FAQ
+ */
+
+// 1. Full Database: All 118 Elements with IUPAC Atomic Weights
+const periodicTable = {
+    "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.011, "N": 14.007, "O": 15.999, "F": 18.998, "Ne": 20.180,
+    "Na": 22.990, "Mg": 24.305, "Al": 26.982, "Si": 28.085, "P": 30.974, "S": 32.06, "Cl": 35.45, "Ar": 39.948, "K": 39.098, "Ca": 40.078,
+    "Sc": 44.956, "Ti": 47.867, "V": 50.942, "Cr": 51.996, "Mn": 54.938, "Fe": 55.845, "Co": 58.933, "Ni": 58.693, "Cu": 63.546, "Zn": 65.38,
+    "Ga": 69.723, "Ge": 72.63, "As": 74.922, "Se": 78.971, "Br": 79.904, "Kr": 83.798, "Rb": 85.468, "Sr": 87.62, "Y": 88.906, "Zr": 91.224,
+    "Nb": 92.906, "Mo": 95.95, "Tc": 98, "Ru": 101.07, "Rh": 102.91, "Pd": 106.42, "Ag": 107.87, "Cd": 112.41, "In": 114.82, "Sn": 118.71,
+    "Sb": 121.76, "Te": 127.60, "I": 126.90, "Xe": 131.29, "Cs": 132.91, "Ba": 137.33, "La": 138.91, "Ce": 140.12, "Pr": 140.91, "Nd": 144.24,
+    "Pm": 145, "Sm": 150.36, "Eu": 151.96, "Gd": 157.25, "Tb": 158.93, "Dy": 162.50, "Ho": 164.93, "Er": 167.26, "Tm": 168.93, "Yb": 173.05,
+    "Lu": 174.97, "Hf": 178.49, "Ta": 180.95, "W": 183.84, "Re": 186.21, "Os": 190.23, "Ir": 192.22, "Pt": 195.08, "Au": 196.97, "Hg": 200.59,
+    "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Po": 209, "At": 210, "Rn": 222, "Fr": 223, "Ra": 226, "Ac": 227, "Th": 232.04, "Pa": 231.04,
+    "U": 238.03, "Np": 237, "Pu": 244, "Am": 243, "Cm": 247, "Bk": 247, "Cf": 251, "Es": 252, "Fm": 257, "Md": 258, "No": 259, "Lr": 262,
+    "Rf": 267, "Db": 270, "Sg": 271, "Bh": 270, "Hs": 277, "Mt": 276, "Ds": 281, "Rg": 280, "Cn": 285, "Nh": 284, "Fl": 289, "Mc": 288,
+    "Lv": 293, "Ts": 294, "Og": 294
+};
+
+// 2. Data for Compound Reference Table (SEO & Content)
+const compoundData = [
+    ["Water", "H2O", "18.015", "Hydration/Solvent"],
+    ["Salt", "NaCl", "58.44", "Seasoning/Preservation"],
+    ["Baking Soda", "NaHCO3", "84.01", "Baking/Cleaning"],
+    ["Sugar (Sucrose)", "C12H22O11", "342.30", "Sweetener"],
+    ["Vinegar", "CH3COOH", "60.05", "Cooking/Cleaning"],
+    ["Aspirin", "C9H8O4", "180.16", "Pain Relief"],
+    ["Caffeine", "C8H10N4O2", "194.19", "Stimulant"],
+    ["Ammonia", "NH3", "17.03", "Fertilizer/Cleaner"],
+    ["Bleach", "NaOCl", "74.44", "Disinfection"],
+    ["Methane", "CH4", "16.04", "Fuel"],
+    ["Ethanol", "C2H5OH", "46.07", "Disinfectant/Fuel"],
+    ["Sulfuric Acid", "H2SO4", "98.08", "Battery Acid"],
+    ["Chalk", "CaCO3", "100.09", "Writing/Supplements"],
+    ["Glucose", "C6H12O6", "180.16", "Energy Source"],
+    ["Epsom Salt", "MgSO4", "120.37", "Muscle Soak"],
+    ["Acetone", "C3H6O", "58.08", "Nail Polish Remover"],
+    ["Propane", "C3H8", "44.10", "Heating Fuel"],
+    ["Potassium Permanganate", "KMnO4", "158.03", "Water Treatment"],
+    ["Hydrochloric Acid", "HCl", "36.46", "Stomach Acid"],
+    ["Sodium Hydroxide", "NaOH", "40.00", "Drain Opener"],
+    ["Magnesium Hydroxide", "Mg(OH)2", "58.32", "Antacid"],
+    ["Potassium Nitrate", "KNO3", "101.10", "Gunpowder"],
+    ["Carbon Dioxide", "CO2", "44.01", "Respiration/Fizz"],
+    ["Silver Nitrate", "AgNO3", "169.87", "Photography"],
+    ["Urea", "CH4N2O", "60.06", "Fertilizer"],
+    ["Hydrogen Peroxide", "H2O2", "34.01", "Antiseptic"],
+    ["Citric Acid", "C6H8O7", "192.12", "Flavoring"],
+    ["Nitrous Oxide", "N2O", "44.01", "Laughter Gas"],
+    ["Sulfur Dioxide", "SO2", "64.06", "Preservative"],
+    ["Calcium Chloride", "CaCl2", "110.98", "Road Salt"],
+    ["Sodium Carbonate", "Na2CO3", "105.99", "Glass Making"],
+    ["Barium Sulfate", "BaSO4", "233.39", "X-ray Contrast"],
+    ["Iron(III) Oxide", "Fe2O3", "159.69", "Rust/Pigment"],
+    ["Phosphoric Acid", "H3PO4", "98.00", "Soda Flavoring"],
+    ["Potassium Chloride", "KCl", "74.55", "Salt Substitute"],
+    ["Zinc Oxide", "ZnO", "81.38", "Sunscreen"],
+    ["Aluminium Oxide", "Al2O3", "101.96", "Abrasives"],
+    ["Methanol", "CH3OH", "32.04", "Antifreeze"],
+    ["Butane", "C4H10", "58.12", "Lighter Fluid"],
+    ["Glycerol", "C3H8O3", "92.09", "Cosmetics"]
+];
+
+// 3. Data for Expert FAQ Cards
+const faqs = [
+    ["What is the difference between Molar Mass and Formula Mass?", "Formula mass is typically used for ionic compounds, while molar mass is the mass of one mole of any pure substance."],
+    ["Can I use lowercase for elements?", "No. Chemical symbols are case-sensitive. 'Co' is Cobalt, while 'CO' is Carbon Monoxide."],
+    ["Why is Hydrogen 1.008?", "Atomic weights are averages based on the natural abundance of isotopes (Proteum and Deuterium)."],
+    ["How do I enter Mg(OH)2?", "Type it as is. The parser multiplies everything inside the brackets by 2."],
+    ["What unit is used?", "The standard unit is grams per mole (g/mol)."],
+    ["Is it used in medicine?", "Yes, to ensure precise molecular dosing in pharmaceuticals."],
+    ["What is Avogadro's Number?", "6.022 x 10^23 particles per mole."],
+    ["How to calculate CuSO4.5H2O?", "The tool treats dots as hydrate separators and adds the water mass to the salt."],
+    ["Why do textbook values vary?", "Some books round to 1 decimal; we use high-precision IUPAC values."],
+    ["Does temperature change mass?", "No, molar mass is an intrinsic property and remains constant regardless of heat."],
+    ["Can mass be negative?", "No, negative mass does not exist in standard chemistry."],
+    ["Are electrons counted?", "No, electron mass is negligible compared to protons and neutrons."],
+    ["What is 1 amu?", "Exactly 1/12th the mass of a Carbon-12 atom."],
+    ["Why use empirical formulas?", "Ionic compounds like NaCl exist as crystal lattices, so we use the simplest ratio."],
+    ["Can I calculate mixtures?", "No, only pure chemical compounds with defined formulas."],
+    ["What is Percent Composition?", "The percentage by mass of each element in the total compound weight."],
+    ["Who standardizes atomic weights?", "The IUPAC Commission on Isotopic Abundances."],
+    ["Is air a compound?", "No, it's a mixture of gases and does not have a single formula mass."],
+    ["What's the heaviest natural element?", "Uranium, at roughly 238.03 g/mol."],
+    ["Do ions have different mass?", "The mass difference from lost/gained electrons is too small to affect standard calculations."]
+];
+
+// 4. POWERFUL CALCULATOR ENGINE
+function calculateMass() {
+    let formula = document.getElementById('formulaInput').value.trim();
+    if (!formula) return;
+
+    try {
+        // Handle Hydrates (e.g., CuSO4.5H2O) by splitting at dots/spaces
+        let parts = formula.split(/[.·\s+]/);
+        let elementCounts = {};
+
+        parts.forEach((part, index) => {
+            let multiplier = 1;
+            let subFormula = part;
+
+            // Handle coefficients (like 5 in 5H2O)
+            let hydrateMatch = part.match(/^(\d+)(.*)/);
+            if (hydrateMatch && index > 0) {
+                multiplier = parseInt(hydrateMatch[1]);
+                subFormula = hydrateMatch[2];
+            }
+
+            let partCounts = parseFormula(subFormula);
+            for (let el in partCounts) {
+                elementCounts[el] = (elementCounts[el] || 0) + (partCounts[el] * multiplier);
+            }
+        });
+
+        // Summation and Display
+        let breakdownHTML = "<ul class='tech-list'>";
+        let percentHTML = "<ul class='tech-list'>";
+        let finalMass = 0;
+
+        for (let el in elementCounts) {
+            if (!periodicTable[el]) throw new Error(`Unknown element: ${el}`);
+            let elementMass = elementCounts[el] * periodicTable[el];
+            finalMass += elementMass;
+            breakdownHTML += `<li>${el}: ${elementCounts[el]} &times; ${periodicTable[el]} = ${elementMass.toFixed(4)} g/mol</li>`;
+        }
+        breakdownHTML += "</ul>";
+
+        for (let el in elementCounts) {
+            let percentage = ((elementCounts[el] * periodicTable[el]) / finalMass) * 100;
+            percentHTML += `<li>${el}: ${percentage.toFixed(2)}%</li>`;
+        }
+        percentHTML += "</ul>";
+
+        document.getElementById('resMolarMass').innerText = `Molar Mass: ${finalMass.toFixed(4)} g/mol`;
+        document.getElementById('resBreakdown').innerHTML = breakdownHTML;
+        document.getElementById('resPercent').innerHTML = percentHTML;
+        document.getElementById('results').style.display = 'block';
+
+    } catch (error) {
+        alert("Error: " + error.message);
+    }
+}
+
+// 5. RECURSIVE PARSER (The Logic Core)
+function parseFormula(formula) {
+    let stack = [{}];
+    const regex = /([A-Z][a-z]*)(\d*)|(\()|(\))(\d*)/g;
+    let match;
+
+    while ((match = regex.exec(formula)) !== null) {
+        let [full, element, count, openParen, closeParen, closeCount] = match;
+        if (element) {
+            let num = count ? parseInt(count) : 1;
+            stack[stack.length - 1][element] = (stack[stack.length - 1][element] || 0) + num;
+        } else if (openParen) {
+            stack.push({});
+        } else if (closeParen) {
+            let mult = closeCount ? parseInt(closeCount) : 1;
+            let last = stack.pop();
+            for (let el in last) {
+                stack[stack.length - 1][el] = (stack[stack.length - 1][el] || 0) + (last[el] * mult);
+            }
+        }
+    }
+    return stack[0];
+}
+
+// 6. INITIALIZATION (Populate Tables & FAQ on Load)
+document.addEventListener("DOMContentLoaded", () => {
+    // Populate Reference Table
+    const tableBody = document.getElementById('reference-table-body');
+    if (tableBody) {
+        compoundData.forEach(c => {
+            tableBody.innerHTML += `<tr><td>${c[0]}</td><td class="formula-text">${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td></tr>`;
+        });
+    }
+
+    // Populate FAQ Grid
+    const faqGrid = document.getElementById('faq-grid');
+    if (faqGrid) {
+        faqs.forEach(f => {
+            faqGrid.innerHTML += `<div class="info-card"><div class="card-q">${f[0]}</div><p class="card-a">${f[1]}</p></div>`;
+        });
+    }
+
+    // Load External Footer
+    fetch("footer.html").then(res => res.text()).then(data => {
+        const footerCont = document.getElementById("footer-container");
+        if (footerCont) footerCont.innerHTML = data;
+    }).catch(err => console.log("Footer not found, skipping."));
+});
+</script>
+</body>
+</html>
