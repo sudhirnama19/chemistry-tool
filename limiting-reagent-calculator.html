@@ -324,17 +324,56 @@
         letter-spacing: 1px;
     }
 
-    
+        /* --- CALCULATOR HEADER STYLING --- */
+.main-header {
+    text-align: center;
+    padding: 30px 10px;
+    background: rgba(30, 41, 59, 0.5); /* Matches glass card aesthetic */
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+    transition: background 0.3s ease;
+}
+
+.main-header:hover {
+    background: rgba(30, 41, 59, 0.7);
+}
+
+.main-header a {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.main-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    /* Premium Cyan-to-Blue Gradient */
+    background: linear-gradient(90deg, #00ffd5, #00bdff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .main-header h1 {
+        font-size: 1.6rem;
+    }
+}
+
+
+        
     </style>
 </head>
 <body>
 
-<div class="container">
-    <a href="#" class="main-header" onclick="location.reload()">
-        <h1>Chemistry Pro</h1>
-        <p>Stoichiometry & Limiting Reagent Solver</p>
+<header class="main-header" id="top">
+    <a href="index.html">
+        <h1>Advanced Chemistry Calculators</h1>
     </a>
-
+</header>
     <section class="glass-card">
         <h2>What is a Limiting Reagent?</h2>
         <p>In a chemical reaction, the <strong>Limiting Reagent</strong> is the reactant that is entirely consumed first. Once it is gone, the reaction stops, regardless of how much of the other reactants remain.</p>
