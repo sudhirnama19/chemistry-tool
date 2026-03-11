@@ -239,332 +239,416 @@ Balance Equation & Show Steps
         
 
 <script>
-
 // ==========================
-// PARSE EQUATION
-// ==========================
-
-function parseEquation(eq){
-
-eq = eq.replace("→","=").replace("->","=")
-
-let sides = eq.split("=")
-
-if(sides.length!=2) throw "Invalid equation"
-
-let left = sides[0].split("+").map(x=>x.trim())
-let right = sides[1].split("+").map(x=>x.trim())
-
-return {left,right}
-
-}
-
-// ==========================
-// PARSE FORMULA
+// COMPREHENSIVE CHEMICAL EQUATION BALANCER
 // ==========================
 
-function parseFormula(formula){
+class AdvancedChemicalBalancer {
+ constructor() {
+ // Complete periodic table elements (up to Rn)
+ this.elements = new Set([
+ 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
+ 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca',
+ 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
+ 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr',
+ 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn',
+ 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd',
+ 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb',
+ 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',
+ 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th',
+ 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm',
+ 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds',
+ 'Rg', 'Cn', 'Fl', 'Lv', 'Ts', 'Og'
+ ]);
+ 
+ // Common polyatomic ions (JEE/NEET important)
+ this.polyatomicIons = new Set([
+ // Oxygen-containing
+ 'OH', 'O2', 'O2-2', 'O3', 'CO3', 'HCO3', 'CO2', 'NO2', 'NO3',
+ 'NO', 'NH4', 'NH2', 'SO3', 'SO4', 'HSO4', 'HSO3', 'ClO3', 'ClO4',
+ 'ClO', 'Cl', 'Br', 'I', 'CN', 'SCN', 'NC', 'C2H3O2', 'CH3COO',
+ 'PO4', 'HPO4', 'H2PO4', 'H3PO4', 'P2O7', 'P4O10', 'S2O3', 'S2O8',
+ // Nitrogen-containing
+ 'NH4', 'NO2', 'NO3', 'N2O', 'N2O3', 'N2O4', 'N2O5',
+ // Carbon-containing
+ 'CO3', 'HCO3', 'C2O4', 'C2H3O2', 'CH3COO',
+ // Others
+ 'MnO4', 'Cr2O7', 'ClO4', 'BrO3', 'IO3', 'AsO4', 'PO4', 'SO4', 'CO3'
+ ]);
+ 
+ // Common redox agents
+ this.redoxAgents = new Set([
+ 'KMnO4', 'K2Cr2O7', 'H2SO4', 'HNO3', 'HCl', 'NaOH', 'KOH',
+ 'FeCl3', 'Pb(NO3)2', 'AgNO3', 'BaCl2', 'CaCl2', 'ZnCl2', 'CuSO4'
+ ]);
+ }
 
-formula=formula.replace("[","(").replace("]",")")
+ // ==========================
+ // ENHANCED VALIDATION
+ // ==========================
+ 
+ validateCompound(compound) {
+ const compoundUpper = compound.toUpperCase();
+ let isValid = true;
+ 
+ // Check for valid element
+ let match = compoundUpper.match(/^[A-Z][a-z]?(\d+)?$/);
+ if (match) {
+ const element = match[0];
+ if (!this.elements.has(element)) {
+ isValid = false;
+ }
+ }
+ 
+ // Check for valid polyatomic ion
+ if (this.polyatomicIons.has(compoundUpper)) {
+ return true;
+ }
+ 
+ // Check for complex compounds with parentheses
+ if (compoundUpper.includes('(') && compoundUpper.includes(')')) {
+ return this.validateComplexCompound(compoundUpper);
+ }
+ 
+ // Check for ionic compounds
+ if (compoundUpper.includes('SO4') || compoundUpper.includes('NO3') || 
+      compoundUpper.includes('PO4') || compoundUpper.includes('CO3')) {
+ return true;
+ }
+ 
+ return isValid;
+ }
 
-let stack=[{}]
-let i=0
+ validateComplexCompound(compound) {
+ // Handle formulas like (NH4)2SO4, Fe2(SO4)3, etc.
+ const outerRegex = /^$[^)]+$(?:\d+)?$/;
+ const simpleRegex = /^[A-Z][a-z]?\d*$/;
+ 
+ if (outerRegex.test(compound)) {
+ // Validate inner content
+ const inner = compound.slice(1, -1);
+ if (!inner.includes('(') && !inner.includes(')') && 
+      !simpleRegex.test(inner)) {
+ return false;
+ }
+ 
+ // Check for valid ions or elements in compound
+ const parts = inner.split(/\d+/).filter(p => p.length > 0);
+ for (const part of parts) {
+ if (!simpleRegex.test(part) && 
+      !this.polyatomicIons.has(part)) {
+ return false;
+ }
+ }
+ return true;
+ }
+ 
+ return simpleRegex.test(compound) || this.polyatomicIons.has(compound);
+ }
 
-while(i<formula.length){
+ // ==========================
+ // COMPREHENSIVE FORMULA PARSER
+ // ==========================
+ 
+ parseFormula(formula) {
+ formula = formula.trim();
+ const elements = {};
+ 
+ // Handle complex compounds with parentheses
+ if (formula.includes('(')) {
+ return this.parseParentheticalFormula(formula, elements);
+ }
+ 
+ // Simple formula parsing
+ let i = 0;
+ while (i < formula.length) {
+ // Parse element
+ let element = formula[i];
+ i++;
+ if (i < formula.length && /[a-z]/.test(formula[i])) {
+ element += formula[i];
+ i++;
+ }
+ 
+ // Parse number
+ let number = '';
+ while (i < formula.length && /\d/.test(formula[i])) {
+ number += formula[i];
+ i++;
+ }
+ 
+ const count = parseInt(number || '1', 10);
+ elements[element] = (elements[element] || 0) + count;
+ }
+ 
+ return elements;
+ }
 
-if(formula[i]=="("){
+ parseParentheticalFormula(formula, result) {
+ const stack = [{ elements: {} }];
+ let i = 0;
+ 
+ while (i < formula.length) {
+ const char = formula[i];
+ 
+ if (char === '(') {
+ stack.push({ elements: {} });
+ i++;
+ } else if (char === ')') {
+ i++;
+ let num = '';
+ while (i < formula.length && /\d/.test(formula[i])) {
+ num += formula[i++];
+ }
+ const multiplier = parseInt(num || '1', 10);
+ const group = stack.pop();
+ const top = stack[stack.length - 1];
+ this.mergeElements(top.elements, group.elements, multiplier);
+ } else if (/[A-Z]/.test(char)) {
+ let element = formula[i++];
+ if (i < formula.length && /[a-z]/.test(formula[i])) {
+ element += formula[i++];
+ }
+ let num = '';
+ while (i < formula.length && /\d/.test(formula[i])) {
+ num += formula[i++];
+ }
+ const count = parseInt(num || '1', 10);
+ const top = stack[stack.length - 1];
+ top.elements[element] = (top.elements[element] || 0) + count;
+ } else if (char === ' ') {
+ i++;
+ } else {
+ throw new Error(`Invalid character '${char}' in formula: ${formula}`);
+ }
+ }
+ 
+ return stack[0].elements;
+ }
 
-stack.push({})
-i++
+ mergeElements(target, source, multiplier = 1) {
+ for (const [element, count] of Object.entries(source)) {
+ target[element] = (target[element] || 0) + count * multiplier;
+ }
+ }
 
+ // ==========================
+ // COMPLETE ELEMENT EXTRACTION
+ // ==========================
+ 
+ getAllElements(compounds) {
+ const allElements = new Set();
+ 
+ compounds.forEach(compound => {
+ try {
+ const parsed = this.parseFormula(compound);
+ for (const element of Object.keys(parsed)) {
+ allElements.add(element);
+ }
+ } catch (error) {
+ throw new Error(`Invalid formula: ${compound}`);
+ }
+ });
+ 
+ return Array.from(allElements).sort();
+ }
+
+ // ==========================
+ // ADVANCED MATRIX CONSTRUCTION
+ // ==========================
+ 
+ buildStoichiometricMatrix(left, right) {
+ const compounds = [...left, ...right];
+ const elements = this.getAllElements(compounds);
+ const elementCount = elements.length;
+ const compoundCount = compounds.length;
+ 
+ // Initialize matrix with proper dimensions
+ const matrix = Array(elementCount).fill().map(() => Array(compoundCount).fill(0));
+ 
+ // Fill matrix with element counts (Reactants are positive, Products are negative)
+ elements.forEach((element, elemIndex) => {
+ compounds.forEach((compound, compIndex) => {
+ const parsed = this.parseFormula(compound);
+ const count = parsed[element] || 0;
+ matrix[elemIndex][compIndex] = compIndex < left.length ? count : -count;
+ });
+ });
+ 
+ return {
+ matrix: matrix,
+ elements: elements,
+ compounds: compounds,
+ elementCount: elementCount,
+ compoundCount: compoundCount
+ };
+ }
+
+ // ==========================
+ // ROBUST NULL SPACE SOLVER
+ // ==========================
+ 
+ solveWithNullSpace(matrix, elementCount, compoundCount) {
+ // Perform row reduction
+ const reduced = this.reducedRowEchelonForm(matrix);
+ 
+ // Extract the null space solution
+ const solution = new Array(compoundCount).fill(1);
+ 
+ // We set the last variable as a free variable (1) and solve for others
+ for (let i = compoundCount - 2; i >= 0; i--) {
+ let row = -1;
+ for (let r = 0; r < elementCount; r++) {
+ if (Math.abs(reduced[r][i] - 1) < 1e-10) {
+ row = r;
+ break;
+ }
+ }
+ 
+ if (row !== -1) {
+ let sum = 0;
+ for (let j = i + 1; j < compoundCount; j++) {
+ sum += reduced[row][j] * solution[j];
+ }
+ solution[i] = -sum;
+ }
+ }
+
+ // If solution contains fractions, multiply to get whole numbers
+ return this.normalizeSolution(solution);
+ }
+
+ reducedRowEchelonForm(matrix) {
+ const m = matrix.length;
+ const n = matrix[0].length;
+ const result = matrix.map(row => [...row]);
+ 
+ let row = 0;
+ for (let col = 0; col < n && row < m; col++) {
+ let pivot = row;
+ while (pivot < m && Math.abs(result[pivot][col]) < 1e-10) pivot++;
+ 
+ if (pivot === m) continue;
+ 
+ [result[row], result[pivot]] = [result[pivot], result[row]];
+ 
+ const pivotVal = result[row][col];
+ for (let j = col; j < n; j++) result[row][j] /= pivotVal;
+ 
+ for (let i = 0; i < m; i++) {
+ if (i !== row) {
+ const factor = result[i][col];
+ for (let j = col; j < n; j++) result[i][j] -= factor * result[row][j];
+ }
+ }
+ row++;
+ }
+ return result;
+ }
+
+ normalizeSolution(solution) {
+ // Find the smallest positive multiplier to make all coefficients integers
+ let multiplier = 1;
+ for (let i = 0; i < 1000; i++) {
+ let isInteger = solution.every(val => {
+ let scaled = val * multiplier;
+ return Math.abs(scaled - Math.round(scaled)) < 1e-5;
+ });
+ if (isInteger) break;
+ multiplier++;
+ }
+ 
+ return solution.map(val => Math.round(Math.abs(val * multiplier)));
+ }
+
+ // ==========================
+ // SOLUTION PROCESSING
+ // ==========================
+ 
+ gcdOfArray(arr) {
+ return arr.reduce((gcd, num) => this.gcd(gcd, num), 0);
+ }
+
+ gcd(a, b) {
+ a = Math.abs(a);
+ b = Math.abs(b);
+ while (b !== 0) {
+ const temp = b;
+ b = a % b;
+ a = temp;
+ }
+ return a;
+ }
+
+ // ==========================
+ // FORMATTING AND OUTPUT
+ // ==========================
+ 
+ formatEquation(left, right, coef) {
+ let leftSide = [];
+ let rightSide = [];
+ 
+ left.forEach((compound, i) => {
+ let c = coef[i];
+ leftSide.push(c === 1 ? compound : c + compound);
+ });
+ 
+ right.forEach((compound, i) => {
+ let c = coef[left.length + i];
+ rightSide.push(c === 1 ? compound : c + compound);
+ });
+ 
+ return {
+ balanced: `${leftSide.join(' + ')} = ${rightSide.join(' + ')}`,
+ coefficients: coef,
+ left: leftSide,
+ right: rightSide
+ };
+ }
+
+ // ==========================
+ // MAIN SOLVER
+ // ==========================
+ 
+ parseEquation(equation) {
+ const sides = equation.split(/[=→]/);
+ if (sides.length !== 2) throw new Error("Invalid equation format. Use '=' or '→'");
+ 
+ return {
+ left: sides[0].split('+').map(s => s.trim()).filter(s => s !== ""),
+ right: sides[1].split('+').map(s => s.trim()).filter(s => s !== "")
+ };
+ }
+
+ balanceEquation(equation) {
+ try {
+ if (!equation || !equation.trim()) {
+ throw new Error("Please enter a chemical equation");
+ }
+ 
+ const { left, right } = this.parseEquation(equation);
+ 
+ // Validate compounds
+ [...left, ...right].forEach(compound => {
+ if (!this.validateCompound(compound)) {
+ throw new Error(`Invalid chemical formula: ${compound}`);
+ }
+ });
+
+ const data = this.buildStoichiometricMatrix(left, right);
+ const solution = this.solveWithNullSpace(data.matrix, data.elementCount, data.compoundCount);
+ 
+ // Simplify by GCD
+ const commonFactor = this.gcdOfArray(solution);
+ const finalCoeffs = solution.map(c => c / commonFactor);
+ 
+ return this.formatEquation(left, right, finalCoeffs);
+
+ } catch (error) {
+ return { error: error.message };
+ }
+ }
 }
-
-else if(formula[i]==")"){
-
-i++
-
-let num=""
-
-while(i<formula.length && /\d/.test(formula[i]))
-num+=formula[i++]
-
-let mult=parseInt(num||1)
-
-let group=stack.pop()
-let top=stack[stack.length-1]
-
-for(let el in group)
-top[el]=(top[el]||0)+group[el]*mult
-
-}
-
-else{
-
-let el=formula[i++]
-
-while(i<formula.length && /[a-z]/.test(formula[i]))
-el+=formula[i++]
-
-let num=""
-
-while(i<formula.length && /\d/.test(formula[i]))
-num+=formula[i++]
-
-let count=parseInt(num||1)
-
-let top=stack[stack.length-1]
-top[el]=(top[el]||0)+count
-
-}
-
-}
-
-return stack[0]
-
-}
-
-// ==========================
-// GET ELEMENTS
-// ==========================
-
-function getElements(compounds){
-
-let set=new Set()
-
-compounds.forEach(c=>{
-
-let parsed=parseFormula(c)
-
-for(let el in parsed)
-set.add(el)
-
-})
-
-return [...set]
-
-}
-
-// ==========================
-// BUILD MATRIX
-// ==========================
-
-function buildMatrix(left,right){
-
-let compounds=[...left,...right]
-
-let elements=getElements(compounds)
-
-let matrix=[]
-
-elements.forEach(el=>{
-
-let row=[]
-
-compounds.forEach((c,i)=>{
-
-let parsed=parseFormula(c)
-
-let value=parsed[el]||0
-
-if(i<left.length)
-row.push(value)
-else
-row.push(-value)
-
-})
-
-matrix.push(row)
-
-})
-
-return matrix
-
-}
-
-// ==========================
-// GCD
-// ==========================
-
-function gcd(a,b){
-return b ? gcd(b,a%b) : Math.abs(a)
-}
-
-// ==========================
-// GAUSS SOLVER
-// ==========================
-
-function solveMatrix(matrix){
-
-let rows = matrix.length
-let cols = matrix[0].length
-
-let A = matrix.map(r=>r.slice())
-
-for(let i=0;i<rows;i++)
-A[i].push(0)
-
-A[rows-1][cols] = 1
-
-for(let i=0;i<rows;i++){
-
-let pivot = A[i][i]
-
-if(pivot==0) continue
-
-for(let j=i;j<=cols;j++)
-A[i][j] /= pivot
-
-for(let k=0;k<rows;k++){
-
-if(k==i) continue
-
-let factor = A[k][i]
-
-for(let j=i;j<=cols;j++)
-A[k][j] -= factor * A[i][j]
-
-}
-
-}
-
-let sol=[]
-
-for(let i=0;i<cols;i++){
-
-if(A[i])
-sol.push(A[i][cols])
-else
-sol.push(1)
-
-}
-
-// remove decimals
-sol = sol.map(x=>Math.round(x*1000))
-
-// remove negatives
-let min = Math.min(...sol)
-
-if(min<0)
-sol = sol.map(x=>-x)
-
-// simplify using gcd
-function gcd(a,b){
-return b ? gcd(b,a%b) : Math.abs(a)
-}
-
-let g = sol.reduce((a,b)=>gcd(a,b))
-
-sol = sol.map(x=>x/g)
-
-return sol
-
-}
-
-// ==========================
-// FORMAT EQUATION
-// ==========================
-
-function formatEquation(left,right,coef){
-
-let L=""
-let R=""
-
-for(let i=0;i<left.length;i++){
-
-if(coef[i]!=1) L+=coef[i]
-
-L+=left[i]
-
-if(i<left.length-1)
-L+=" + "
-
-}
-
-for(let i=0;i<right.length;i++){
-
-let c=coef[i+left.length]
-
-if(c!=1) R+=c
-
-R+=right[i]
-
-if(i<right.length-1)
-R+=" + "
-
-}
-
-return L+" → "+R
-
-}
-
-// ==========================
-// STEP EXPLANATION
-// ==========================
-
-function generateSteps(eq,left,right,matrix){
-
-let elements=getElements([...left,...right])
-
-let steps=""
-
-steps+="<div class='step-item'><b>Step 1:</b> Parse equation.<br>"
-steps+="Reactants: "+left.join(", ")+"<br>"
-steps+="Products: "+right.join(", ")+"</div>"
-
-steps+="<div class='step-item'><b>Step 2:</b> Identify elements.<br>"
-steps+=elements.join(", ")+"</div>"
-
-steps+="<div class='step-item'><b>Step 3:</b> Build stoichiometric matrix.</div>"
-
-steps+="<div class='step-item'><b>Step 4:</b> Solve linear equations to get coefficients.</div>"
-
-steps+="<div class='step-item'><b>Step 5:</b> Convert to smallest whole numbers.</div>"
-
-document.getElementById("stepsOutput").innerHTML=steps
-
-}
-
-// ==========================
-// MAIN BALANCER
-// ==========================
-
-function balanceEquation(){
-
-try{
-
-let eq=document.getElementById("equationInput").value
-
-if(!eq){
-document.getElementById("balancedOutput").innerHTML="Enter an equation"
-return
-}
-
-let {left,right}=parseEquation(eq)
-
-let matrix=buildMatrix(left,right)
-
-let coef=solveMatrix(matrix)
-
-let result=formatEquation(left,right,coef)
-
-document.getElementById("balance-result").style.display="block"
-
-document.getElementById("balancedOutput").innerHTML=result
-
-generateSteps(eq,left,right,matrix)
-
-}
-
-catch(err){
-
-document.getElementById("balancedOutput").innerHTML="Invalid equation"
-
-}
-
-}
-
 </script>
-
-            
 </body>
 </html>
