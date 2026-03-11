@@ -33,9 +33,9 @@
         }
 
         /* Clickable Header */
-        .main-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-header { padding: 25px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-header a { text-decoration: none; color: var(--accent); transition: 0.3s; }
-        .main-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+        .main-header h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
 
         .container-narrow { max-width: 850px; margin: auto; padding: 15px; box-sizing: border-box; }
 
@@ -106,7 +106,7 @@
 
 <body>
     <header class="main-header">
-        <a href="index.html"><h1>CHEMISTRY SPARK LAB</h1></a>
+        <a href="index.html"><h1>Advanced Chemistry Calculators</h1></a>
     </header>
 
     <div class="container-narrow">
@@ -196,46 +196,58 @@
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent">Application in Scientific Research</h5>
-            <p class="theory-text">
-                In **Pharmaceutical Research**, reaction balancing is critical for synthesizing drug compounds with 99%+ purity. This ensures chemical safety and molecular accuracy.
-            </p>
-            <div class="example-scroll">
-                <div class="text-white" style="font-style: italic;">
-                    $C_7H_6O_3 + C_4H_6O_3 \rightarrow C_9H_8O_4 + C_2H_4O_2$
-                    <p class="small text-secondary mt-2 mb-0">Research relies on this 1:1 molar ratio to minimize chemical waste (Green Chemistry).</p>
-                </div>
+    <h5 class="h-accent">Application in Scientific Research</h5>
+    <p class="theory-text">
+        In modern chemical engineering and scientific research, reaction balancing is the backbone of <strong>Green Chemistry</strong>. By precisely balancing equations, researchers can calculate the <strong>Atom Economy</strong>, a metric that measures the efficiency of a chemical process in terms of the atoms wasted.
+    </p>
+    
+    <div class="research-box" style="background: rgba(0,0,0,0.2); padding: 7px; border-radius: 15px; border-left: 3px solid var(--accent); overflow-x: auto;">
+        <div style="font-style: italic; font-size: 0.95rem; color: #cbd5e1; white-space: normal; word-break: keep-all;">
+            <strong style="color: var(--accent); display: block; margin-bottom: 8px;">Research Example: Carbon Capture</strong>
+            
+            <div style="margin-bottom: 12px; font-size: 1.1rem; color: #ffffff;">
+                $CO_2 + 2KOH \rightarrow K_2CO_3 + H_2O$
             </div>
+            
+            <p style="margin: 0; line-height: 1.6;">
+                Researchers use this reaction to scrub carbon dioxide from industrial exhaust. 
+                Accurate balancing ensures that the exact tonnage of Potassium Hydroxide is calculated 
+                to prevent environmental contamination from excess reagents.
+            </p>
         </div>
+    </div>
+</div>
 
         <h5 class="text-center h-accent mb-4">Frequently Asked Questions</h5>
         <div id="faq-container">
             <script>
                 const faqs = [
-                    ["What is a coefficient?", "A number placed in front of a chemical formula in an equation."],
-                    ["Why can't I change subscripts?", "Changing subscripts changes the identity of the substance (e.g., H2O vs H2O2)."],
-                    ["What is the Law of Conservation of Mass?", "Matter is neither created nor destroyed during a chemical reaction."],
-                    ["What are the reactants?", "The substances you start with, located on the left side of the arrow."],
-                    ["What are products?", "The substances formed during the reaction, on the right side."],
-                    ["What is a skeleton equation?", "An unbalanced equation that just shows the chemical formulas."],
-                    ["Can coefficients be fractions?", "In final balanced equations, we usually use the smallest whole numbers."],
-                    ["How do I balance polyatomic ions?", "Treat them as a single unit if they appear unchanged on both sides."],
-                    ["What is a combustion reaction?", "A reaction where a substance reacts with oxygen, usually producing CO2 and H2O."],
-                    ["What is a limiting reactant?", "The reactant that is completely consumed first, stopping the reaction."],
-                    ["Does balancing apply to nuclear reactions?", "No, nuclear reactions involve mass-energy equivalence."],
-                    ["What if an equation can't be balanced?", "Check if the chemical formulas are written correctly first."],
-                    ["Is heat part of the balance?", "Heat is energy change, not mass, so it's not balanced by atoms."],
-                    ["What does the arrow mean?", "It represents 'yields' or 'reacts to form'."],
-                    ["What is stoichiometry?", "The study of quantitative relationships in chemical reactions."],
-                    ["Why do we balance equations?", "To satisfy the laws of physics and perform accurate chemical experiments."]
+                    ["Why is a balanced equation necessary for stoichiometry?", "A balanced equation provides the specific molar ratios between reactants and products. Without these ratios, it is impossible to calculate how many grams of a reactant are needed to produce a specific amount of product, leading to failed laboratory experiments and industrial waste."],
+                    ["What happens if I change the subscripts while balancing?", "Changing a subscript alters the chemical substance itself. For example, changing H2O (Water) to H2O2 (Hydrogen Peroxide) changes a life-sustaining liquid into a caustic bleaching agent. Balancing must only involve coefficients to keep the substances identical."],
+                    ["Does balancing an equation involve the states of matter?", "While symbols like (s), (l), (g), and (aq) are important for understanding the reaction environment, they do not change the number of atoms. Balancing focuses purely on the atomic count regardless of whether the substance is a solid or a gas."],
+                    ["How do I handle polyatomic ions that appear on both sides?", "The most efficient way to balance equations with polyatomic ions (like SO4 or NO3) is to treat the entire ion as a single unit or 'super-atom'. If you have one sulfate on the left and one on the right, they are already balanced relative to each other."],
+                    ["What is a limiting reactant in a balanced equation?", "The limiting reactant is the substance that is completely consumed first. Even in a perfectly balanced equation, if you do not provide the reactants in the exact molar ratio specified by the coefficients, one will run out, and the reaction will stop."],
+                    ["Can the coefficients in a balanced equation be fractions?", "In intermediate steps, fractions are often used. However, the final standard form of a chemical equation should use the lowest possible whole-number coefficients to represent discrete molecules or formula units accurately."],
+                    ["Is the mass of the electrons considered in balancing?", "No. Chemical reactions involve the rearrangement of electrons, but the mass of an electron is so negligible compared to protons and neutrons that it does not affect the mass balance required by the Law of Conservation of Mass."],
+                    ["Why do combustion reactions always seem harder to balance?", "Combustion reactions involve oxygen ($O_2$), which often ends up in two different product molecules ($CO_2$ and $H_2O$). This distribution requires a systematic approach, usually balancing Carbon first, then Hydrogen, and Oxygen last."],
+                    ["What is an 'atom economy' in green chemistry?", "Atom economy is a calculation derived from balanced equations: $(\text{Mass of Desired Product} / \text{Total Mass of Reactants}) \times 100$. High atom economy means the reaction is 'green' because most of the reactant atoms end up in the final product."],
+                    ["Does balancing an equation tell us how fast the reaction occurs?", "No. Balancing only provides information about the 'before' and 'after' states (Stoichiometry). The speed of the reaction (Kinetics) is determined by temperature, concentration, and catalysts, not the coefficients."],
+                    ["What is the difference between a skeleton equation and a balanced one?", "A skeleton equation simply lists the formulas of the reactants and products. It shows what is reacting but violates the Law of Conservation of Mass. A balanced equation corrects this by adding coefficients."],
+                    ["How do you balance redox reactions specifically?", "Redox reactions require balancing not just the atoms, but also the total charge. This is often done using the half-reaction method, ensuring the number of electrons lost equals the number of electrons gained."],
+                    ["Are there reactions that cannot be balanced?", "Any real chemical reaction can be balanced. If an equation appears 'unbalanceable,' it usually indicates an error in the chemical formulas or a missing product that was overlooked during the observation phase."],
+                    ["What is the significance of the arrow symbol?", "The arrow ($\rightarrow$) signifies a chemical change or 'yield'. It separates the starting materials from the new substances formed. A double arrow ($\rightleftharpoons$) indicates that the reaction is reversible and reaches equilibrium."],
+                    ["How does temperature affect a balanced equation?", "Temperature can shift the equilibrium or change the state of matter, but it does not change the balanced coefficients. The ratio of atoms required for the reaction to occur remains a constant physical property of the substances involved."],
+                    ["What is the role of catalysts in balancing?", "Catalysts speed up a reaction but are not consumed in the process. Therefore, they appear above the reaction arrow and do not factor into the mass balance coefficients of the reactants or products."]
                 ];
                 faqs.forEach(f => {
-                    document.write(`<div class="faq-card"><p class="mb-1" style="font-weight:700; color:var(--accent);">${f[0]}</p><small class="text-secondary">${f[1]}</small></div>`);
+                    document.write(`<div class="faq-card"><p class="mb-2" style="font-weight:700; color:var(--accent); font-size:1.05rem;">${f[0]}</p><p class="text-secondary mb-0" style="font-size:0.92rem; line-height:1.6;">${f[1]}</p></div>`);
                 });
             </script>
         </div>
+
         <div id="footer-container"></div>
     </div>
+
 
     <script>
         // ==========================
