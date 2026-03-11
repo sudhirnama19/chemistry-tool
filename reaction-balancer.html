@@ -594,50 +594,54 @@
     }
 
     // --- UI Logic Binding ---
-    const solver = new AdvancedChemicalBalancer();
+const solver = new AdvancedChemicalBalancer();
 
-    function runBalance() {
-        const input = document.getElementById('equationInput').value;
-        const outputBox = document.getElementById('balance-result');
-        const balancedDiv = document.getElementById('balancedOutput');
-        const stepsDiv = document.getElementById('stepsOutput');
+function runBalance() {
+    const input = document.getElementById('equationInput').value;
+    const outputBox = document.getElementById('balance-result');
+    const balancedDiv = document.getElementById('balancedOutput');
+    const stepsDiv = document.getElementById('stepsOutput');
 
-        const result = solver.balanceEquation(input);
+    const result = solver.balanceEquation(input);
 
-        if(result.error) {
-            alert("Error: " + result.error);
-            return;
-        }
-
-        balancedDiv.innerHTML = result.balanced;
-        
-        // Generate Step-by-Step pattern
-        let stepHtml = "";
-        let LCounts = result.elements.map(e => {
-            let sum = 0;
-            result.leftRaw.forEach(c => sum += (solver.parseFormula(c)[e] || 0));
-            return `${e}=${sum}`;
-        }).join(", ");
-        
-        let RCounts = result.elements.map(e => {
-            let sum = 0;
-            result.rightRaw.forEach(c => sum += (solver.parseFormula(c)[e] || 0));
-            return `${e}=${sum}`;
-        }).join(", ");
-
-        stepHtml += `<div class="step-item"><strong>Step 1:</strong> List atoms. Left: ${LCounts}. Right: ${RCounts}.</div>`;
-        stepHtml += `<div class="step-item"><strong>Step 2:</strong> Balance elements using matrix coefficients (Law of Conservation).</div>`;
-        stepHtml += `<div class="step-item"><strong>Step 3:</strong> Final coefficients applied: ${result.coefs.join(", ")}. All atoms balanced.</div>`;
-
-        stepsDiv.innerHTML = stepHtml;
-        outputBox.style.display = 'block';
-        MathJax.typesetPromise();
+    if(result.error) {
+        alert("Error: " + result.error);
+        return;
     }
 
+    // FIX: Apply formatting to the main balanced result
+    balancedDiv.innerHTML = formatChemicalHTML(result.balanced);
+    
+    // Generate Step-by-Step pattern
+    let stepHtml = "";
+    let LCounts = result.elements.map(e => {
+        let sum = 0;
+        result.leftRaw.forEach(c => sum += (solver.parseFormula(c)[e] || 0));
+        return `${e}=${sum}`;
+    }).join(", ");
+    
+    let RCounts = result.elements.map(e => {
+        let sum = 0;
+        result.rightRaw.forEach(c => sum += (solver.parseFormula(c)[e] || 0));
+        return `${e}=${sum}`;
+    }).join(", ");
 
-        // Function to convert plain text formulas to HTML with subscripts
+    // FIX: Apply formatting to LCounts and RCounts so Step 1 also shows subscripts
+    stepHtml += `<div class="step-item"><strong>Step 1:</strong> List atoms. Left: ${formatChemicalHTML(LCounts)}. Right: ${formatChemicalHTML(RCounts)}.</div>`;
+    stepHtml += `<div class="step-item"><strong>Step 2:</strong> Balance elements using matrix coefficients (Law of Conservation).</div>`;
+    stepHtml += `<div class="step-item"><strong>Step 3:</strong> Final coefficients applied: ${result.coefs.join(", ")}. All atoms balanced.</div>`;
+
+    stepsDiv.innerHTML = stepHtml;
+    outputBox.style.display = 'block';
+    
+    if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+    }
+}
+
+// Ensure this function is present right below runBalance or at the end of your script
 function formatChemicalHTML(str) {
-    // This regex looks for numbers that follow a letter or a closing parenthesis
+    // Regex: Finds numbers that follow a letter or a closing parenthesis
     // and wraps them in <sub> tags.
     return str.replace(/([a-zA-Z]|\))(\d+)/g, '$1<sub>$2</sub>');
 }
