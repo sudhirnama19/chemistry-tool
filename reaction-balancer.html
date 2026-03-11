@@ -412,16 +412,16 @@ let pivot = A[i][i]
 if(pivot==0) continue
 
 for(let j=i;j<=cols;j++)
-A[i][j]/=pivot
+A[i][j] /= pivot
 
 for(let k=0;k<rows;k++){
 
 if(k==i) continue
 
-let factor=A[k][i]
+let factor = A[k][i]
 
 for(let j=i;j<=cols;j++)
-A[k][j]-=factor*A[i][j]
+A[k][j] -= factor * A[i][j]
 
 }
 
@@ -429,14 +429,32 @@ A[k][j]-=factor*A[i][j]
 
 let sol=[]
 
-for(let i=0;i<cols;i++)
-sol.push(A[i] ? A[i][cols] : 1)
+for(let i=0;i<cols;i++){
 
-sol=sol.map(x=>Math.round(x*1000))
+if(A[i])
+sol.push(A[i][cols])
+else
+sol.push(1)
 
-let g=sol.reduce((a,b)=>gcd(a,b))
+}
 
-sol=sol.map(x=>x/g)
+// remove decimals
+sol = sol.map(x=>Math.round(x*1000))
+
+// remove negatives
+let min = Math.min(...sol)
+
+if(min<0)
+sol = sol.map(x=>-x)
+
+// simplify using gcd
+function gcd(a,b){
+return b ? gcd(b,a%b) : Math.abs(a)
+}
+
+let g = sol.reduce((a,b)=>gcd(a,b))
+
+sol = sol.map(x=>x/g)
 
 return sol
 
