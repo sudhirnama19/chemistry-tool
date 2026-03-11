@@ -152,10 +152,17 @@
         <h2>What is a Limiting Reagent?</h2>
         <p>In a chemical reaction, the <strong>Limiting Reagent</strong> is the reactant that is entirely consumed first. Once it is gone, the reaction stops, regardless of how much of the other reactants remain.</p>
         <p>Our solver uses molecular weights and stoichiometric ratios to determine which component will run out first and calculates the exact yields based on that limitation.</p>
+
+        <div class="formula-box">
+            <strong>Core Formulas:</strong><br>
+            1. Moles (n) = Mass (m) / Molar Mass (M)<br>
+            2. Comparison Ratio = Moles / Stoichiometric Coefficient<br>
+            3. Theoretical Yield = Moles of LR × (Product Coef / LR Coef) × Product Molar Mass
+        </div>
     </section>
 
     <section class="glass-card">
-        <h2 style="text-align: center; color: var(--accent);">🧪 Advanced Calculator</h2>
+        <h2 style="text-align: center; color: var(--accent);">Advanced Limiting Reagent Calculator</h2>
         
         <label>Balanced Equation (e.g., 2H2 + O2 → 2H2O)</label>
         <input type="text" id="equationInput" value="O3 + NO → O2 + NO2">
@@ -168,6 +175,53 @@
         <div id="balance-result">
             <div id="balancedOutput"></div>
         </div>
+    </section>
+
+    <section class="glass-card">
+        <h2>How to use this Calculator</h2>
+        <p>Follow these steps to get accurate JEE/NEET level stoichiometric analysis:</p>
+        <ul>
+            <li><strong>Step 1:</strong> Enter your <b>balanced</b> chemical equation. Use "→" or "->".</li>
+            <li><strong>Step 2:</strong> Enter the mass of each reactant in grams, separated by a comma (e.g., if you have 10g of A and 20g of B, type <code>10, 20</code>).</li>
+            <li><strong>Step 3:</strong> Click Calculate. The tool will use a <b>Smart Parser</b> to handle scientific notation (e.g., 1.5e-2).</li>
+        </ul>
+        <p><i>Example: For <code>N2 + 3H2 → 2NH3</code> with 28g N2 and 6g H2, enter "28, 6".</i></p>
+    </section>
+
+    <section class="glass-card">
+        <h2>Rules of Limiting Reagents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Application</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Law of Conservation</td>
+                    <td>Mass of reactants must equal mass of products.</td>
+                </tr>
+                <tr>
+                    <td>The Ratio Rule</td>
+                    <td>Lowest mole-to-coefficient ratio is ALWAYS the Limiting Reagent.</td>
+                </tr>
+                <tr>
+                    <td>Excess Reagent</td>
+                    <td>Substances left over after the LR is consumed.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="glass-card">
+        <h2>Scientific Research & Applications</h2>
+        <p>In industrial chemical synthesis and pharmaceutical research, determining the limiting reagent is critical for <strong>Atom Economy</strong>. Researchers use these calculations to:</p>
+        <ul>
+            <li>Minimize expensive catalyst waste.</li>
+            <li>Calculate <strong>Percent Yield</strong> to optimize reaction conditions.</li>
+            <li>Manage safety in exothermic reactions by controlling the LR feed.</li>
+        </ul>
     </section>
 
     <h2 style="text-align: center;">Frequently Asked Questions</h2>
