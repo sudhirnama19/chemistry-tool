@@ -4,17 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Limiting Reagent Calculator | NEET & JEE Chemistry Solver</title>
+    <title>Advanced Limiting Reagent Calculator | NEET & JEE Advanced</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #00ffd5;
             --text: #f1f5f9;
+            --card-bg: #1e293b;
         }
 
         body {
@@ -27,97 +26,168 @@
 
         .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 
+        /* FIXED: PREMIUM CLICKABLE HEADER */
+        .main-header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 213, 0.1), rgba(30, 41, 59, 0.5));
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .main-header:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(0, 255, 213, 0.2), rgba(30, 41, 59, 0.7));
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .main-header h1 {
+            color: var(--accent);
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .main-header p {
+            color: #94a3b8;
+            margin: 10px 0 0 0;
+            font-weight: 300;
+        }
+
         /* Glassmorphism Card Style */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .clickable-header {
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .clickable-header:hover { transform: scale(1.02); }
-        .clickable-header h1 { color: var(--accent); margin-bottom: 5px; }
-
-        /* Form Styling */
+        /* Input Styling */
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--accent); font-weight: 600; }
+        
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             border: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.2);
+            background: rgba(15, 23, 42, 0.8);
             color: white;
+            font-size: 1rem;
             box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.2);
         }
 
         .btn-calc {
-            background: var(--accent);
+            background: linear-gradient(90deg, #00ffd5, #0081ff);
             color: #0f172a;
             border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 18px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            font-size: 1.1rem;
-            transition: 0.3s;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            transition: 0.4s;
+            box-shadow: 0 4px 15px rgba(0, 255, 213, 0.3);
         }
-        .btn-calc:hover { box-shadow: 0 0 20px var(--accent); opacity: 0.9; }
 
-        /* Tables & Lists */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--glass-border); }
-        th { color: var(--accent); }
+        .btn-calc:hover {
+            transform: scale(1.01);
+            box-shadow: 0 6px 25px rgba(0, 255, 213, 0.5);
+        }
 
-        .faq-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+        /* Results Display */
+        .result-container {
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .highlight-box {
+            background: rgba(0, 255, 213, 0.1);
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .sub { vertical-align: sub; font-size: smaller; }
-        .formula-box { background: rgba(0, 255, 213, 0.05); padding: 15px; border-left: 4px solid var(--accent); font-family: monospace; }
         
-        #balance-result { display: none; margin-top: 20px; }
+        /* Educational Content */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .faq-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .faq-card h4 { color: var(--accent); margin-top: 0; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { color: var(--accent); }
+
+        #balance-result { margin-top: 30px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header class="glass-card clickable-header" onclick="location.reload()">
-        <h1>Advanced Limiting Reagent Calculator</h1>
-        <p>Stoichiometry Solver for NEET, JEE & Research Chemistry</p>
-    </header>
+    <a href="#" class="main-header" onclick="location.reload()">
+        <h1>Chemistry Pro</h1>
+        <p>Stoichiometry & Limiting Reagent Solver</p>
+    </a>
 
     <section class="glass-card">
         <h2>What is a Limiting Reagent?</h2>
-        <p>The <strong>Limiting Reagent</strong> (or limiting reactant) is the substance that is totally consumed when the chemical reaction is complete. The amount of product formed is limited by this reagent, since the reaction cannot continue without it.</p>
-        
-        <div class="formula-box">
-            <strong>Core Formulas:</strong><br>
-            1. Moles (n) = Mass (m) / Molar Mass (M)<br>
-            2. Comparison Ratio = Moles / Stoichiometric Coefficient<br>
-            3. Theoretical Yield = Moles of LR × (Product Coef / LR Coef) × Product Molar Mass
+        <p>In a chemical reaction, the <strong>Limiting Reagent</strong> is the reactant that is entirely consumed first, preventing the reaction from continuing. This determines the maximum amount of product that can be generated (Theoretical Yield).</p>
+        <div class="highlight-box">
+            <strong>Key Formula:</strong><br>
+            Moles Ratio = \(\frac{\text{Available Moles}}{\text{Stoichiometric Coefficient}}\)<br>
+            <em>The reactant with the smallest ratio is the Limiting Reagent.</em>
         </div>
     </section>
 
     <section class="glass-card">
-        <h2 style="text-align: center; color: var(--accent);">🧪 Stoichiometry Calculator</h2>
+        <h2 style="text-align: center; color: var(--accent);">🧪 Advanced Calculator</h2>
         
-        <label>Enter Balanced Equation (e.g., 2H2 + O2 → 2H2O)</label>
-        <input type="text" id="equationInput" placeholder="2H2 + O2 → 2H2O" value="2H2 + O2 → 2H2O">
-        
-        <label>Reactant Masses (Comma separated, in order: 4, 32)</label>
-        <input type="text" id="massInputs" placeholder="e.g. 4, 32" value="4, 32">
+        <div class="input-group">
+            <label>Balanced Equation</label>
+            <input type="text" id="equationInput" placeholder="e.g., 2H2 + O2 → 2H2O" value="O3 + NO → O2 + NO2">
+        </div>
+
+        <div class="input-group">
+            <label>Reactant Masses (grams, comma separated)</label>
+            <input type="text" id="massInputs" placeholder="e.g., 0.740, 0.670" value="0.740, 0.670">
+        </div>
         
         <button class="btn-calc" onclick="runStoichiometry()">Calculate Results</button>
 
@@ -127,84 +197,63 @@
     </section>
 
     <section class="glass-card">
-        <h2>How to use this Calculator</h2>
-        <p>Follow these steps to get accurate JEE/NEET level stoichiometric analysis:</p>
-        <ul>
-            <li><strong>Step 1:</strong> Enter your <b>balanced</b> chemical equation. Use "→" or "->".</li>
-            <li><strong>Step 2:</strong> Enter the mass of each reactant in grams, separated by a comma (e.g., if you have 10g of A and 20g of B, type <code>10, 20</code>).</li>
-            <li><strong>Step 3:</strong> Click Calculate. The tool will use a <b>Smart Parser</b> to handle scientific notation (e.g., 1.5e-2).</li>
-        </ul>
-        <p><i>Example: For <code>N2 + 3H2 → 2NH3</code> with 28g N2 and 6g H2, enter "28, 6".</i></p>
+        <h2>How to Solve Step-by-Step</h2>
+        <p>To find the limiting reagent manually, follow these verified rules used by our algorithm:</p>
+        <ol>
+            <li><strong>Balance the Equation:</strong> Ensure atoms on the left match the right.</li>
+            <li><strong>Convert Mass to Moles:</strong> Divide given mass by the molar mass (\(n = m/M\)).</li>
+            <li><strong>Identify the Limiting Reagent:</strong> Divide the moles by the coefficient in the balanced equation. The smallest result limits the reaction.</li>
+            <li><strong>Calculate Product Yield:</strong> Use the moles of the limiting reagent to find the product mass.</li>
+        </ol>
     </section>
 
     <section class="glass-card">
-        <h2>Rules of Limiting Reagents</h2>
+        <h2>Rules & Scientific Applications</h2>
         <table>
-            <thead>
-                <tr>
-                    <th>Rule</th>
-                    <th>Application</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Law of Conservation</td>
-                    <td>Mass of reactants must equal mass of products.</td>
-                </tr>
-                <tr>
-                    <td>The Ratio Rule</td>
-                    <td>Lowest mole-to-coefficient ratio is ALWAYS the Limiting Reagent.</td>
-                </tr>
-                <tr>
-                    <td>Excess Reagent</td>
-                    <td>Substances left over after the LR is consumed.</td>
-                </tr>
-            </tbody>
+            <tr>
+                <th>Aspect</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Atom Economy</td>
+                <td>Used in research to minimize chemical waste.</td>
+            </tr>
+            <tr>
+                <td>Pharmaceuticals</td>
+                <td>Critical for ensuring expensive drug precursors are fully reacted.</td>
+            </tr>
+            <tr>
+                <td>Combustion</td>
+                <td>Determining fuel-to-air ratios in engine efficiency.</td>
+            </tr>
         </table>
     </section>
 
-    <section class="glass-card">
-        <h2>Scientific Research & Applications</h2>
-        <p>In industrial chemical synthesis and pharmaceutical research, determining the limiting reagent is critical for <strong>Atom Economy</strong>. Researchers use these calculations to:</p>
-        <ul>
-            <li>Minimize expensive catalyst waste.</li>
-            <li>Calculate <strong>Percent Yield</strong> to optimize reaction conditions.</li>
-            <li>Manage safety in exothermic reactions by controlling the LR feed.</li>
-        </ul>
-    </section>
-
     <h2 style="text-align: center;">Frequently Asked Questions</h2>
-    <div class="faq-grid">
-        <div class="glass-card">
-            <h4>Can a product be a limiting reagent?</h4>
-            <p>No, limiting reagents are always reactants.</p>
+    <div class="info-grid">
+        <div class="faq-card">
+            <h4>Can a reaction have two limiting reagents?</h4>
+            <p>Yes, if the reactants are present in perfect stoichiometric proportions, both are consumed simultaneously.</p>
         </div>
-        <div class="glass-card">
-            <h4>What if ratios are equal?</h4>
-            <p>Both reactants are consumed simultaneously; there is no LR.</p>
+        <div class="faq-card">
+            <h4>Does the lowest mass mean it's the limiting reagent?</h4>
+            <p>No. You must convert to moles and divide by the coefficient. A heavy molecule might have fewer moles than a light one.</p>
         </div>
-        <div class="glass-card">
-            <h4>Why is actual yield lower than theoretical?</h4>
-            <p>Due to side reactions, impurities, or incomplete recovery.</p>
+        <div class="faq-card">
+            <h4>How does this apply to research?</h4>
+            <p>In scientific research, we use LR to control exothermic reactions and manage cost-efficiency of rare earth elements.</p>
         </div>
-        <div class="glass-card">
-            <h4>How do I handle scientific notation?</h4>
-            <p>Our calculator supports 'e' notation, e.g., 6.022e23.</p>
+        <div class="faq-card">
+            <h4>What is Theoretical Yield?</h4>
+            <p>The maximum mass of product calculated based on the total consumption of the limiting reagent.</p>
         </div>
-        </div>
+    </div>
 
     <div id="footer-placeholder"></div>
 </div>
 
 <script>
-    // Load your external footer
-    fetch('footer.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('footer-placeholder').innerHTML = data;
-        });
-
-    // --- YOUR FIXED JAVASCRIPT LOGIC ---
+    // FIXED JAVASCRIPT LOGIC
     class LimitingReagentCalculator {
         constructor() {
             this.molarMasses = {
@@ -214,20 +263,8 @@
                 'K': 39.098, 'Ca': 40.078, 'Sc': 44.956, 'Ti': 47.867, 'V': 50.942, 'Cr': 51.996,
                 'Mn': 54.938, 'Fe': 55.845, 'Co': 58.933, 'Ni': 58.693, 'Cu': 63.546, 'Zn': 65.38,
                 'Ga': 69.723, 'Ge': 72.64, 'As': 74.922, 'Se': 78.971, 'Br': 79.904, 'Kr': 83.798,
-                'Rb': 85.468, 'Sr': 87.62, 'Y': 88.906, 'Zr': 91.224, 'Nb': 92.906, 'Mo': 95.95,
-                'Tc': 98.0, 'Ru': 101.07, 'Rh': 102.91, 'Pd': 106.42, 'Ag': 107.87, 'Cd': 112.41,
-                'In': 114.82, 'Sn': 118.71, 'Sb': 121.76, 'Te': 127.60, 'I': 126.90, 'Xe': 131.29,
-                'Cs': 132.91, 'Ba': 137.33, 'La': 138.91, 'Ce': 140.12, 'Pr': 140.91, 'Nd': 144.24,
-                'Pm': 145.0, 'Sm': 150.36, 'Eu': 151.96, 'Gd': 157.25, 'Tb': 158.93, 'Dy': 162.50,
-                'Ho': 164.93, 'Er': 167.26, 'Tm': 168.93, 'Yb': 173.05, 'Lu': 174.97, 'Hf': 178.49,
-                'Ta': 180.95, 'W': 183.84, 'Re': 186.21, 'Os': 190.23, 'Ir': 192.22, 'Pt': 195.08,
-                'Au': 196.97, 'Hg': 200.59, 'Tl': 204.38, 'Pb': 207.2, 'Bi': 208.98, 'Po': 209.0,
-                'At': 210.0, 'Rn': 222.0, 'Fr': 223.0, 'Ra': 226.0, 'Ac': 227.0, 'Th': 232.04,
-                'Pa': 231.04, 'U': 238.03, 'Np': 237.0, 'Pu': 244.0, 'Am': 243.0, 'Cm': 247.0,
-                'Bk': 247.0, 'Cf': 251.0, 'Es': 252.0, 'Fm': 257.0, 'Md': 258.0, 'No': 269.0,
-                'Lr': 262.0
+                'I': 126.90, 'Xe': 131.29, 'Ag': 107.87, 'Au': 196.97, 'Hg': 200.59
             };
-            this.steps = [];
         }
 
         parseChemicalFormula(formula) {
@@ -235,128 +272,119 @@
             const elements = [];
             let match;
             while ((match = regex.exec(formula)) !== null) {
-                const element = match[1];
-                const count = match[2] ? parseInt(match[2]) : 1;
-                elements.push({ element, count });
+                elements.push({ element: match[1], count: match[2] ? parseInt(match[2]) : 1 });
             }
             return elements;
         }
 
-        calculateMolarMass(formula) {
+        getMolarMass(formula) {
             const elements = Array.isArray(formula) ? formula : this.parseChemicalFormula(formula);
-            let mass = 0;
-            for (const { element, count } of elements) {
-                if (this.molarMasses[element]) {
-                    mass += this.molarMasses[element] * count;
-                } else {
-                    throw new Error(`Unknown element: ${element}`);
-                }
-            }
-            return mass;
+            return elements.reduce((acc, el) => acc + (this.molarMasses[el.element] || 0) * el.count, 0);
         }
 
         parseEquation(equation) {
             const separator = equation.includes('->') ? '->' : '→';
-            const parts = equation.split(separator);
-            const reactantsStr = parts[0].trim();
-            const productsStr = parts[1].trim();
+            const [reactantsPart, productsPart] = equation.split(separator);
             
-            const processSide = (str) => {
-                const items = [];
-                const coefs = [];
-                str.split('+').forEach(part => {
-                    const trimmed = part.trim();
-                    const match = trimmed.match(/^(\d+)\s*(.*)/);
-                    if (match) {
-                        coefs.push(parseInt(match[1]));
-                        items.push(this.parseChemicalFormula(match[2]));
-                    } else {
-                        coefs.push(1);
-                        items.push(this.parseChemicalFormula(trimmed));
-                    }
-                });
-                return { items, coefs };
-            };
-
-            const rData = processSide(reactantsStr);
-            const pData = processSide(productsStr);
-            return { reactants: rData.items, coefficients: rData.coefs, products: pData.items, productCoefficients: pData.coefs };
-        }
-
-        calculateMoles(mass, formula) {
-            return mass / this.calculateMolarMass(formula);
-        }
-
-        solve(equation, masses) {
-            const { reactants, coefficients, products, productCoefficients } = this.parseEquation(equation);
-            const moleRatios = reactants.map((r, i) => this.calculateMoles(masses[i], r) / coefficients[i]);
-            const minRatio = Math.min(...moleRatios);
-            const lrIndex = moleRatios.indexOf(minRatio);
-            
-            const lrName = reactants[lrIndex].map(e => e.element + (e.count > 1 ? e.count : '')).join('');
-            const reactantNames = reactants.map(r => r.map(e => e.element + (e.count > 1 ? e.count : '')).join(''));
-            
-            const yields = products.map((p, i) => {
-                const moles = productCoefficients[i] * minRatio;
+            const process = (side) => side.split('+').map(part => {
+                const trimmed = part.trim();
+                const match = trimmed.match(/^(\d+)?\s*(.*)$/);
                 return {
-                    product: p.map(e => e.element + (e.count > 1 ? e.count : '')).join(''),
-                    moles: moles,
-                    mass: moles * this.calculateMolarMass(p)
+                    coef: match[1] ? parseInt(match[1]) : 1,
+                    formula: match[2],
+                    name: match[2]
                 };
             });
 
-            const excessMasses = reactants.map((r, i) => {
-                const initialMoles = this.calculateMoles(masses[i], r);
-                const usedMoles = coefficients[i] * minRatio;
-                return (initialMoles - usedMoles) * this.calculateMolarMass(r);
-            });
-
-            return { limitingReagent: lrName, theoreticalYield: yields, excessMasses, reactantNames };
+            return { reactants: process(reactantsPart), products: process(productsPart) };
         }
 
+        solve(equation, masses) {
+            const { reactants, products } = this.parseEquation(equation);
+            
+            // 1. Calculate Initial Moles
+            const reactantData = reactants.map((r, i) => {
+                const moles = masses[i] / this.getMolarMass(r.formula);
+                return { ...r, initialMoles: moles, ratio: moles / r.coef };
+            });
+
+            // 2. Find Limiting
+            const limiting = reactantData.reduce((prev, curr) => (curr.ratio < prev.ratio ? curr : prev));
+
+            // 3. Calculate Consumed and Remaining
+            const consumptionData = reactantData.map(r => {
+                const consumed = (limiting.initialMoles / limiting.coef) * r.coef;
+                return { formula: r.formula, consumedMoles: consumed, consumedMass: consumed * this.getMolarMass(r.formula) };
+            });
+
+            // 4. Calculate Theoretical Yield
+            const yieldData = products.map(p => {
+                const moles = (limiting.initialMoles / limiting.coef) * p.coef;
+                return { formula: p.formula, moles: moles, mass: moles * this.getMolarMass(p.formula) };
+            });
+
+            return { limiting, consumptionData, yieldData, reactantData };
+        }
+
+        // FIXED DISPLAY METHOD (Removes weird codes and fixes spacing)
         formatResultForDisplay(result) {
-            let html = '<div class="result-container">';
-            html += `<h3 style="color:var(--accent);">🎯 Result: ${result.limitingReagent} is Limiting</h3>`;
-            html += '<h4>📊 Theoretical Yields:</h4>';
-            result.theoreticalYield.forEach(y => {
-                html += `<p>${y.product}: <b>${y.mass.toFixed(2)}g</b> (${y.moles.toFixed(4)} mol)</p>`;
+            let html = `<div class="result-container">`;
+            
+            // Limiting Reagent Box
+            html += `<div class="highlight-box">
+                        <span style="font-size: 1.2rem;">🎯 Result: <b>${result.limiting.formula}</b> is the Limiting Reagent</span>
+                     </div>`;
+
+            // Theoretical Yield Section
+            html += `<h3 style="color:var(--accent); margin-top:20px;">📊 Theoretical Yields (Products)</h3>`;
+            result.yieldData.forEach(y => {
+                html += `<div class="result-item">
+                            <b>${y.formula}:</b> ${y.mass.toFixed(2)}g <span style="color:#94a3b8">(${y.moles.toFixed(4)} mol)</span>
+                         </div>`;
             });
-            html += '<h4>🔄 Excess Remaining:</h4>';
-            result.reactantNames.forEach((name, i) => {
-                if(name !== result.limitingReagent) {
-                    html += `<p>${name}: ${result.excessMasses[i].toFixed(2)}g</p>`;
-                }
+
+            // Reactant Consumption Logic
+            html += `<h3 style="color:var(--accent); margin-top:20px;">📉 Reactant Consumption</h3>`;
+            result.consumptionData.forEach((c, i) => {
+                const remaining = result.reactantData[i].initialMoles - c.consumedMoles;
+                const remainingMass = Math.max(0, remaining * this.getMolarMass(c.formula));
+                
+                html += `<div class="result-item">
+                            <b>${c.formula}:</b> Consumed ${c.consumedMass.toFixed(2)}g 
+                            | <span style="color:#ff4d4d">Remaining: ${remainingMass.toFixed(2)}g</span>
+                         </div>`;
             });
-            html += '</div>';
+
+            html += `</div>`;
             return html;
         }
     }
 
-    // UTILITIES
+    // Helper functions for UI
     function smartParser(v) {
-        if (!v || v.toString().trim()==="") return 0;
+        if (!v) return 0;
         let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
         try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
     }
 
     function formatChemicalHTML(str) {
-        return str.replace(/([a-zA-Z]|\))(\d+)/g, '$1<sub>$2</sub>');
+        return str.replace(/([a-zA-Z]|\))(\d+)/g, '$1<span class="sub">$2</span>');
     }
 
     const calc = new LimitingReagentCalculator();
 
     function runStoichiometry() {
         const eq = document.getElementById('equationInput').value;
-        const massStr = document.getElementById('massInputs').value;
-        const massArr = massStr.split(',').map(m => smartParser(m.trim()));
-        
+        const massInput = document.getElementById('massInputs').value;
+        const masses = massInput.split(',').map(m => smartParser(m.trim()));
+
         try {
-            const res = calc.solve(eq, massArr);
-            const output = calc.formatResultForDisplay(res);
-            document.getElementById('balancedOutput').innerHTML = formatChemicalHTML(output);
+            const res = calc.solve(eq, masses);
+            const outputHtml = calc.formatResultForDisplay(res);
+            document.getElementById('balancedOutput').innerHTML = formatChemicalHTML(outputHtml);
             document.getElementById('balance-result').style.display = 'block';
         } catch (e) {
-            alert("Error: " + e.message);
+            alert("Input Error: Ensure the equation is balanced and masses match reactant count.");
         }
     }
 </script>
