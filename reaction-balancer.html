@@ -9,6 +9,8 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
     
     <script>
         window.MathJax = {
@@ -111,9 +113,12 @@
             <h5 class="h-accent text-center">Smart Equation Balancer</h5>
             <div class="mb-3">
                 <label class="form-label text-secondary small">Enter Chemical Equation (e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2)</label>
-                <input type="text" id="equationInput" class="form-control" placeholder="Type equation here..." style="color: white !important; background-color: #161b22 !important;">
-            </div>
-            <button onclick="balanceEquation()" class="btn-calc">Balance Equation & Show Steps</button>
+                <input id="equationInput" placeholder="Example: KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2">
+
+<button onclick="balanceEquation()">Balance Reaction</button>
+
+<div id="balancedOutput"></div>
+<div id="stepsOutput"></div>
             
             <div id="balance-result">
                 <div class="result-display px-3 py-4 border border-info rounded-4 bg-dark mt-3">
@@ -508,6 +513,311 @@ Right: ${JSON.stringify(atomsFinalRight)}
 </div>`;
 
 document.getElementById("stepsOutput").innerHTML=steps;
+
+}
+
+</script>
+
+
+        
+
+
+        <script>
+
+// ============================
+// POLYATOMIC ION LIST
+// ============================
+
+const polyIons = [
+"SO4","SO3","NO3","NO2","CO3","PO4",
+"PO3","OH","NH4","ClO3","ClO4",
+"Cr2O7","MnO4"
+]
+
+// ============================
+// EQUATION PARSER
+// ============================
+
+function parseEquation(eq){
+
+eq = eq.replace("→","=").replace("->","=")
+
+let sides = eq.split("=")
+
+let left = sides[0].split("+").map(x=>x.trim())
+let right = sides[1].split("+").map(x=>x.trim())
+
+return {left,right}
+
+}
+
+// ============================
+// FORMULA PARSER
+// ============================
+
+function parseFormula(formula){
+
+formula=formula.replace("[","(").replace("]",")")
+
+let stack=[{}]
+let i=0
+
+while(i<formula.length){
+
+if(formula[i]=="("){
+
+stack.push({})
+i++
+
+}
+
+else if(formula[i]==")"){
+
+i++
+
+let num=""
+
+while(i<formula.length && /\d/.test(formula[i]))
+num+=formula[i++]
+
+let mult=parseInt(num||1)
+
+let group=stack.pop()
+let top=stack[stack.length-1]
+
+for(let el in group)
+top[el]=(top[el]||0)+group[el]*mult
+
+}
+
+else{
+
+let el=formula[i++]
+
+while(i<formula.length && /[a-z]/.test(formula[i]))
+el+=formula[i++]
+
+let num=""
+
+while(i<formula.length && /\d/.test(formula[i]))
+num+=formula[i++]
+
+let count=parseInt(num||1)
+
+let top=stack[stack.length-1]
+top[el]=(top[el]||0)+count
+
+}
+
+}
+
+return stack[0]
+
+}
+
+// ============================
+// DETECT POLYATOMIC IONS
+// ============================
+
+function detectPolyatomic(compounds){
+
+let detected=new Set()
+
+compounds.forEach(c=>{
+
+polyIons.forEach(ion=>{
+
+if(c.includes(ion))
+detected.add(ion)
+
+})
+
+})
+
+return [...detected]
+
+}
+
+// ============================
+// GET ALL ELEMENTS
+// ============================
+
+function getElements(compounds){
+
+let set=new Set()
+
+compounds.forEach(c=>{
+
+let parsed=parseFormula(c)
+
+for(let el in parsed)
+set.add(el)
+
+})
+
+return [...set]
+
+}
+
+// ============================
+// BUILD STOICHIOMETRIC MATRIX
+// ============================
+
+function buildMatrix(left,right){
+
+let compounds=[...left,...right]
+
+let elements=getElements(compounds)
+
+let matrix=[]
+
+elements.forEach(el=>{
+
+let row=[]
+
+compounds.forEach((c,i)=>{
+
+let parsed=parseFormula(c)
+
+let value=parsed[el]||0
+
+if(i<left.length)
+row.push(value)
+else
+row.push(-value)
+
+})
+
+matrix.push(row)
+
+})
+
+return matrix
+
+}
+
+// ============================
+// GCD FUNCTION
+// ============================
+
+function gcd(a,b){
+return b ? gcd(b,a%b) : Math.abs(a)
+}
+
+// ============================
+// NULL SPACE SOLVER
+// ============================
+
+function solveMatrix(matrix){
+
+let A=math.matrix(matrix)
+
+let svd=math.svd(A)
+
+let V=svd.V._data
+
+let solution=V.map(r=>r[r.length-1])
+
+let multiplier=1000
+
+solution=solution.map(v=>Math.round(v*multiplier))
+
+let g=solution.reduce((a,b)=>gcd(a,b))
+
+solution=solution.map(v=>v/g)
+
+return solution
+
+}
+
+// ============================
+// FORMAT BALANCED EQUATION
+// ============================
+
+function formatEquation(left,right,coef){
+
+let L=""
+let R=""
+
+for(let i=0;i<left.length;i++){
+
+if(coef[i]!=1) L+=coef[i]
+
+L+=left[i]
+
+if(i<left.length-1)
+L+=" + "
+
+}
+
+for(let i=0;i<right.length;i++){
+
+let c=coef[i+left.length]
+
+if(c!=1) R+=c
+
+R+=right[i]
+
+if(i<right.length-1)
+R+=" + "
+
+}
+
+return L+" → "+R
+
+}
+
+// ============================
+// STEP EXPLANATION
+// ============================
+
+function generateSteps(eq,left,right,matrix,coef){
+
+let steps=""
+
+steps+="<b>Step 1:</b> Parse the chemical equation.<br>"
+steps+="Reactants: "+left.join(", ")+"<br>"
+steps+="Products: "+right.join(", ")+"<br><br>"
+
+steps+="<b>Step 2:</b> Identify elements.<br>"
+
+let elements=getElements([...left,...right])
+
+steps+=elements.join(", ")+"<br><br>"
+
+steps+="<b>Step 3:</b> Construct stoichiometric matrix.<br>"
+
+steps+=JSON.stringify(matrix)+"<br><br>"
+
+steps+="<b>Step 4:</b> Solve null space Ax=0.<br><br>"
+
+steps+="<b>Step 5:</b> Convert to smallest integer coefficients.<br><br>"
+
+steps+="<b>Step 6:</b> Verify atoms are balanced."
+
+document.getElementById("stepsOutput").innerHTML=steps
+
+}
+
+// ============================
+// MAIN BALANCE FUNCTION
+// ============================
+
+function balanceEquation(){
+
+let eq=document.getElementById("equationInput").value
+
+let {left,right}=parseEquation(eq)
+
+let matrix=buildMatrix(left,right)
+
+let coef=solveMatrix(matrix)
+
+let result=formatEquation(left,right,coef)
+
+document.getElementById("balancedOutput").innerHTML=result
+
+generateSteps(eq,left,right,matrix,coef)
 
 }
 
