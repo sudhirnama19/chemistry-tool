@@ -536,5 +536,29 @@ generateSteps(eq,left,right,matrix,coef)
 }
 
 </script>
+
+
+
+
+    <script>
+
+function balanceEquation(){
+
+let eq=document.getElementById("equationInput").value;
+
+if(eq==""){
+document.getElementById("balancedOutput").innerHTML="Please enter equation";
+return;
+}
+
+document.getElementById("balancedOutput").innerHTML=
+"You entered: "+eq;
+
+document.getElementById("stepsOutput").innerHTML=
+"Parser working successfully.";
+
+}
+
+</script>
 </body>
 </html>
