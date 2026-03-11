@@ -236,27 +236,21 @@ Balance Equation & Show Steps
     </div>
 
 
-        <script>
+        
 
-// ============================
-// POLYATOMIC ION LIST
-// ============================
+<script>
 
-const polyIons = [
-"SO4","SO3","NO3","NO2","CO3","PO4",
-"PO3","OH","NH4","ClO3","ClO4",
-"Cr2O7","MnO4"
-]
-
-// ============================
-// EQUATION PARSER
-// ============================
+// ==========================
+// PARSE EQUATION
+// ==========================
 
 function parseEquation(eq){
 
 eq = eq.replace("→","=").replace("->","=")
 
 let sides = eq.split("=")
+
+if(sides.length!=2) throw "Invalid equation"
 
 let left = sides[0].split("+").map(x=>x.trim())
 let right = sides[1].split("+").map(x=>x.trim())
@@ -265,9 +259,9 @@ return {left,right}
 
 }
 
-// ============================
-// FORMULA PARSER
-// ============================
+// ==========================
+// PARSE FORMULA
+// ==========================
 
 function parseFormula(formula){
 
@@ -329,32 +323,9 @@ return stack[0]
 
 }
 
-// ============================
-// DETECT POLYATOMIC IONS
-// ============================
-
-function detectPolyatomic(compounds){
-
-let detected=new Set()
-
-compounds.forEach(c=>{
-
-polyIons.forEach(ion=>{
-
-if(c.includes(ion))
-detected.add(ion)
-
-})
-
-})
-
-return [...detected]
-
-}
-
-// ============================
-// GET ALL ELEMENTS
-// ============================
+// ==========================
+// GET ELEMENTS
+// ==========================
 
 function getElements(compounds){
 
@@ -373,9 +344,9 @@ return [...set]
 
 }
 
-// ============================
-// BUILD STOICHIOMETRIC MATRIX
-// ============================
+// ==========================
+// BUILD MATRIX
+// ==========================
 
 function buildMatrix(left,right){
 
@@ -410,43 +381,70 @@ return matrix
 
 }
 
-// ============================
-// GCD FUNCTION
-// ============================
+// ==========================
+// GCD
+// ==========================
 
 function gcd(a,b){
 return b ? gcd(b,a%b) : Math.abs(a)
 }
 
-// ============================
-// NULL SPACE SOLVER
-// ============================
+// ==========================
+// GAUSS SOLVER
+// ==========================
 
 function solveMatrix(matrix){
 
-let A=math.matrix(matrix)
+let rows = matrix.length
+let cols = matrix[0].length
 
-let svd=math.svd(A)
+let A = matrix.map(r=>r.slice())
 
-let V=svd.V._data
+for(let i=0;i<rows;i++)
+A[i].push(0)
 
-let solution=V.map(r=>r[r.length-1])
+A[rows-1][cols] = 1
 
-let multiplier=1000
+for(let i=0;i<rows;i++){
 
-solution=solution.map(v=>Math.round(v*multiplier))
+let pivot = A[i][i]
 
-let g=solution.reduce((a,b)=>gcd(a,b))
+if(pivot==0) continue
 
-solution=solution.map(v=>v/g)
+for(let j=i;j<=cols;j++)
+A[i][j]/=pivot
 
-return solution
+for(let k=0;k<rows;k++){
+
+if(k==i) continue
+
+let factor=A[k][i]
+
+for(let j=i;j<=cols;j++)
+A[k][j]-=factor*A[i][j]
 
 }
 
-// ============================
-// FORMAT BALANCED EQUATION
-// ============================
+}
+
+let sol=[]
+
+for(let i=0;i<cols;i++)
+sol.push(A[i] ? A[i][cols] : 1)
+
+sol=sol.map(x=>Math.round(x*1000))
+
+let g=sol.reduce((a,b)=>gcd(a,b))
+
+sol=sol.map(x=>x/g)
+
+return sol
+
+}
+
+// ==========================
+// FORMAT EQUATION
+// ==========================
 
 function formatEquation(left,right,coef){
 
@@ -481,45 +479,47 @@ return L+" → "+R
 
 }
 
-// ============================
+// ==========================
 // STEP EXPLANATION
-// ============================
+// ==========================
 
-function generateSteps(eq,left,right,matrix,coef){
-
-let steps=""
-
-steps+="<b>Step 1:</b> Parse the chemical equation.<br>"
-steps+="Reactants: "+left.join(", ")+"<br>"
-steps+="Products: "+right.join(", ")+"<br><br>"
-
-steps+="<b>Step 2:</b> Identify elements.<br>"
+function generateSteps(eq,left,right,matrix){
 
 let elements=getElements([...left,...right])
 
-steps+=elements.join(", ")+"<br><br>"
+let steps=""
 
-steps+="<b>Step 3:</b> Construct stoichiometric matrix.<br>"
+steps+="<div class='step-item'><b>Step 1:</b> Parse equation.<br>"
+steps+="Reactants: "+left.join(", ")+"<br>"
+steps+="Products: "+right.join(", ")+"</div>"
 
-steps+=JSON.stringify(matrix)+"<br><br>"
+steps+="<div class='step-item'><b>Step 2:</b> Identify elements.<br>"
+steps+=elements.join(", ")+"</div>"
 
-steps+="<b>Step 4:</b> Solve null space Ax=0.<br><br>"
+steps+="<div class='step-item'><b>Step 3:</b> Build stoichiometric matrix.</div>"
 
-steps+="<b>Step 5:</b> Convert to smallest integer coefficients.<br><br>"
+steps+="<div class='step-item'><b>Step 4:</b> Solve linear equations to get coefficients.</div>"
 
-steps+="<b>Step 6:</b> Verify atoms are balanced."
+steps+="<div class='step-item'><b>Step 5:</b> Convert to smallest whole numbers.</div>"
 
 document.getElementById("stepsOutput").innerHTML=steps
 
 }
 
-// ============================
-// MAIN BALANCE FUNCTION
-// ============================
+// ==========================
+// MAIN BALANCER
+// ==========================
 
 function balanceEquation(){
 
+try{
+
 let eq=document.getElementById("equationInput").value
+
+if(!eq){
+document.getElementById("balancedOutput").innerHTML="Enter an equation"
+return
+}
 
 let {left,right}=parseEquation(eq)
 
@@ -529,36 +529,24 @@ let coef=solveMatrix(matrix)
 
 let result=formatEquation(left,right,coef)
 
+document.getElementById("balance-result").style.display="block"
+
 document.getElementById("balancedOutput").innerHTML=result
 
-generateSteps(eq,left,right,matrix,coef)
+generateSteps(eq,left,right,matrix)
+
+}
+
+catch(err){
+
+document.getElementById("balancedOutput").innerHTML="Invalid equation"
+
+}
 
 }
 
 </script>
 
-
-
-
-    <script>
-
-function balanceEquation(){
-
-let eq=document.getElementById("equationInput").value;
-
-if(eq==""){
-document.getElementById("balancedOutput").innerHTML="Please enter equation";
-return;
-}
-
-document.getElementById("balancedOutput").innerHTML=
-"You entered: "+eq;
-
-document.getElementById("stepsOutput").innerHTML=
-"Parser working successfully.";
-
-}
-
-</script>
+            
 </body>
 </html>
