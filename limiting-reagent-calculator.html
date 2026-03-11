@@ -424,6 +424,12 @@
         <label>Balanced Equation (e.g., 2H2 + O2 → 2H2O)</label>
         <input type="text" id="equationInput" value="O3 + NO → O2 + NO2">
 
+        <label for="unitInput">Input Unit</label>
+<select id="unitInput" class="input-style" style="width: 100%; padding: 10px; border-radius: 8px; margin-bottom: 20px; background: rgba(15, 23, 42, 0.8); color: white; border: 1px solid var(--glass-border);">
+    <option value="grams">Grams (g)</option>
+    <option value="moles">Moles (mol)</option>
+</select>
+
         <label>Reactant Masses (grams, comma separated)</label>
         <input type="text" id="massInputs" value="0.740, 0.670">
         
@@ -715,39 +721,58 @@
             return this.parseFormula(formula).reduce((acc, el) => acc + (this.molarMasses[el.element] || 0) * el.count, 0);
         }
 
-        solve(equation, masses) {
-            const separator = equation.includes('->') ? '->' : '→';
-            const [rPart, pPart] = equation.split(separator);
-            
-            const process = (side) => side.split('+').map(p => {
-                const match = p.trim().match(/^(\d+)?\s*(.*)$/);
-                return { coef: match[1] ? parseInt(match[1]) : 1, formula: match[2] };
-            });
+        solve(equation, inputs, unit = 'grams') {
+    const separator = equation.includes('->') ? '->' : '→';
+    const [rPart, pPart] = equation.split(separator);
+    
+    const process = (side) => side.split('+').map(p => {
+        const match = p.trim().match(/^(\d+)?\s*(.*)$/);
+        return { coef: match[1] ? parseInt(match[1]) : 1, formula: match[2] };
+    });
 
-            const reactants = process(rPart);
-            const products = process(pPart);
+    const reactants = process(rPart);
+    const products = process(pPart);
 
-            const reactantData = reactants.map((r, i) => {
-                const mass = masses[i] || 0;
-                const moles = mass / this.getMolarMass(r.formula);
-                return { ...r, initialMass: mass, initialMoles: moles, ratio: moles / r.coef };
-            });
-
-            const limiting = reactantData.reduce((prev, curr) => (curr.ratio < prev.ratio ? curr : prev));
-
-            const yieldData = products.map(p => {
-                const moles = (limiting.initialMoles / limiting.coef) * p.coef;
-                return { formula: p.formula, mass: moles * this.getMolarMass(p.formula), moles: moles };
-            });
-
-            const consumptionData = reactantData.map(r => {
-                const consumedMoles = (limiting.initialMoles / limiting.coef) * r.coef;
-                return { formula: r.formula, consumedMass: consumedMoles * this.getMolarMass(r.formula), remainingMass: Math.max(0, r.initialMass - (consumedMoles * this.getMolarMass(r.formula))) };
-            });
-
-            return { limiting, yieldData, consumptionData };
+    const reactantData = reactants.map((r, i) => {
+        const val = inputs[i] || 0;
+        const mm = this.getMolarMass(r.formula);
+        
+        // FIX: Calculate moles based on the selected unit
+        let initialMoles, initialMass;
+        if (unit === 'moles') {
+            initialMoles = val;
+            initialMass = val * mm;
+        } else {
+            initialMass = val;
+            initialMoles = val / mm;
         }
 
+        return { ...r, initialMass, initialMoles, ratio: initialMoles / r.coef };
+    });
+
+    const limiting = reactantData.reduce((prev, curr) => (curr.ratio < prev.ratio ? curr : prev));
+
+    const yieldData = products.map(p => {
+        const moles = (limiting.initialMoles / limiting.coef) * p.coef;
+        return { formula: p.formula, mass: moles * this.getMolarMass(p.formula), moles: moles };
+    });
+
+    const consumptionData = reactantData.map(r => {
+        const consumedMoles = (limiting.initialMoles / limiting.coef) * r.coef;
+        const consumedMass = consumedMoles * this.getMolarMass(r.formula);
+        const consumedMolesVal = consumedMoles;
+        
+        return { 
+            formula: r.formula, 
+            consumedMass: consumedMass, 
+            consumedMoles: consumedMolesVal,
+            remainingMass: Math.max(0, r.initialMass - consumedMass),
+            remainingMoles: Math.max(0, r.initialMoles - consumedMolesVal)
+        };
+    });
+
+    return { limiting, yieldData, consumptionData };
+}
         // FIXED: Clean formatting without glitchy codes
         formatResultForDisplay(result) {
             let html = `<div class="result-container">`;
@@ -792,18 +817,21 @@
     const calc = new LimitingReagentCalculator();
 
     function runStoichiometry() {
-        const eq = document.getElementById('equationInput').value;
-        const massInput = document.getElementById('massInputs').value;
-        const masses = massInput.split(',').map(m => smartParser(m.trim()));
+    const eq = document.getElementById('equationInput').value;
+    const mIn = document.getElementById('massInputs').value;
+    const unit = document.getElementById('unitInput').value; // Get the selected unit
+    const rawValues = mIn.split(',').map(m => smartParser(m.trim()));
 
-        try {
-            const res = calc.solve(eq, masses);
-            document.getElementById('balancedOutput').innerHTML = calc.formatResultForDisplay(res);
-            document.getElementById('balance-result').style.display = 'block';
-        } catch (e) {
-            alert("Error: Check your equation and masses.");
-        }
+    try {
+        // If the unit is grams, the solver works as usual.
+        // If the unit is moles, we need to bypass the mass/molarMass division inside the solve method.
+        const res = calc.solve(eq, rawValues, unit); 
+        
+        // ... rest of your display logic ...
+    } catch (e) {
+        alert("Error: Check your equation and inputs.");
     }
+}
 
     /* --- FOOTER LOADER SYSTEM --- */
 document.addEventListener("DOMContentLoaded", function() {
