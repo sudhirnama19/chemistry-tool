@@ -324,10 +324,10 @@
         letter-spacing: 1px;
     }
 
-        /* --- CALCULATOR HEADER STYLING --- */
-.main-header {
+         /* --- CALCULATOR HEADER STYLING --- */
+.top-header {
     text-align: center;
-    padding: 30px 10px;
+    padding: 25px 5px;
     background: rgba(30, 41, 59, 0.5); /* Matches glass card aesthetic */
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -335,18 +335,18 @@
     transition: background 0.3s ease;
 }
 
-.main-header:hover {
+.top-header:hover {
     background: rgba(30, 41, 59, 0.7);
 }
 
-.main-header a {
+.top-header a {
     text-decoration: none;
     display: inline-block;
 }
 
-.main-header h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
+.top-header h1 {
+    font-size: 1.4rem;
+    font-weight: 1000;
     margin: 0;
     /* Premium Cyan-to-Blue Gradient */
     background: linear-gradient(90deg, #00ffd5, #00bdff);
@@ -359,10 +359,9 @@
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
     .main-header h1 {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
     }
 }
-
 
         /* --- MOBILE SPACING FIX --- */
 * {
@@ -397,14 +396,13 @@
 </head>
 <body>
 
-<header class="main-header" id="top">
+<header class="top-header" id="top">
     <a href="index.html">
         <h1>Advanced Chemistry Calculators</h1>
     </a>
 </header>
 
     <div class="container">
-        <h2>Limiting Reagent Calculator</h2>
 
         
     <section class="glass-card">
