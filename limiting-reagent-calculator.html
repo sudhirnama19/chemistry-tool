@@ -695,164 +695,141 @@
     <div id="footer-placeholder"></div>
 </div>
 
-<script>
-    class LimitingReagentCalculator {
-        constructor() {
-            this.molarMasses = {
-                'H': 1.008, 'He': 4.003, 'Li': 6.941, 'Be': 9.012, 'B': 10.811, 'C': 12.011,
-                'N': 14.007, 'O': 15.999, 'F': 18.998, 'Ne': 20.180, 'Na': 22.990, 'Mg': 24.305,
-                'Al': 26.982, 'Si': 28.085, 'P': 30.974, 'S': 32.06, 'Cl': 35.45, 'Ar': 39.948,
-                'K': 39.098, 'Ca': 40.078, 'Ti': 47.867, 'Cr': 51.996, 'Mn': 54.938, 'Fe': 55.845,
-                'Co': 58.933, 'Ni': 58.693, 'Cu': 63.546, 'Zn': 65.38, 'Ag': 107.87, 'I': 126.90, 'Au': 196.97
-            };
-        }
-
-        parseFormula(formula) {
-            const regex = /([A-Z][a-z]?)(\d*)/g;
-            const elements = [];
-            let match;
-            while ((match = regex.exec(formula)) !== null) {
-                elements.push({ element: match[1], count: match[2] ? parseInt(match[2]) : 1 });
-            }
-            return elements;
-        }
-
-        getMolarMass(formula) {
-            return this.parseFormula(formula).reduce((acc, el) => acc + (this.molarMasses[el.element] || 0) * el.count, 0);
-        }
-
-        solve(equation, inputs, unit = 'grams') {
-    const separator = equation.includes('->') ? '->' : '→';
-    const [rPart, pPart] = equation.split(separator);
     
-    const process = (side) => side.split('+').map(p => {
-        const match = p.trim().match(/^(\d+)?\s*(.*)$/);
-        return { coef: match[1] ? parseInt(match[1]) : 1, formula: match[2] };
-    });
 
-    const reactants = process(rPart);
-    const products = process(pPart);
+<script>
 
-    const reactantData = reactants.map((r, i) => {
-        const val = inputs[i] || 0;
-        const mm = this.getMolarMass(r.formula);
-        
-        // FIX: Calculate moles based on the selected unit
-        let initialMoles, initialMass;
-        if (unit === 'moles') {
-            initialMoles = val;
-            initialMass = val * mm;
-        } else {
-            initialMass = val;
-            initialMoles = val / mm;
-        }
-
-        return { ...r, initialMass, initialMoles, ratio: initialMoles / r.coef };
-    });
-
-    const limiting = reactantData.reduce((prev, curr) => (curr.ratio < prev.ratio ? curr : prev));
-
-    const yieldData = products.map(p => {
-        const moles = (limiting.initialMoles / limiting.coef) * p.coef;
-        return { formula: p.formula, mass: moles * this.getMolarMass(p.formula), moles: moles };
-    });
-
-    const consumptionData = reactantData.map(r => {
-        const consumedMoles = (limiting.initialMoles / limiting.coef) * r.coef;
-        const consumedMass = consumedMoles * this.getMolarMass(r.formula);
-        const consumedMolesVal = consumedMoles;
-        
-        return { 
-            formula: r.formula, 
-            consumedMass: consumedMass, 
-            consumedMoles: consumedMolesVal,
-            remainingMass: Math.max(0, r.initialMass - consumedMass),
-            remainingMoles: Math.max(0, r.initialMoles - consumedMolesVal)
-        };
-    });
-
-    return { limiting, yieldData, consumptionData };
+    // 1. SMART PARSER (Handles scientific notation and ^ characters)
+function smartParser(v) {
+    if (!v) return 0;
+    let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
+    try {
+        return Function('"use strict"; return (' + s + ')')();
+    } catch(e) {
+        return 0;
+    }
 }
-        // FIXED: Clean formatting without glitchy codes
-        formatResultForDisplay(result) {
-            let html = `<div class="result-container">`;
+
+class LimitingReagentCalculator {
+    constructor() {
+        this.molarMasses = { 
+            'H': 1.008, 'He': 4.003, 'Li': 6.941, 'Be': 9.012, 'B': 10.811, 'C': 12.011,
+            'N': 14.007, 'O': 15.999, 'F': 18.998, 'Ne': 20.180, 'Na': 22.990, 'Mg': 24.305,
+            'Al': 26.982, 'Si': 28.085, 'P': 30.974, 'S': 32.06, 'Cl': 35.45, 'Ar': 39.948,
+            'K': 39.098, 'Ca': 40.078, 'Fe': 55.845, 'Cu': 63.546, 'Zn': 65.38, 'Ag': 107.87
+        };
+    }
+
+    getMolarMass(formula) {
+        const regex = /([A-Z][a-z]?)(\d*)/g;
+        let mass = 0;
+        let m;
+        while ((m = regex.exec(formula)) !== null) {
+            let el = m[1];
+            let count = m[2] ? parseInt(m[2]) : 1;
+            mass += (this.molarMasses[el] || 1.0) * count;
+        }
+        return mass;
+    }
+
+    // UPDATED SOLVE FUNCTION
+    solve(equation, inputs, unit) {
+        const separator = equation.includes('->') ? '->' : '→';
+        const [rPart, pPart] = equation.split(separator);
+        
+        const process = (side) => side.split('+').map(p => {
+            const match = p.trim().match(/^(\d+)?\s*(.*)$/);
+            return { coef: match[1] ? parseInt(match[1]) : 1, formula: match[2] };
+        });
+
+        const reactants = process(rPart);
+        const products = process(pPart);
+
+        const reactantData = reactants.map((r, i) => {
+            const val = inputs[i] || 0;
+            const mm = this.getMolarMass(r.formula);
             
-            html += `<div class="highlight-box">
-                        <span style="font-size: 1.2rem;">🎯 Result: <b>${this.fmt(result.limiting.formula)}</b> is the Limiting Reagent</span>
-                     </div>`;
+            let initialMoles, initialMass;
+            // CHECK UNIT: If moles, don't divide by molar mass
+            if (unit === 'moles') {
+                initialMoles = val;
+                initialMass = val * mm;
+            } else {
+                initialMass = val;
+                initialMoles = val / mm;
+            }
 
-            html += `<div class="result-section-title">📊 Theoretical Yields (Products)</div>`;
-            result.yieldData.forEach(y => {
-                html += `<div class="result-item">
-                            <b>${this.fmt(y.formula)}:</b> ${y.mass.toFixed(2)}g 
-                            <span style="color:#94a3b8; margin-left:10px;">(${y.moles.toFixed(4)} mol)</span>
-                         </div>`;
-            });
+            return { ...r, initialMass, initialMoles, ratio: initialMoles / r.coef };
+        });
 
-            html += `<div class="result-section-title">📉 Reactant Consumption</div>`;
-            result.consumptionData.forEach(c => {
-                html += `<div class="result-item">
-                            <b>${this.fmt(c.formula)}:</b> Consumed ${c.consumedMass.toFixed(2)}g | 
-                            <span class="rem-text">Remaining: ${c.remainingMass.toFixed(2)}g</span>
-                         </div>`;
-            });
+        const limiting = reactantData.reduce((prev, curr) => (curr.ratio < prev.ratio ? curr : prev));
 
-            html += `</div>`;
-            return html;
-        }
+        const yieldData = products.map(p => {
+            const moles = (limiting.initialMoles / limiting.coef) * p.coef;
+            return { formula: p.formula, mass: moles * this.getMolarMass(p.formula), moles: moles };
+        });
 
-        // Internal formatter to avoid breaking HTML tags
-        fmt(formula) {
-            return formula.replace(/(\d+)/g, '<span class="sub">$1</span>');
-        }
+        const consumptionData = reactantData.map(r => {
+            const consumedMoles = (limiting.initialMoles / limiting.coef) * r.coef;
+            const consumedMass = consumedMoles * this.getMolarMass(r.formula);
+            
+            return { 
+                formula: r.formula, 
+                consumedMass: consumedMass, 
+                remainingMass: Math.max(0, r.initialMass - consumedMass) 
+            };
+        });
+
+        return { limiting, yieldData, consumptionData };
     }
 
-    // Global smartParser for scientific notation
-    function smartParser(v) {
-        if (!v) return 0;
-        let s = v.toString().toLowerCase().replace(/x/g, '*').replace(/\^/g, '**').replace(/e/g, '*10**');
-        try { return Function('"use strict"; return (' + s + ')')(); } catch(e) { return 0; }
+    format(formula) {
+        return formula.replace(/(\d+)/g, '<span class="sub">$1</span>');
     }
+}
 
-    const calc = new LimitingReagentCalculator();
+const calc = new LimitingReagentCalculator();
 
-    function runStoichiometry() {
+// UPDATED RUN FUNCTION
+function runStoichiometry() {
     const eq = document.getElementById('equationInput').value;
     const mIn = document.getElementById('massInputs').value;
-    const unit = document.getElementById('unitInput').value; // Get the selected unit
-    const rawValues = mIn.split(',').map(m => smartParser(m.trim()));
+    const unit = document.getElementById('unitInput').value; // READS THE DROPDOWN
+
+    // Uses smartParser for scientific notation
+    const inputValues = mIn.split(',').map(m => smartParser(m.trim()));
 
     try {
-        // If the unit is grams, the solver works as usual.
-        // If the unit is moles, we need to bypass the mass/molarMass division inside the solve method.
-        const res = calc.solve(eq, rawValues, unit); 
+        const res = calc.solve(eq, inputValues, unit); // PASSES EVERYTHING TO SOLVE
         
-        // ... rest of your display logic ...
+        let h = `<div class="result-container">`;
+        h += `<div class="highlight-box">🎯 Result: <b>${calc.format(res.limiting.formula)}</b> is the Limiting Reagent</div>`;
+        
+        h += `<div class="result-section-title">📊 Theoretical Yields</div>`;
+        res.yieldData.forEach(y => {
+            h += `<div class="result-item"><b>${calc.format(y.formula)}:</b> ${y.mass.toFixed(2)}g (${y.moles.toFixed(4)} mol)</div>`;
+        });
+
+        h += `<div class="result-section-title">📉 Reactant Consumption</div>`;
+        res.consumptionData.forEach(c => {
+            h += `<div class="result-item"><b>${calc.format(c.formula)}:</b> Consumed ${c.consumedMass.toFixed(2)}g | <span class="rem-text">Remaining: ${c.remainingMass.toFixed(2)}g</span></div>`;
+        });
+
+        document.getElementById('balancedOutput').innerHTML = h + `</div>`;
+        document.getElementById('balance-result').style.display = 'block';
     } catch (e) {
-        alert("Error: Check your equation and inputs.");
+        console.error(e);
+        alert("Error: Check your equation format and input values.");
     }
 }
 
-    /* --- FOOTER LOADER SYSTEM --- */
+// FOOTER LOADER
 document.addEventListener("DOMContentLoaded", function() {
-    const footerPlaceholder = document.getElementById('footer-placeholder');
-    
-    if (footerPlaceholder) {
-        fetch('footer.html')
-            .then(response => {
-                if (!response.ok) throw new Error('Footer file not found');
-                return response.text();
-            })
-            .then(data => {
-                footerPlaceholder.innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error loading footer:', error);
-                // Optional: Fallback text if file is missing
-                footerPlaceholder.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">© 2026 Advanced Chemistry Calculators</p>';
-            });
-    }
+    fetch('footer.html').then(r => r.text()).then(d => {
+        document.getElementById('footer-placeholder').innerHTML = d;
+    }).catch(e => console.log("Footer load failed"));
 });
 </script>
+    
 </body>
 </html>
