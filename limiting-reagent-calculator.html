@@ -364,6 +364,34 @@
 }
 
 
+        /* --- MOBILE SPACING FIX --- */
+* {
+    box-sizing: border-box; /* Ensures padding doesn't push width over 100% */
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 15px 40px 15px; /* Adds 15px safety gap on left and right */
+}
+
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 25px; /* Slightly reduced for better mobile fit */
+    margin-bottom: 25px;
+    width: 100%; /* Ensures it stays within container */
+}
+
+/* Extra safety for very small screens */
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 20px 15px; /* Narrower padding on tiny phones */
+        border-radius: 15px;
+    }
+}
         
     </style>
 </head>
@@ -773,6 +801,27 @@
             alert("Error: Check your equation and masses.");
         }
     }
+
+    /* --- FOOTER LOADER SYSTEM --- */
+document.addEventListener("DOMContentLoaded", function() {
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    
+    if (footerPlaceholder) {
+        fetch('footer.html')
+            .then(response => {
+                if (!response.ok) throw new Error('Footer file not found');
+                return response.text();
+            })
+            .then(data => {
+                footerPlaceholder.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error loading footer:', error);
+                // Optional: Fallback text if file is missing
+                footerPlaceholder.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">© 2026 Advanced Chemistry Calculators</p>';
+            });
+    }
+});
 </script>
 </body>
 </html>
