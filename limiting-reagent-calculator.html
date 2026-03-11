@@ -141,6 +141,64 @@
         .formula-box { background: rgba(0, 255, 213, 0.05); padding: 15px; border-left: 4px solid var(--accent); font-family: monospace; }
 
         #balance-result { margin-top: 30px; display: none; }
+
+
+
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .rule-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .rule-item:hover {
+            background: rgba(0, 255, 213, 0.05);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        .rule-number {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            font-size: 4rem;
+            font-weight: 800;
+            color: rgba(0, 255, 213, 0.05);
+            user-select: none;
+        }
+        .rule-item h3 {
+            color: var(--accent);
+            margin-top: 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .rule-item p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            margin-bottom: 0;
+        }
+        .rule-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 255, 213, 0.1);
+            color: var(--accent);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
     </style>
 </head>
 <body>
@@ -191,31 +249,40 @@
         <p><i>Example: For <code>N2 + 3H2 → 2NH3</code> with 28g N2 and 6g H2, enter "28, 6".</i></p>
     </section>
 
+    
     <section class="glass-card">
-        <h2>Rules of Limiting Reagents</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Rule</th>
-                    <th>Application</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Law of Conservation</td>
-                    <td>Mass of reactants must equal mass of products.</td>
-                </tr>
-                <tr>
-                    <td>The Ratio Rule</td>
-                    <td>Lowest mole-to-coefficient ratio is ALWAYS the Limiting Reagent.</td>
-                </tr>
-                <tr>
-                    <td>Excess Reagent</td>
-                    <td>Substances left over after the LR is consumed.</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: var(--accent); font-size: 2rem; margin-bottom: 10px;">Fundamental Rules of Stoichiometry</h2>
+        <p style="color: #94a3b8; max-width: 700px; margin: 0 auto;">Mastering these three core principles is essential for solving any chemical reaction problem involving limiting and excess reactants.</p>
+    </div>
+    <div class="rules-grid">
+        <div class="rule-item">
+            <span class="rule-number">01</span>
+            <div class="rule-badge">Conservation Law</div>
+            <h3>Law of Mass Action</h3>
+            <p>According to the <strong>Law of Conservation of Mass</strong>, matter cannot be created or destroyed. In limiting reagent problems, the total mass of reactants used must precisely equal the total mass of products formed plus any remaining excess reagents.</p>
+        </div>
+
+        <div class="rule-item">
+            <span class="rule-number">02</span>
+            <div class="rule-badge">The Ratio Rule</div>
+            <h3>Stoichiometric Proportion</h3>
+            <p>The <strong>Limiting Reagent (LR)</strong> is not the reactant with the lowest mass, but the one with the <strong>lowest mole-to-coefficient ratio</strong>. This rule ensures that stoichiometry accounts for the unique molecular weight of every substance in the equation.</p>
+        </div>
+
+        <div class="rule-item">
+            <span class="rule-number">03</span>
+            <div class="rule-badge">Excess Logic</div>
+            <h3>Residual Reagents</h3>
+            <p>Any reactant that is not the limiting reagent is classified as an <strong>Excess Reagent</strong>. Once the LR is completely consumed, the chemical process halts, leaving these substances behind in their unreacted form, which we calculate as "Remaining Mass."</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 20px;">
+        <h4 style="margin-top: 0; color: var(--accent);">Practical Applications in Research</h4>
+        <p style="font-size: 0.9rem;">Applying these rules is critical in industrial chemistry for maximizing <strong>Atom Economy</strong> and reducing production costs by ensuring expensive reagents are the limiting factor.</p>
+    </div>
+</section>
 
     <section class="glass-card">
         <h2>Scientific Research & Applications</h2>
