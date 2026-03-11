@@ -198,7 +198,133 @@
             font-weight: 600;
             margin-bottom: 15px;
         }
+
+
+
+
         
+        .usage-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+        /* Vertical line connecting steps */
+        .usage-container::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            z-index: 0;
+        }
+        .step-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-left: 10px;
+            z-index: 1;
+            transition: 0.3s ease;
+        }
+        .step-card:hover {
+            background: rgba(0, 255, 213, 0.05);
+            border-color: var(--accent);
+        }
+        .step-icon {
+            background: var(--accent);
+            color: #0f172a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.4);
+        }
+        .step-content h3 {
+            margin: 0 0 5px 0;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+        .step-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+        .example-box {
+            margin-top: 30px;
+            background: rgba(0, 255, 213, 0.05);
+            border: 1px dashed var(--accent);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #00ffd5;
+            font-family: monospace;
+        }
+
+
+
+        
+    .faq-grid-main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 50px;
+    }
+    .faq-item {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .faq-item:hover {
+        transform: translateY(-8px);
+        border-color: var(--accent);
+        box-shadow: 0 10px 30px rgba(0, 255, 213, 0.1);
+    }
+    .faq-item h4 {
+        color: var(--accent);
+        margin-top: 0;
+        font-size: 1.1rem;
+        line-height: 1.4;
+        border-bottom: 1px solid rgba(0, 255, 213, 0.2);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .faq-item p {
+        font-size: 0.9rem;
+        color: #cbd5e1;
+        margin-bottom: 0;
+        flex-grow: 1;
+    }
+    .fact-tag {
+        display: inline-block;
+        background: rgba(0, 255, 213, 0.1);
+        color: var(--accent);
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    
     </style>
 </head>
 <body>
@@ -239,15 +365,44 @@
     </section>
 
     <section class="glass-card">
-        <h2>How to use this Calculator</h2>
-        <p>Follow these steps to get accurate JEE/NEET level stoichiometric analysis:</p>
-        <ul>
-            <li><strong>Step 1:</strong> Enter your <b>balanced</b> chemical equation. Use "→" or "->".</li>
-            <li><strong>Step 2:</strong> Enter the mass of each reactant in grams, separated by a comma (e.g., if you have 10g of A and 20g of B, type <code>10, 20</code>).</li>
-            <li><strong>Step 3:</strong> Click Calculate. The tool will use a <b>Smart Parser</b> to handle scientific notation (e.g., 1.5e-2).</li>
-        </ul>
-        <p><i>Example: For <code>N2 + 3H2 → 2NH3</code> with 28g N2 and 6g H2, enter "28, 6".</i></p>
-    </section>
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: var(--accent); font-size: 2rem; margin-bottom: 10px;">Guide How To Use Solver</h2>
+        <p style="color: #94a3b8; max-width: 700px; margin: 0 auto;">Follow these professional guidelines to obtain accurate chemical calculations for competitive exams like NEET, JEE, and research-level chemistry.</p>
+    </div>
+    <div class="usage-container">
+        <div class="step-card">
+            <div class="step-icon">1</div>
+            <div class="step-content">
+                <h3>Input Balanced Equation</h3>
+                <p>Enter your <strong>balanced chemical equation</strong> using standard symbols. Use <code>→</code> or <code>-></code> for the reaction arrow and <code>+</code> to separate compounds.</p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-icon">2</div>
+            <div class="step-content">
+                <h3>Define Reactant Masses</h3>
+                <p>Input the mass of each reactant in <strong>grams (g)</strong>, separated by a comma. Ensure the order of masses matches the order of reactants in your equation.</p>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-icon">3</div>
+            <div class="step-content">
+                <h3>Smart Processing</h3>
+                <p>Click <b>Calculate Results</b>. Our <strong>Smart Parser</strong> automatically handles scientific notation (e.g., <code>1.5e-2</code> or <code>2^3</code>) to provide high-precision mole and mass values.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="example-box">
+        <h4 style="margin-top: 0; color: var(--accent);">💡 Pro Example for Practice</h4>
+        <p style="font-size: 0.9rem; margin-bottom: 0;">
+            For the synthesis of ammonia: <code>N2 + 3H2 → 2NH3</code><br>
+            If you have <strong>28g</strong> of Nitrogen and <strong>6g</strong> of Hydrogen, simply enter <code>28, 6</code> into the mass field. The solver will instantly identify the limiting reagent and theoretical yield.
+        </p>
+    </div>
+</section>
 
     
     <section class="glass-card">
@@ -294,17 +449,107 @@
         </ul>
     </section>
 
-    <h2 style="text-align: center;">Frequently Asked Questions</h2>
-    <div class="info-grid">
-        <div class="faq-card">
-            <h4>How is the Limiting Reagent calculated?</h4>
-            <p>We convert mass to moles, then divide by the stoichiometric coefficient. The lowest ratio is the limiter.</p>
-        </div>
-        <div class="faq-card">
-            <h4>Why do I see 'Remaining' mass?</h4>
-            <p>This is the 'Excess Reagent'. It's the amount of reactant left over because the limiting reagent ran out first.</p>
-        </div>
+    <div style="text-align: center; margin: 60px 0 30px 0;">
+    <h2 style="color: var(--accent); font-size: 2.2rem; margin-bottom: 10px;">Stoichiometry & LR FAQ</h2>
+    <p style="color: #94a3b8;">Everything you need to know about limiting reactants, from basic concepts to advanced research applications.</p>
+</div>
+<div class="faq-grid-main">
+    <div class="faq-item">
+        <span class="fact-tag">Core Logic</span>
+        <h4>How is the Limiting Reagent calculated?</h4>
+        <p>The calculation involves converting given mass to moles (n = m/M) and then dividing by the stoichiometric coefficient from the balanced equation. The reactant with the lowest numerical ratio is the limiter.</p>
     </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Residue</span>
+        <h4>Why does 'Remaining' mass appear?</h4>
+        <p>This represents the 'Excess Reagent'. It is the portion of a reactant that remains unreacted because the Limiting Reagent was completely consumed first, halting the process.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Unique Fact</span>
+        <h4>Can water be a limiting reagent?</h4>
+        <p>Absolutely. While often a solvent used in excess, in hydration reactions or the synthesis of metal hydroxides, water can be the limiting factor if present in small quantities.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Scientific Notation</span>
+        <h4>How do I input very small masses?</h4>
+        <p>Our solver utilizes a <b>smartParser</b> that accepts scientific notation. You can enter values like 1.5e-5 or 2^-3 directly into the mass fields.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Efficiency</span>
+        <h4>What is 'Percent Yield' vs 'Theoretical Yield'?</h4>
+        <p>Theoretical yield is the maximum product possible (what our calculator shows). Percent yield is the (Actual / Theoretical) × 100, showing how efficient a real-world reaction was.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Industrial Tip</span>
+        <h4>Why do industries use 'Excess' reactants?</h4>
+        <p>Companies often use the cheaper reactant in excess to ensure that 100% of a more expensive or rare chemical (the limiting reagent) is fully consumed.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">JEE/NEET Insight</span>
+        <h4>Is the reactant with the least mass always the LR?</h4>
+        <p>No. This is a common mistake. A reactant might have a small mass but a very low molar mass, giving it more moles than a 'heavier' substance.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Advanced</span>
+        <h4>What is a Stoichiometric Mixture?</h4>
+        <p>This occurs when both reactants have identical mole-to-coefficient ratios. In this rare case, there is no limiting reagent because both are consumed perfectly at the same time.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Calculation Help</span>
+        <h4>Does the calculator handle complex formulas?</h4>
+        <p>Yes. The parser recognizes elements, counts, and molecular weights to calculate the molar mass of complex molecules like KMnO4 or C6H12O6 automatically.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Environmental</span>
+        <h4>What is Atom Economy?</h4>
+        <p>Atom economy measures how many atoms of the reactants end up in the desired product. Higher atom economy means less waste and better use of the limiting reagent.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Reaction Types</span>
+        <h4>Do gaseous reactions follow the same rules?</h4>
+        <p>Yes, but you can also use volume ratios (Avogadro's Law) if temperature and pressure are constant, as volume is proportional to moles.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Safety</span>
+        <h4>How does LR affect reaction heat?</h4>
+        <p>The total heat released (Enthalpy) in an exothermic reaction is limited by the amount of the limiting reagent available to react.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Reversibility</span>
+        <h4>What about equilibrium reactions?</h4>
+        <p>In equilibrium, reactions don't go to 100% completion. While we calculate the "Theoretical" limit, the actual yield is restricted by the equilibrium constant (Kc).</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Lab Practice</span>
+        <h4>Why did my experiment produce 0g yield?</h4>
+        <p>Ensure your equation is balanced. If the ratio is incorrect or a reactant mass is missing, the theoretical yield will appear as zero or error out.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Molar Volume</span>
+        <h4>Can I use liters instead of grams?</h4>
+        <p>Currently, this tool requires mass in grams. Convert your liters to grams using density (d = m/V) before inputting values for gaseous reactants.</p>
+    </div>
+
+    <div class="faq-item">
+        <span class="fact-tag">Update Log</span>
+        <h4>Is the data current for 2026?</h4>
+        <p>Yes, our molar mass database and smart parsing algorithms are updated to the latest IUPAC standards for 2026 chemical research.</p>
+    </div>
+</div>
 
     <div id="footer-placeholder"></div>
 </div>
