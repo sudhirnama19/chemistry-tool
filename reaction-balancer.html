@@ -599,7 +599,7 @@
     function runBalance() {
         const input = document.getElementById('equationInput').value;
         const outputBox = document.getElementById('balance-result');
-        const balancedDiv = document.getElementById('balancedOutput').innerHTML = formatChemicalHTML(res.balanced);
+        const balancedDiv = document.getElementById('balancedOutput');
         const stepsDiv = document.getElementById('stepsOutput');
 
         const result = solver.balanceEquation(input);
