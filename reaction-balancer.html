@@ -110,25 +110,48 @@
         </div>
 
         <div class="glass-card">
-            <h5 class="h-accent text-center">Smart Equation Balancer</h5>
-            <div class="mb-3">
-                <label class="form-label text-secondary small">Enter Chemical Equation (e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2)</label>
-                <input type="text" id="equationInput" class="form-control" placeholder="Type equation here..." style="color: white !important; background-color: #161b22 !important;">
-            </div>
-            <button onclick="balanceEquation()" class="btn-calc">Balance Equation & Show Steps</button>
-    
-            <div id="balance-result">
-                <div class="result-display px-3 py-4 border border-info rounded-4 bg-dark mt-3">
-                    <h6 class="text-accent">Balanced Equation:</h6>
-                    <div id="balancedOutput" class="h4 text-white mb-4"></div>
-                    <hr class="border-secondary">
-                    <h6 class="text-accent">Analytical Logic:</h6>
-                    <div id="stepsOutput" class="theory-text"></div>
-                    <div id="balancedOutput"></div>
-<div id="stepsOutput"></div>
-                </div>
-            </div>
-        </div>
+
+<h5 class="h-accent text-center">Smart Equation Balancer</h5>
+
+<div class="mb-3">
+
+<label class="form-label text-secondary small">
+Enter Chemical Equation (e.g., KMnO4 + HCl = KCl + MnCl2 + H2O + Cl2)
+</label>
+
+<input 
+type="text"
+id="equationInput"
+class="form-control"
+placeholder="Type equation here..."
+style="color:white !important; background-color:#161b22 !important;"
+>
+
+</div>
+
+<button onclick="balanceEquation()" class="btn-calc">
+Balance Equation & Show Steps
+</button>
+
+<div id="balance-result">
+
+<div class="result-display px-3 py-4 border border-info rounded-4 bg-dark mt-3">
+
+<h6 class="text-accent">Balanced Equation:</h6>
+
+<div id="balancedOutput" class="h4 text-white mb-4"></div>
+
+<hr class="border-secondary">
+
+<h6 class="text-accent">Analytical Logic:</h6>
+
+<div id="stepsOutput" class="theory-text"></div>
+
+</div>
+
+</div>
+
+</div>
 
         <div class="glass-card">
             <h5 class="h-accent">How to Put Values in the Calculator</h5>
