@@ -170,51 +170,70 @@ document.addEventListener("DOMContentLoaded", function() {
         .bar { width: 24px; height: 2px; background: var(--nav-accent); transition: 0.3s; border-radius: 2px; }
 
         @media (max-width: 900px) {
-            .mobile-toggle { display: flex; }
-            .nav-menu {
-                position: absolute; top: 70px; left: 0; width: 100%;
-                background: var(--dense-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-                flex-direction: column; padding: 15px; gap: 5px;
-                border-radius: 16px; border: 1px solid var(--glass-border);
-                transform: translateY(-15px); opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-            }
-            .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
-            .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 14px; font-size: 1.1rem; }
-            .nav-dropdown { width: 100%; }
-            .drop-menu { 
-                position: static; width: 100%; opacity: 1; visibility: visible; 
-                display: none; transform: none; background: transparent; border: none; box-shadow: none; padding: 0 10px 10px 10px;
-            }
-            .nav-dropdown.active .drop-menu { display: block; }
-            .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .drop-menu a { font-size: 0.9rem; padding: 12px; }
-        }
+    /* 1. Make the capsule grow when menu is open */
+    .spark-nav { 
+        height: auto !important; 
+        min-height: 62px; 
+        max-height: 90vh; 
+        overflow-y: auto; 
+    }
 
+    .mobile-toggle { display: flex; }
 
-        /* 1. Ensure the dropdown is always on top of calculator cards */
-.nav-dropdown.active .drop-menu {
-    z-index: 9999999 !important;
-}
+    /* 2. Changed from 'absolute' to 'relative' to push calculator cards down */
+    .nav-menu {
+        position: relative !important; 
+        top: 0 !important; 
+        width: 100%;
+        background: transparent; 
+        backdrop-filter: none; 
+        -webkit-backdrop-filter: none;
+        flex-direction: column; 
+        padding: 10px 0; 
+        gap: 5px;
+        border: none; 
+        transform: none !important; 
+        opacity: 0; 
+        visibility: hidden; 
+        display: none; 
+        transition: 0.3s ease;
+    }
 
-/* 2. Prevent the mobile menu from being cut off by the body/containers */
-@media (max-width: 900px) {
-    .nav-menu.active {
+    /* 3. Show menu and set Z-index high */
+    .nav-menu.active { 
+        display: flex !important; 
+        opacity: 1 !important; 
+        visibility: visible !important; 
         z-index: 1000005 !important;
-        /* Ensure it floats above the glass cards */
-        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.9);
     }
+
+    .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 14px; font-size: 1.1rem; }
     
-    /* This fixes the "clipping" issue seen in your screenshot */
-    .nav-dropdown {
-        position: static !important;
+    .nav-dropdown { 
+        width: 100%; 
+        position: static !important; /* Fixed: Prevents clipping */
     }
+
+    .drop-menu { 
+        position: static !important; 
+        width: 100%; 
+        opacity: 1; 
+        visibility: visible; 
+        display: none; 
+        background: rgba(255, 255, 255, 0.05); 
+        border: none; 
+        padding: 0 10px 10px 10px; 
+    }
+
+    .nav-dropdown.active .drop-menu { display: block !important; }
+    .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .drop-menu a { font-size: 0.9rem; padding: 12px; }
 }
 
-/* 3. Force the container to allow the menu to "pop out" */
-.container-narrow {
+/* 4. Ensure the main page container stays below the menu */
+.container-narrow, .container {
     position: relative;
-    z-index: 1; /* Lower than the nav */
+    z-index: 1 !important;
 }
     </style>
     `;
