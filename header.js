@@ -1,6 +1,7 @@
+
 /**
- * Chemistry Spark Lab - Universal Header (v5.2)
- * FIX: Side-bleed text visibility, Dense Frost Blur, Mobile 2-column grid.
+ * Chemistry Spark Lab - Universal Header (v5.3)
+ * FIX: Side-bleed visibility, Desktop/Mobile spacing, Dense Frost Blur.
  */
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -79,13 +80,18 @@ document.addEventListener("DOMContentLoaded", function() {
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        /* Fix: Prevents content from showing in the gaps during scroll */
-        html { background-color: #0a0f1c; }
-        body { padding-top: 85px !important; background-color: #0a0f1c; }
+        /* CRITICAL FIX: Ensures text scrolling in side-gaps matches the background */
+        html, body { 
+            background-color: #0a0f1c !important; 
+            margin: 0;
+            padding: 0;
+        }
+        body { padding-top: 85px !important; }
 
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1200px; height: 60px; z-index: 999999; /* Max Z-Index */
+            width: 95%; max-width: 1200px; height: 60px; 
+            z-index: 999999; /* Keeps header above all page content */
             display: flex; align-items: center; border-radius: 12px;
             border: 1px solid var(--glass-border); background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -110,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
             background: var(--dense-glass); 
             border-radius: 15px;
             border: 1px solid var(--glass-border); 
-            padding: 15px; 
+            padding: 20px; 
             width: 750px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -143,12 +149,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 background: var(--dense-glass); 
                 backdrop-filter: var(--glass-blur);
                 -webkit-backdrop-filter: var(--glass-blur);
-                flex-direction: column; padding: 20px;
+                flex-direction: column; 
+                padding: 15px; /* Reduced overall padding */
+                gap: 5px;     /* Reduced gap between Home and Calculators */
                 border-radius: 15px; border: 1px solid var(--glass-border);
                 transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
                 max-height: 80vh; overflow-y: auto;
                 z-index: 1000001;
             }
+            
+            .nav-link, .drop-trigger {
+                padding: 10px 15px; /* Thinner links to bring them closer */
+                width: 100%;
+                text-align: left;
+            }
+
             .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
             .nav-dropdown { width: 100%; }
             .drop-menu { 
