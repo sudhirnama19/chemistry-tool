@@ -1,8 +1,8 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v6.2)
+ * Chemistry Spark Lab - Universal Header (v6.3)
  * RESTORED: Floating "Capsule" Design.
- * FIXED: Horizontal shifting on mobile and layout alignment bugs.
+ * NEW: Universal Background Sync to match colors across all pages.
  */
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <div class="header-barrier"></div>
     `;
 
-    // 3. FULL CSS STYLING (With the fixes for shifting)
+    // 3. FULL CSS STYLING
     const navStyles = `
     <style>
         :root {
@@ -86,19 +86,22 @@ document.addEventListener("DOMContentLoaded", function() {
             --dense-glass: rgba(10, 15, 28, 1);
             --glass-blur: blur(60px) saturate(210%);
             --glass-border: rgba(255, 255, 255, 0.15);
+            --universal-bg: #0a1120; /* The exact color of your header theme */
         }
 
-        /* FIX 1: FORCE PRECISE BOX SIZING ON ALL NAV ELEMENTS */
-        .spark-nav, .spark-nav *, .spark-nav *::before, .spark-nav *::after {
-            box-sizing: border-box !important;
-        }
-
+        /* UNIVERSAL BACKGROUND SYNC - This fixes all calculators */
         html, body { 
+            background-color: var(--universal-bg) !important; 
             overflow-x: hidden !important; 
             width: 100% !important; 
             margin: 0; 
             padding: 0; 
-            background-color: #0a1120 !important; 
+            color: #ffffff; /* Ensures text stays visible on dark bg */
+        }
+
+        /* Box-Sizing Reset for Header Stability */
+        .spark-nav, .spark-nav *, .spark-nav *::before, .spark-nav *::after {
+            box-sizing: border-box !important;
         }
 
         .navbar, .main-header, #header { display: none !important; visibility: hidden !important; }
@@ -107,15 +110,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         .header-barrier {
             position: fixed; top: 0; left: 0; width: 100%; height: 95px;
-            background: #0a1120; z-index: 999997; pointer-events: none;
+            background: var(--universal-bg); z-index: 999997; pointer-events: none;
         }
 
         /* MAIN NAV DESIGN */
         .spark-nav {
             position: fixed; top: 15px; 
             left: 50%; transform: translateX(-50%);
-            width: 92%; /* Slightly narrower to prevent edge-bumping */
-            max-width: 1200px; height: 62px; 
+            width: 92%; max-width: 1200px; height: 62px; 
             z-index: 999999 !important;
             display: flex; align-items: center; border-radius: 14px;
             border: 1px solid var(--glass-border); 
@@ -131,23 +133,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-
-        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.25rem; letter-spacing: 0.5px; white-space: nowrap; cursor: pointer; }
+        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.25rem; letter-spacing: 0.5px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
         .brand-spark { color: var(--nav-accent); }
         .brand-lab { color: #ffffff; margin-left: 4px; }
 
         .nav-menu { display: flex; gap: 8px; align-items: center; }
-
         .nav-link, .drop-trigger {
             color: #fff; text-decoration: none; font-size: 0.95rem; font-weight: 700;
             background: none; border: none; padding: 8px 14px; border-radius: 9px;
             cursor: pointer; transition: 0.3s all ease;
         }
-
         .nav-link:hover, .drop-trigger:hover { background: rgba(255, 255, 255, 0.08); color: var(--nav-accent); }
 
         .nav-dropdown { position: relative; }
-
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
             background: var(--dense-glass); border-radius: 18px;
@@ -158,17 +156,14 @@ document.addEventListener("DOMContentLoaded", function() {
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             z-index: 1000000;
         }
-
         .nav-dropdown.active .drop-menu { opacity: 1; visibility: visible; transform: translateY(0); }
         .drop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
         .drop-menu a {
             color: rgba(255,255,255,0.85); padding: 12px; text-decoration: none;
             font-size: 0.85rem; font-weight: 600; border-radius: 10px;
             background: rgba(255,255,255,0.03); border: 1px solid transparent;
             transition: 0.2s ease;
         }
-
         .drop-menu a:hover { background: var(--nav-accent); color: #000; border-color: var(--nav-accent); transform: translateY(-2px); }
         .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg); margin-left: 10px; transition: 0.3s; vertical-align: middle; }
         .nav-dropdown.active .chevron { transform: rotate(225deg); color: var(--nav-accent); border-color: var(--nav-accent); }
@@ -179,11 +174,9 @@ document.addEventListener("DOMContentLoaded", function() {
         @media (max-width: 900px) {
             .mobile-toggle { display: flex; }
             .nav-menu {
-                position: absolute; top: 70px; left: 0; 
-                width: 100%; /* FIX 2: Mobile menu now respects parent container width */
+                position: absolute; top: 70px; left: 0; width: 100%;
                 background: var(--dense-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-                flex-direction: column; padding: 15px; 
-                gap: 5px;
+                flex-direction: column; padding: 15px; gap: 5px;
                 border-radius: 16px; border: 1px solid var(--glass-border);
                 transform: translateY(-15px); opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
@@ -199,9 +192,6 @@ document.addEventListener("DOMContentLoaded", function() {
             .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .drop-menu a { font-size: 0.9rem; padding: 12px; }
         }
-
-        /* FIX 3: PREVENT FLEX-SHRINK ON BRANDING */
-        .nav-brand { flex-shrink: 0; }
     </style>
     `;
 
