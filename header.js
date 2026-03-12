@@ -128,8 +128,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Remove existing main-header if it exists
     const oldHeader = document.querySelector('.main-header');
     if (oldHeader) oldHeader.remove();
-  const oldHeader = document.querySelector('.top-header');
-    if (oldHeader) oldHeader.remove();
 
     // Prepend Styles and Nav to Body
     document.head.insertAdjacentHTML('beforeend', navStyles);
