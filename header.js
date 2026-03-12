@@ -1,17 +1,16 @@
 /**
- * Chemistry Spark Lab - Ultra-Frost iOS Universal Header
- * Professional Compact Design | iOS Blur | Full Link Grid
+ * Chemistry Spark Lab - Ultra-Frost iOS Universal Header (v3.0)
+ * FIX: Mobile Full-Screen Blur, Line Removal, and Smooth Expansion
  */
 
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. FORCED CLEANUP: Removes any existing header elements to prevent duplication
+    // 1. FORCED CLEANUP: Remove old headers
     const legacyHeaders = ['.main-header', '.top-header', 'header', '#header', '.universal-nav', '.spark-nav', '.ios-nav'];
     legacyHeaders.forEach(selector => {
         const el = document.querySelector(selector);
         if (el) el.remove();
     });
 
-    // 2. HEADER STRUCTURE (Full Live Links from Chemistry Spark Lab)
     const headerHTML = `
     <nav class="ios-nav">
         <div class="nav-container">
@@ -37,13 +36,13 @@ document.addEventListener("DOMContentLoaded", function() {
                             <a href="titration-calculator.html">Titration Curve</a>
                             <a href="entropy-change.html">Entropy Change</a>
                             <a href="gibbs-energy.html">Gibbs Free Energy</a>
-                            <a href="equilibrium-constant-calculator.html">Equilibrium (Kc) Solver</a>
+                            <a href="equilibrium-constant-calculator.html">Equilibrium (Kc)</a>
                             <a href="ionic-strength-calculator.html">Ionic Strength</a>
                             <a href="kinetics-calculator.html">Rate Kinetics</a>
-                            <a href="stereoisomers-calculator.html">Stereoisomer Counter</a>
-                            <a href="electrolysis-calculator.html">Electrolysis Solver</a>
-                            <a href="emf-calculator.html">EMF (Nernst) Solver</a>
-                            <a href="percent-yield-calculator.html">Percent Yield Lab</a>
+                            <a href="stereoisomers-calculator.html">Stereoisomers</a>
+                            <a href="electrolysis-calculator.html">Electrolysis</a>
+                            <a href="emf-calculator.html">EMF (Nernst)</a>
+                            <a href="percent-yield-calculator.html">Percent Yield</a>
                             <a href="pka-pkb-calculator.html">pKa & pKb Solver</a>
                             <a href="empirical-formula-calculator.html">Empirical Formula</a>
                             <a href="ppm-ppb-calculator.html">ppm / ppb Solver</a>
@@ -62,17 +61,15 @@ document.addEventListener("DOMContentLoaded", function() {
     </nav>
     `;
 
-    // 3. STYLING (Ultra-Frost Glass & Modern Grid)
     const navStyles = `
     <style>
         :root {
-            --ios-blur: blur(25px) saturate(180%);
-            --ios-bg: rgba(10, 15, 28, 0.72);
+            --ios-blur: blur(25px) saturate(200%);
+            --ios-bg: rgba(10, 15, 28, 0.75);
             --accent: #00f2ff;
-            --font-nav: 1.1rem; /* Increased font size */
         }
 
-        body { padding-top: 75px !important; }
+        body { padding-top: 60px !important; }
 
         .ios-nav {
             position: fixed; top: 0; left: 0; width: 100%; height: 60px;
@@ -80,8 +77,9 @@ document.addEventListener("DOMContentLoaded", function() {
             background: var(--ios-bg);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            /* REMOVED THE DARK BORDER LINE */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
         }
 
         .nav-container {
@@ -90,100 +88,89 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         .nav-brand {
-            text-decoration: none; color: #fff; font-weight: 800; font-size: 1.4rem;
-            letter-spacing: -0.5px; transition: 0.3s;
+            text-decoration: none; color: #fff; font-weight: 800; font-size: 1.3rem;
+            letter-spacing: -0.5px;
         }
-        .brand-accent { color: var(--accent); margin-left: 2px; }
+        .brand-accent { color: var(--accent); }
 
-        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links { display: flex; gap: 35px; align-items: center; }
 
         .nav-item, .drop-trigger {
             color: rgba(255,255,255,0.9); text-decoration: none;
-            font-size: var(--font-nav); font-weight: 700; 
-            background: none; border: none; cursor: pointer;
-            transition: 0.2s ease; padding: 5px 0;
+            font-size: 1.05rem; font-weight: 700; background: none; border: none; cursor: pointer;
         }
 
-        .nav-item:hover, .drop-trigger:hover { color: var(--accent); }
-
-        /* DROPDOWN - Frost Effect Applied */
+        /* DESKTOP DROPDOWN */
         .nav-dropdown { position: relative; }
         .drop-content {
             position: absolute; top: 100%; right: 0; margin-top: 15px;
-            background: rgba(15, 23, 42, 0.85); /* Frosty background */
-            backdrop-filter: blur(30px) saturate(160%);
-            -webkit-backdrop-filter: blur(30px) saturate(160%);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
             padding: 20px; width: 550px; opacity: 0; visibility: hidden;
-            transform: translateY(12px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+            transform: translateY(10px); transition: 0.3s;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
-        
         .drop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        /* Animation Trigger */
         .nav-dropdown:hover .drop-content { opacity: 1; visibility: visible; transform: translateY(0); }
-        .nav-dropdown:hover .chevron { transform: rotate(180deg); }
 
         .drop-content a {
-            color: rgba(255,255,255,0.8); padding: 12px 18px; text-decoration: none;
-            font-size: 0.95rem; font-weight: 600; border-radius: 12px; transition: 0.2s;
-            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+            color: rgba(255,255,255,0.8); padding: 10px 15px; text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; border-radius: 10px; transition: 0.2s;
+            background: rgba(255,255,255,0.03);
         }
-        .drop-content a:hover { 
-            background: rgba(0, 242, 255, 0.15); color: var(--accent); 
-            border-color: rgba(0, 242, 255, 0.3); transform: scale(1.03);
-        }
+        .drop-content a:hover { background: rgba(0, 242, 255, 0.15); color: var(--accent); }
 
         .chevron {
             display: inline-block; width: 7px; height: 7px;
-            border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor;
-            transform: rotate(45deg); margin-left: 8px; margin-bottom: 3px;
-            transition: transform 0.3s ease;
+            border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+            transform: rotate(45deg); margin-left: 5px; transition: 0.3s;
         }
 
-        /* MOBILE MENU LOGIC */
-        .menu-toggle { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; padding: 5px; }
-        .menu-toggle .bar { width: 24px; height: 2px; background: var(--accent); border-radius: 2px; transition: 0.3s; }
-
-        @media (max-width: 992px) {
-            .drop-content { width: 450px; }
-            .nav-links { gap: 25px; }
-        }
+        /* MOBILE FIXES */
+        .menu-toggle { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; }
+        .menu-toggle span { width: 24px; height: 2px; background: #fff; transition: 0.3s; }
 
         @media (max-width: 768px) {
-            .menu-toggle { display: flex; }
+            .menu-toggle { display: flex; z-index: 10001; }
             .nav-links {
-                position: fixed; top: 60px; left: 0; width: 100%; height: 0;
-                background: rgba(10, 15, 28, 0.98); flex-direction: column; 
-                overflow: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 0;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background: rgba(10, 15, 28, 0.85); /* Frost background for full mobile screen */
+                backdrop-filter: blur(25px) saturate(180%);
+                -webkit-backdrop-filter: blur(25px) saturate(180%);
+                flex-direction: column; justify-content: flex-start;
+                padding-top: 100px; gap: 30px;
+                opacity: 0; visibility: hidden; transition: 0.4s;
             }
-            .nav-links.active { height: calc(100vh - 60px); padding-top: 30px; overflow-y: auto; }
+            .nav-links.active { opacity: 1; visibility: visible; }
+
             .nav-dropdown { width: 100%; text-align: center; }
             .drop-content { 
-                position: static; width: 100%; opacity: 1; visibility: visible; 
-                transform: none; display: none; background: transparent; border: none; box-shadow: none; 
+                position: static; width: 90%; margin: 10px auto; 
+                opacity: 1; visibility: visible; display: none; 
+                transform: none; background: rgba(255,255,255,0.05);
             }
             .nav-dropdown.active .drop-content { display: block; }
-            .drop-grid { grid-template-columns: 1fr; padding: 0 20px; }
+            .nav-dropdown.active .chevron { transform: rotate(-135deg); }
+            .drop-grid { grid-template-columns: 1fr; }
         }
     </style>
     `;
 
-    // 4. DOM INJECTION
+    // 4. INJECTION
     document.head.insertAdjacentHTML('beforeend', navStyles);
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // 5. INTERACTIVITY & EVENTS
+    // 5. INTERACTIVITY
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const dropBtn = document.getElementById('dropBtn');
     const dropWrapper = document.getElementById('dropWrapper');
 
-    // Mobile Hamburger Animation & Menu Toggle
     mobileToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
-        const bars = mobileToggle.querySelectorAll('.bar');
+        const bars = mobileToggle.querySelectorAll('span');
         if(navMenu.classList.contains('active')) {
             bars[0].style.transform = "rotate(45deg) translate(6px, 6px)";
             bars[1].style.opacity = "0";
@@ -193,19 +180,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Mobile Dropdown Click Override
     dropBtn.addEventListener('click', (e) => {
         if (window.innerWidth <= 768) {
             e.preventDefault();
             dropWrapper.classList.toggle('active');
-        }
-    });
-
-    // Close mobile menu on larger screen resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            navMenu.classList.remove('active');
-            dropWrapper.classList.remove('active');
         }
     });
 });
