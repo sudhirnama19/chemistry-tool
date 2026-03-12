@@ -1,21 +1,22 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v5.6)
- * FEATURES: 
- * - Global Auto-Hide for old headers
- * - Scroll-Bleed Protection (Solid Barrier)
- * - Ultra-Tight Mobile Spacing
- * - Smooth Fade-In Animation
+ * Chemistry Spark Lab - Universal Header (v6.0)
+ * COMPLETE EDITION: Includes SmartParser Integration, 
+ * Legacy Removal, Scroll-Bleed Fix, and Smooth Animations.
  */
 
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. CLEANUP: Instantly find and delete old headers from the HTML
-    const legacyHeaders = ['.main-header', '.top-header', 'header', '#header', '.universal-nav', '.spark-nav', '.ios-nav'];
-    legacyHeaders.forEach(selector => {
-        const el = document.querySelectorAll(selector);
-        el.forEach(item => item.remove());
+    // 1. LEGACY CLEANUP - Wipes out old headers/navbars from existing HTML files
+    const legacySelectors = ['.navbar', '.main-header', '.top-header', 'header', '#header', '.universal-nav'];
+    legacySelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            el.style.display = 'none'; // Instant hide
+            el.remove();               // Permanent delete
+        });
     });
 
+    // 2. THE HEADER HTML STRUCTURE
     const headerHTML = `
     <nav class="spark-nav">
         <div class="nav-container">
@@ -77,124 +78,133 @@ document.addEventListener("DOMContentLoaded", function() {
     <div class="header-barrier"></div>
     `;
 
+    // 3. FULL CSS STYLING
     const navStyles = `
     <style>
         :root {
             --nav-accent: #00f2ff;
             --dense-glass: rgba(10, 15, 28, 1);
-            --glass-blur: blur(70px) saturate(230%);
+            --glass-blur: blur(60px) saturate(210%);
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        /* HIDE OLD CALCULATOR HEADER */
-        .main-header { display: none !important; opacity: 0 !important; pointer-events: none !important; }
-
-        /* SCROLL PROTECTION: Matches site background to hide text bleeding through side gaps */
-        html { background-color: #0a0f1c !important; }
-        body { padding-top: 90px !important; background-color: #0a0f1c !important; position: relative; }
-
-        .header-barrier {
-            position: fixed; top: 0; left: 0; width: 100%; height: 90px;
-            background: #0a0f1c; z-index: 999998; pointer-events: none;
+        /* FIX HORIZONTAL OVERFLOW & ALIGNMENT */
+        html, body { 
+            overflow-x: hidden !important; 
+            width: 100% !important; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #0a1120 !important; 
         }
 
-        /* HEADER DESIGN & ANIMATION */
+        /* AUTO-HIDE OLD ELEMENTS - REINFORCEMENT */
+        .navbar, .main-header, #header { display: none !important; visibility: hidden !important; }
+
+        /* SCROLL PROTECTION BARRIER (Hides text bleeding behind header) */
+        body { padding-top: 100px !important; }
+        .header-barrier {
+            position: fixed; top: 0; left: 0; width: 100%; height: 95px;
+            background: #0a1120; z-index: 999997; pointer-events: none;
+        }
+
+        /* MAIN NAV DESIGN */
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1200px; height: 60px; 
+            width: 95%; max-width: 1200px; height: 62px; 
             z-index: 999999 !important;
-            display: flex; align-items: center; border-radius: 12px;
-            border: 1px solid var(--glass-border); background: var(--dense-glass);
+            display: flex; align-items: center; border-radius: 14px;
+            border: 1px solid var(--glass-border); 
+            background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            animation: navEntrance 0.8s ease-out forwards;
-            opacity: 0;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            opacity: 0; animation: navEntrance 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         @keyframes navEntrance {
-            from { opacity: 0; transform: translate(-50%, -20px); }
+            from { opacity: 0; transform: translate(-50%, -25px); }
             to { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.5rem; letter-spacing: 1px; white-space: nowrap; }
+        .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
+        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.45rem; letter-spacing: 0.5px; white-space: nowrap; cursor: pointer; }
         .brand-spark { color: var(--nav-accent); }
         .brand-lab { color: #ffffff; margin-left: 4px; }
-        .nav-menu { display: flex; gap: 15px; align-items: center; }
 
+        /* NAV MENU LINKS */
+        .nav-menu { display: flex; gap: 12px; align-items: center; }
         .nav-link, .drop-trigger {
-            color: #fff; text-decoration: none; font-size: 1rem; font-weight: 700;
-            background: none; border: none; padding: 10px 15px; border-radius: 8px;
-            cursor: pointer; transition: 0.3s;
+            color: #fff; text-decoration: none; font-size: 0.98rem; font-weight: 700;
+            background: none; border: none; padding: 10px 16px; border-radius: 9px;
+            cursor: pointer; transition: 0.3s all ease;
         }
+        .nav-link:hover, .drop-trigger:hover { background: rgba(255, 255, 255, 0.08); color: var(--nav-accent); }
 
-        .nav-link:hover, .drop-trigger:hover { background: rgba(255,255,255,0.1); color: var(--nav-accent); }
-
-        /* DROPDOWN MENU */
+        /* DESKTOP DROPDOWN */
         .nav-dropdown { position: relative; }
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
-            background: var(--dense-glass); border-radius: 15px;
-            border: 1px solid var(--glass-border); padding: 20px; width: 750px;
+            background: var(--dense-glass); border-radius: 18px;
+            border: 1px solid var(--glass-border); padding: 22px; width: 780px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             z-index: 1000000;
         }
-        
         .nav-dropdown.active .drop-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-        .nav-dropdown.active .chevron { transform: rotate(180deg); }
 
-        .drop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .drop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .drop-menu a {
-            color: rgba(255,255,255,0.9); padding: 10px; text-decoration: none;
-            font-size: 0.82rem; font-weight: 600; border-radius: 8px;
-            background: rgba(255,255,255,0.05); transition: 0.2s;
+            color: rgba(255,255,255,0.85); padding: 12px; text-decoration: none;
+            font-size: 0.85rem; font-weight: 600; border-radius: 10px;
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+            transition: 0.2s ease;
         }
-        .drop-menu a:hover { background: var(--nav-accent); color: #000; }
+        .drop-menu a:hover { background: var(--nav-accent); color: #000; border-color: var(--nav-accent); transform: translateY(-2px); }
 
-        .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-left: 8px; transition: 0.3s; }
+        .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg); margin-left: 10px; transition: 0.3s; vertical-align: middle; }
+        .nav-dropdown.active .chevron { transform: rotate(225deg); color: var(--nav-accent); border-color: var(--nav-accent); }
 
-        /* MOBILE MENU & COMPACT SPACING */
-        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 5px; }
-        .bar { width: 22px; height: 2px; background: var(--nav-accent); transition: 0.3s; }
+        /* MOBILE MENU & HAMBURGER */
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 10px; z-index: 1000002; }
+        .bar { width: 24px; height: 2px; background: var(--nav-accent); transition: 0.3s; border-radius: 2px; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .mobile-toggle { display: flex; }
             .nav-menu {
                 position: absolute; top: 75px; left: 0; width: 100%;
                 background: var(--dense-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-                flex-direction: column; 
-                padding: 12px; 
-                gap: 5px; /* TIGHT SPACING FOR EASY REACH */
-                border-radius: 15px; border: 1px solid var(--glass-border);
-                transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
-                max-height: 80vh; overflow-y: auto; z-index: 1000001;
+                flex-direction: column; padding: 15px; 
+                gap: 5px; /* TIGHT MOBILE SPACING */
+                border-radius: 16px; border: 1px solid var(--glass-border);
+                transform: translateY(-15px); opacity: 0; visibility: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
             }
-            .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 12px; }
             .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
+            .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 14px; font-size: 1.1rem; }
             .nav-dropdown { width: 100%; }
             .drop-menu { 
                 position: static; width: 100%; opacity: 1; visibility: visible; 
-                display: none; transform: none; background: transparent; border: none; box-shadow: none;
-                backdrop-filter: none;
+                display: none; transform: none; background: transparent; border: none; box-shadow: none; padding: 0 10px 10px 10px;
             }
             .nav-dropdown.active .drop-menu { display: block; }
-            .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 0; }
+            .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .drop-menu a { font-size: 0.9rem; padding: 12px; }
         }
     </style>
     `;
 
+    // 4. INJECTION
     document.head.insertAdjacentHTML('beforeend', navStyles);
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // LOGIC CONTROLS
+    // 5. INTERACTIVITY LOGIC
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const dropTrigger = document.getElementById('dropTrigger');
     const dropdownWrapper = document.getElementById('dropdownWrapper');
 
+    // Mobile Toggle Handler
     mobileToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         navMenu.classList.toggle('active');
@@ -208,11 +218,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Dropdown Toggle Handler
     dropTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownWrapper.classList.toggle('active');
     });
 
+    // Close on Outside Click
     document.addEventListener('click', (e) => {
         if (!dropdownWrapper.contains(e.target)) {
             dropdownWrapper.classList.remove('active');
