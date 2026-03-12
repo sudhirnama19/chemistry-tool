@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", function() {
     <style>
         :root {
             --nav-accent: #00f2ff;
-            --dense-glass: rgba(10, 15, 28, 1); /* Increased Opacity */
-            --glass-blur: blur(70px) saturate(280%); /* Stronger Blur */
+            --dense-glass: rgba(10, 15, 28, 0.99); /* Increased Opacity */
+            --glass-blur: blur(70px) saturate(250%); /* Stronger Blur */
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
