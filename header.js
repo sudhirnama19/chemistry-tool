@@ -1,7 +1,8 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v6.4)
- * FIX: Overrides hardcoded radial-gradients in individual HTML files.
+ * Chemistry Spark Lab - Universal Header (v6.5)
+ * FIXED: Mobile menu now pushes content down instead of overlapping.
+ * FIXED: Background color sync across all pages.
  */
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -9,10 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const legacySelectors = ['.navbar', '.main-header', '.top-header', 'header', '#header', '.universal-nav'];
     legacySelectors.forEach(selector => {
         const elements = document.querySelectorAll(selector);
-        elements.forEach(el => {
-            el.style.display = 'none';
-            el.remove();
-        });
+        elements.forEach(el => { el.style.display = 'none'; el.remove(); });
     });
 
     // 2. THE HEADER HTML STRUCTURE
@@ -83,28 +81,20 @@ document.addEventListener("DOMContentLoaded", function() {
         :root {
             --nav-accent: #00f2ff;
             --dense-glass: rgba(10, 15, 28, 1);
-            --glass-blur: blur(60px) saturate(210%);
+            --glass-blur: blur(40px) saturate(180%);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --universal-bg: #0a1120; 
+            --universal-bg: #0a1120;
         }
 
-        /* FIX: KILL THE RADIAL GRADIENT FROM HTML FILES */
+        /* SYNC BACKGROUNDS AND REMOVE GRADIENTS */
         html, body { 
             background-color: var(--universal-bg) !important; 
-            background-image: none !important; /* This removes the radial-gradient */
-            background: var(--universal-bg) !important; /* Double protection */
-            overflow-x: hidden !important; 
-            width: 100% !important; 
-            margin: 0; 
-            padding: 0; 
+            background-image: none !important; 
+            background: var(--universal-bg) !important;
         }
 
-        /* Header Stability Fixes */
-        .spark-nav, .spark-nav *, .spark-nav *::before, .spark-nav *::after {
-            box-sizing: border-box !important;
-        }
-
-        .navbar, .main-header, #header { display: none !important; visibility: hidden !important; }
+        .spark-nav, .spark-nav * { box-sizing: border-box !important; }
+        .navbar, .main-header, #header { display: none !important; }
 
         body { padding-top: 100px !important; }
 
@@ -113,128 +103,74 @@ document.addEventListener("DOMContentLoaded", function() {
             background: var(--universal-bg); z-index: 999997; pointer-events: none;
         }
 
+        /* THE FLOATING CAPSULE */
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 1200px; height: 62px; 
+            width: 92%; max-width: 1200px; min-height: 62px;
             z-index: 999999 !important;
-            display: flex; align-items: center; border-radius: 14px;
-            border: 1px solid var(--glass-border); 
             background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); border-radius: 14px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            opacity: 0; animation: navEntrance 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            transition: height 0.3s ease;
         }
 
-        @keyframes navEntrance {
-            from { opacity: 0; transform: translate(-50%, -25px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
-
-        .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.25rem; letter-spacing: 0.5px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+        .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; }
+        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; }
         .brand-spark { color: var(--nav-accent); }
         .brand-lab { color: #ffffff; margin-left: 4px; }
 
         .nav-menu { display: flex; gap: 8px; align-items: center; }
         .nav-link, .drop-trigger {
             color: #fff; text-decoration: none; font-size: 0.95rem; font-weight: 700;
-            background: none; border: none; padding: 8px 14px; border-radius: 9px;
-            cursor: pointer; transition: 0.3s all ease;
+            background: none; border: none; padding: 8px 14px; border-radius: 8px;
+            cursor: pointer; transition: 0.3s;
         }
-        .nav-link:hover, .drop-trigger:hover { background: rgba(255, 255, 255, 0.08); color: var(--nav-accent); }
 
+        /* DESKTOP DROPDOWN */
         .nav-dropdown { position: relative; }
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
             background: var(--dense-glass); border-radius: 18px;
-            border: 1px solid var(--glass-border); padding: 22px; width: 780px;
+            border: 1px solid var(--glass-border); padding: 20px; width: 700px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            z-index: 1000000;
+            transition: 0.3s ease; z-index: 1000000;
         }
         .nav-dropdown.active .drop-menu { opacity: 1; visibility: visible; transform: translateY(0); }
         .drop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .drop-menu a {
-            color: rgba(255,255,255,0.85); padding: 12px; text-decoration: none;
-            font-size: 0.85rem; font-weight: 600; border-radius: 10px;
-            background: rgba(255,255,255,0.03); border: 1px solid transparent;
-            transition: 0.2s ease;
-        }
-        .drop-menu a:hover { background: var(--nav-accent); color: #000; border-color: var(--nav-accent); transform: translateY(-2px); }
-        .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg); margin-left: 10px; transition: 0.3s; vertical-align: middle; }
-        .nav-dropdown.active .chevron { transform: rotate(225deg); color: var(--nav-accent); border-color: var(--nav-accent); }
+        .drop-grid a { color: #fff; text-decoration: none; font-size: 0.85rem; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); }
+        .drop-grid a:hover { background: var(--nav-accent); color: #000; }
 
-        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 5px; z-index: 1000002; }
-        .bar { width: 24px; height: 2px; background: var(--nav-accent); transition: 0.3s; border-radius: 2px; }
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; }
+        .bar { width: 22px; height: 2px; background: var(--nav-accent); border-radius: 2px; }
 
+        /* MOBILE FIXES */
         @media (max-width: 900px) {
-    /* 1. Make the capsule grow when menu is open */
-    .spark-nav { 
-        height: auto !important; 
-        min-height: 62px; 
-        max-height: 90vh; 
-        overflow-y: auto; 
-    }
+            .mobile-toggle { display: flex; }
+            
+            /* The Menu now pushes the Capsule down */
+            .nav-container { flex-wrap: wrap; }
+            
+            .nav-menu {
+                display: none; width: 100%; flex-direction: column; 
+                padding: 20px 0 10px 0; border-top: 1px solid rgba(255,255,255,0.1);
+                margin-top: 10px;
+            }
+            .nav-menu.active { display: flex; }
 
-    .mobile-toggle { display: flex; }
+            .nav-link, .drop-trigger { width: 100%; padding: 12px; }
 
-    /* 2. Changed from 'absolute' to 'relative' to push calculator cards down */
-    .nav-menu {
-        position: relative !important; 
-        top: 0 !important; 
-        width: 100%;
-        background: transparent; 
-        backdrop-filter: none; 
-        -webkit-backdrop-filter: none;
-        flex-direction: column; 
-        padding: 10px 0; 
-        gap: 5px;
-        border: none; 
-        transform: none !important; 
-        opacity: 0; 
-        visibility: hidden; 
-        display: none; 
-        transition: 0.3s ease;
-    }
-
-    /* 3. Show menu and set Z-index high */
-    .nav-menu.active { 
-        display: flex !important; 
-        opacity: 1 !important; 
-        visibility: visible !important; 
-        z-index: 1000005 !important;
-    }
-
-    .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 14px; font-size: 1.1rem; }
-    
-    .nav-dropdown { 
-        width: 100%; 
-        position: static !important; /* Fixed: Prevents clipping */
-    }
-
-    .drop-menu { 
-        position: static !important; 
-        width: 100%; 
-        opacity: 1; 
-        visibility: visible; 
-        display: none; 
-        background: rgba(255, 255, 255, 0.05); 
-        border: none; 
-        padding: 0 10px 10px 10px; 
-    }
-
-    .nav-dropdown.active .drop-menu { display: block !important; }
-    .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .drop-menu a { font-size: 0.9rem; padding: 12px; }
-}
-
-/* 4. Ensure the main page container stays below the menu */
-.container-narrow, .container {
-    position: relative;
-    z-index: 1 !important;
-}
+            .drop-menu { 
+                position: static !important; width: 100% !important; 
+                display: none; opacity: 1; visibility: visible; 
+                transform: none; background: transparent; border: none; padding: 10px;
+            }
+            .nav-dropdown.active .drop-menu { display: block; }
+            .drop-grid { grid-template-columns: 1fr 1fr; }
+            
+            /* Make sure calculator content stays below the floating header */
+            .container-narrow, .container { position: relative; z-index: 1 !important; }
+        }
     </style>
     `;
 
@@ -242,23 +178,14 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.insertAdjacentHTML('beforeend', navStyles);
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // 5. INTERACTIVITY LOGIC (Same as before)
+    // 5. INTERACTIVITY
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const dropTrigger = document.getElementById('dropTrigger');
     const dropdownWrapper = document.getElementById('dropdownWrapper');
 
-    mobileToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
+    mobileToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
-        const bars = mobileToggle.querySelectorAll('.bar');
-        if(navMenu.classList.contains('active')) {
-            bars[0].style.transform = "rotate(45deg) translate(5px, 5px)";
-            bars[1].style.opacity = "0";
-            bars[2].style.transform = "rotate(-45deg) translate(5px, -5px)";
-        } else {
-            bars[0].style.transform = ""; bars[1].style.opacity = "1"; bars[2].style.transform = "";
-        }
     });
 
     dropTrigger.addEventListener('click', (e) => {
@@ -267,13 +194,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!dropdownWrapper.contains(e.target)) {
-            dropdownWrapper.classList.remove('active');
-        }
-        if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-            navMenu.classList.remove('active');
-            const bars = mobileToggle.querySelectorAll('.bar');
-            bars[0].style.transform = ""; bars[1].style.opacity = "1"; bars[2].style.transform = "";
-        }
+        if (!dropdownWrapper.contains(e.target)) dropdownWrapper.classList.remove('active');
     });
 });
