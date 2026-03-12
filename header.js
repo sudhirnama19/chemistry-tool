@@ -190,6 +190,32 @@ document.addEventListener("DOMContentLoaded", function() {
             .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .drop-menu a { font-size: 0.9rem; padding: 12px; }
         }
+
+
+        /* 1. Ensure the dropdown is always on top of calculator cards */
+.nav-dropdown.active .drop-menu {
+    z-index: 9999999 !important;
+}
+
+/* 2. Prevent the mobile menu from being cut off by the body/containers */
+@media (max-width: 900px) {
+    .nav-menu.active {
+        z-index: 1000005 !important;
+        /* Ensure it floats above the glass cards */
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.9);
+    }
+    
+    /* This fixes the "clipping" issue seen in your screenshot */
+    .nav-dropdown {
+        position: static !important;
+    }
+}
+
+/* 3. Force the container to allow the menu to "pop out" */
+.container-narrow {
+    position: relative;
+    z-index: 1; /* Lower than the nav */
+}
     </style>
     `;
 
