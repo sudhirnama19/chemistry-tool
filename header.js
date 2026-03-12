@@ -1,7 +1,6 @@
-
 /**
- * Chemistry Spark Lab - Universal Header (v5.1)
- * FIX: Dense Frost Blur for Dropdown, Mobile 2-column grid, Click-away listener.
+ * Chemistry Spark Lab - Universal Header (v5.2)
+ * FIX: Side-bleed text visibility, Dense Frost Blur, Mobile 2-column grid.
  */
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -75,16 +74,18 @@ document.addEventListener("DOMContentLoaded", function() {
     <style>
         :root {
             --nav-accent: #00f2ff;
-            --dense-glass: rgba(10, 15, 28, 1); /* Increased Opacity */
-            --glass-blur: blur(70px) saturate(230%); /* Stronger Blur */
+            --dense-glass: rgba(10, 15, 28, 1);
+            --glass-blur: blur(70px) saturate(230%);
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        body { padding-top: 85px !important; }
+        /* Fix: Prevents content from showing in the gaps during scroll */
+        html { background-color: #0a0f1c; }
+        body { padding-top: 85px !important; background-color: #0a0f1c; }
 
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1200px; height: 60px; z-index: 10000;
+            width: 95%; max-width: 1200px; height: 60px; z-index: 999999; /* Max Z-Index */
             display: flex; align-items: center; border-radius: 12px;
             border: 1px solid var(--glass-border); background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -92,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.5rem; letter-spacing: 1px; }
+        .nav-brand { text-decoration: none; font-weight: 900; font-size: 1.5rem; letter-spacing: 1px; white-space: nowrap; }
         .brand-spark { color: var(--nav-accent); }
         .brand-lab { color: #ffffff; margin-left: 4px; }
         .nav-menu { display: flex; gap: 15px; align-items: center; }
@@ -103,22 +104,20 @@ document.addEventListener("DOMContentLoaded", function() {
             cursor: pointer; transition: 0.3s;
         }
 
-        /* DESKTOP DROPDOWN - FIXED BLUR */
         .nav-dropdown { position: relative; }
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
             background: var(--dense-glass); 
             border-radius: 15px;
             border: 1px solid var(--glass-border); 
-            padding: 20px; 
+            padding: 15px; 
             width: 750px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            /* Force Blur on the dropdown itself */
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            z-index: 10001;
+            z-index: 1000000;
         }
         
         .nav-dropdown.active .drop-menu { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -134,8 +133,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-left: 8px; transition: 0.3s; }
 
-        /* MOBILE STYLES */
-        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; }
+        .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 5px; }
         .bar { width: 22px; height: 2px; background: var(--nav-accent); transition: 0.3s; }
 
         @media (max-width: 768px) {
@@ -149,13 +147,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 border-radius: 15px; border: 1px solid var(--glass-border);
                 transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
                 max-height: 80vh; overflow-y: auto;
+                z-index: 1000001;
             }
             .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
             .nav-dropdown { width: 100%; }
             .drop-menu { 
                 position: static; width: 100%; opacity: 1; visibility: visible; 
                 display: none; transform: none; background: transparent; border: none; box-shadow: none;
-                backdrop-filter: none; /* Disable nested blur on mobile to avoid lag */
+                backdrop-filter: none;
             }
             .nav-dropdown.active .drop-menu { display: block; }
             .drop-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; }
