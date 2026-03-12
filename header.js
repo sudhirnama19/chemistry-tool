@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <nav class="spark-nav">
         <div class="nav-container">
             <a href="index.html" class="nav-brand">
-                <span class="brand-spark">CHEMISTRY</span><span class="brand-lab">LAB</span>
+                <span class="brand-spark">Advanced Chemistry</span><span class="brand-lab">Calculators</span>
             </a>
             
             <div class="nav-actions">
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .nav-brand { text-decoration: none; font-weight: 800; font-size: 1.3rem; letter-spacing: 1px; }
+        .nav-brand { text-decoration: none; font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
         .brand-spark { color: var(--nav-accent); }
         .brand-lab { color: #ffffff; margin-left: 4px; }
         .nav-menu { display: flex; gap: 15px; align-items: center; }
