@@ -150,22 +150,23 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         .drop-grid a:hover { background: var(--nav-accent); color: #000; }
 
-        /* The Glow Effect when clicking a Calculator Tab */
+        /* The Internal Glow Effect when clicking a Calculator Tab */
 .drop-grid a:active {
     background: var(--nav-accent) !important; /* Changes background to Cyan */
-    color: #000 !important; /* Makes text black for better contrast during the glow */
-    transform: scale(0.95); /* Slight shrink effect to feel like a real button press */
-    box-shadow: 0 0 20px var(--nav-accent), 0 0 40px var(--nav-accent); /* Dual-layer neon glow */
-    border-color: var(--nav-accent);
-    transition: 0.1s; /* Fast transition for an instant "click" feel */
+    color: #000 !important; /* FIX: Text becomes dark on click */
+    font-weight: 800 !important; /* Makes text bolder when dark for clarity */
+    
+    /* FIX: Glow is now INSIDE the tab only */
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5), 
+                inset 0 0 5px rgba(255, 255, 255, 0.5); 
+                
+    transform: scale(0.96); /* Slight press effect */
+    transition: 0.05s; /* Instant reaction */
 }
 
-/* Optional: Also add this for a smooth hover glow on Desktop */
-@media (min-width: 901px) {
-    .drop-grid a:hover {
-        box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
-        transform: translateY(-2px);
-    }
+/* Ensure the text stays dark if the link is focused */
+.drop-grid a:focus {
+    color: #000 !important;
 }
 
         .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; }
