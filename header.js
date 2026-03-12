@@ -150,23 +150,26 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         .drop-grid a:hover { background: var(--nav-accent); color: #000; }
 
-        /* The Internal Glow Effect when clicking a Calculator Tab */
-.drop-grid a:active {
-    background: var(--nav-accent) !important; /* Changes background to Cyan */
-    color: #000 !important; /* FIX: Text becomes dark on click */
-    font-weight: 800 !important; /* Makes text bolder when dark for clarity */
-    
-    /* FIX: Glow is now INSIDE the tab only */
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5), 
-                inset 0 0 5px rgba(255, 255, 255, 0.5); 
-                
-    transform: scale(0.96); /* Slight press effect */
-    transition: 0.05s; /* Instant reaction */
+        /* 1. Reset standard state to ensure text is always white by default */
+.drop-grid a {
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: background 0.2s, color 0.2s;
 }
 
-/* Ensure the text stays dark if the link is focused */
-.drop-grid a:focus {
-    color: #000 !important;
+/* 2. Glow and Dark text ONLY while the finger/mouse is pressing down */
+.drop-grid a:active {
+    background: var(--nav-accent) !important; 
+    color: #000 !important; 
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5) !important;
+    transform: scale(0.96);
+    transition: 0s; /* Makes the change instant when touching */
+}
+
+/* 3. Force text back to white immediately after the click/touch ends */
+.drop-grid a:focus, 
+.drop-grid a:visited {
+    color: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.08) !important; /* Reverts to original subtle glass */
 }
 
         .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; }
