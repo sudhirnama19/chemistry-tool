@@ -1,8 +1,7 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v6.3)
- * RESTORED: Floating "Capsule" Design.
- * NEW: Universal Background Sync to match colors across all pages.
+ * Chemistry Spark Lab - Universal Header (v6.4)
+ * FIX: Overrides hardcoded radial-gradients in individual HTML files.
  */
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -86,20 +85,21 @@ document.addEventListener("DOMContentLoaded", function() {
             --dense-glass: rgba(10, 15, 28, 1);
             --glass-blur: blur(60px) saturate(210%);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --universal-bg: #0a1120; /* The exact color of your header theme */
+            --universal-bg: #0a1120; 
         }
 
-        /* UNIVERSAL BACKGROUND SYNC - This fixes all calculators */
+        /* FIX: KILL THE RADIAL GRADIENT FROM HTML FILES */
         html, body { 
             background-color: var(--universal-bg) !important; 
+            background-image: none !important; /* This removes the radial-gradient */
+            background: var(--universal-bg) !important; /* Double protection */
             overflow-x: hidden !important; 
             width: 100% !important; 
             margin: 0; 
             padding: 0; 
-            color: #ffffff; /* Ensures text stays visible on dark bg */
         }
 
-        /* Box-Sizing Reset for Header Stability */
+        /* Header Stability Fixes */
         .spark-nav, .spark-nav *, .spark-nav *::before, .spark-nav *::after {
             box-sizing: border-box !important;
         }
@@ -113,10 +113,8 @@ document.addEventListener("DOMContentLoaded", function() {
             background: var(--universal-bg); z-index: 999997; pointer-events: none;
         }
 
-        /* MAIN NAV DESIGN */
         .spark-nav {
-            position: fixed; top: 15px; 
-            left: 50%; transform: translateX(-50%);
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
             width: 92%; max-width: 1200px; height: 62px; 
             z-index: 999999 !important;
             display: flex; align-items: center; border-radius: 14px;
@@ -199,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.insertAdjacentHTML('beforeend', navStyles);
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
-    // 5. INTERACTIVITY LOGIC
+    // 5. INTERACTIVITY LOGIC (Same as before)
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const dropTrigger = document.getElementById('dropTrigger');
