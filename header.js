@@ -1,14 +1,15 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v5.3)
- * FIX: Side-bleed visibility, Desktop/Mobile spacing, Dense Frost Blur.
+ * Chemistry Spark Lab - Universal Header (v5.4)
+ * FIX: Side-bleed text visibility, Desktop/Mobile spacing, Layer priority.
  */
 
 document.addEventListener("DOMContentLoaded", function() {
+    // 1. Remove ANY existing header elements to prevent duplicates or layout issues
     const legacyHeaders = ['.main-header', '.top-header', 'header', '#header', '.universal-nav', '.spark-nav', '.ios-nav'];
     legacyHeaders.forEach(selector => {
-        const el = document.querySelector(selector);
-        if (el) el.remove();
+        const el = document.querySelectorAll(selector);
+        el.forEach(item => item.remove());
     });
 
     const headerHTML = `
@@ -69,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         </div>
     </nav>
+    <div class="header-barrier"></div>
     `;
 
     const navStyles = `
@@ -80,18 +82,22 @@ document.addEventListener("DOMContentLoaded", function() {
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        /* CRITICAL FIX: Ensures text scrolling in side-gaps matches the background */
-        html, body { 
-            background-color: #0a0f1c !important; 
-            margin: 0;
-            padding: 0;
+        /* FIX: Prevents text from bleeding through the side gaps during scroll */
+        html { background-color: #0a0f1c !important; }
+        body { padding-top: 90px !important; background-color: #0a0f1c !important; }
+
+        /* The Barrier creates a solid dark block behind the floating pill */
+        .header-barrier {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 90px;
+            background: #0a0f1c;
+            z-index: 999998;
         }
-        body { padding-top: 85px !important; }
 
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
             width: 95%; max-width: 1200px; height: 60px; 
-            z-index: 999999; /* Keeps header above all page content */
+            z-index: 999999 !important;
             display: flex; align-items: center; border-radius: 12px;
             border: 1px solid var(--glass-border); background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -150,20 +156,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 backdrop-filter: var(--glass-blur);
                 -webkit-backdrop-filter: var(--glass-blur);
                 flex-direction: column; 
-                padding: 15px; /* Reduced overall padding */
-                gap: 5px;     /* Reduced gap between Home and Calculators */
+                padding: 12px; /* Tighter padding for mobile */
+                gap: 5px;      /* Reduced gap between items */
                 border-radius: 15px; border: 1px solid var(--glass-border);
                 transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
                 max-height: 80vh; overflow-y: auto;
                 z-index: 1000001;
             }
-            
-            .nav-link, .drop-trigger {
-                padding: 10px 15px; /* Thinner links to bring them closer */
-                width: 100%;
-                text-align: left;
-            }
-
+            .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 12px; }
             .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
             .nav-dropdown { width: 100%; }
             .drop-menu { 
