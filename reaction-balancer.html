@@ -367,141 +367,106 @@
         }
 
         // ==========================
-        // COMPREHENSIVE FORMULA PARSER
-        // ==========================
-        
-        parseFormula(formula) {
+// COMPREHENSIVE FORMULA PARSER (FIXED)
+// ==========================
+
+parseFormula(formula) {
+
+    // convert complex ion brackets to parentheses
+    formula = formula.replace(/\[/g,'(').replace(/\]/g,')');
+
+    // hydrate support (CuSO4·5H2O)
+    if (formula.includes('·')) {
+        const parts = formula.split('·');
+        let total = {};
+
+        for (let part of parts) {
+
+            let match = part.match(/^(\d+)(.*)/);
+            let multiplier = 1;
+
+            if (match) {
+                multiplier = parseInt(match[1]);
+                part = match[2];
+            }
+
+            const parsed = this.parseFormula(part);
+
+            for (let el in parsed) {
+                total[el] = (total[el] || 0) + parsed[el] * multiplier;
+            }
+        }
+
+        return total;
+    }
 
     formula = formula.trim();
 
-    // Support complex ions like K4[Fe(CN)6]
-    formula = formula.replace(/\[/g, '(').replace(/\]/g, ')');
-
-    // Support hydrates like CuSO4·5H2O or CuSO4.5H2O
-    formula = formula.replace(/·/g, '.');
-    if (formula.includes('.')) {
-        let parts = formula.split('.');
-        let main = parts[0];
-        for (let i = 1; i < parts.length; i++) {
-            let m = parts[i].match(/^(\d+)(.*)$/);
-            if (m) {
-                main += '(' + m[2] + ')' + m[1];
-            } else {
-                main += '(' + parts[i] + ')';
-            }
-        }
-        formula = main;
-    }
-
-    const elements = {};
-
-    // Handle complex compounds with parentheses
-    if (formula.includes('(')) {
-        return this.parseParentheticalFormula(formula, elements);
-    }
-
-    // Simple formula parsing
+    let stack = [{}];
     let i = 0;
+
     while (i < formula.length) {
 
-        let element = formula[i];
-        i++;
-
-        if (i < formula.length && /[a-z]/.test(formula[i])) {
-            element += formula[i];
+        if (formula[i] === '(') {
+            stack.push({});
             i++;
         }
 
-        let number = '';
-        while (i < formula.length && /\d/.test(formula[i])) {
-            number += formula[i];
+        else if (formula[i] === ')') {
+
             i++;
+
+            let num = '';
+            while (i < formula.length && /\d/.test(formula[i])) {
+                num += formula[i];
+                i++;
+            }
+
+            let multiplier = parseInt(num || '1');
+            let group = stack.pop();
+            let top = stack[stack.length - 1];
+
+            for (let el in group) {
+                top[el] = (top[el] || 0) + group[el] * multiplier;
+            }
         }
 
-        const count = parseInt(number || '1', 10);
-        elements[element] = (elements[element] || 0) + count;
+        else {
+
+            let element = formula[i];
+            i++;
+
+            if (i < formula.length && /[a-z]/.test(formula[i])) {
+                element += formula[i];
+                i++;
+            }
+
+            let num = '';
+            while (i < formula.length && /\d/.test(formula[i])) {
+                num += formula[i];
+                i++;
+            }
+
+            let count = parseInt(num || '1');
+            let top = stack[stack.length - 1];
+
+            top[element] = (top[element] || 0) + count;
+        }
     }
 
-    return elements;
+    return stack[0];
 }
-        
-        // Handle complex compounds with parentheses
-        if (formula.includes('(')) {
-        return this.parseParentheticalFormula(formula, elements);
-        }
-        
-        // Simple formula parsing
-        let i = 0;
-        while (i < formula.length) {
-        // Parse element
-        let element = formula[i];
-        i++;
-        if (i < formula.length && /[a-z]/.test(formula[i])) {
-        element += formula[i];
-        i++;
-        }
-        
-        // Parse number
-        let number = '';
-        while (i < formula.length && /\d/.test(formula[i])) {
-        number += formula[i];
-        i++;
-        }
-        
-        const count = parseInt(number || '1', 10);
-        elements[element] = (elements[element] || 0) + count;
-        }
-        
-        return elements;
-        }
 
-        parseParentheticalFormula(formula, result) {
-        const stack = [{ elements: {} }];
-        let i = 0;
-        
-        while (i < formula.length) {
-        const char = formula[i];
-        
-        if (char === '(') {
-        stack.push({ elements: {} });
-        i++;
-        } else if (char === ')') {
-        i++;
-        let num = '';
-        while (i < formula.length && /\d/.test(formula[i])) {
-        num += formula[i++];
-        }
-        const multiplier = parseInt(num || '1', 10);
-        const group = stack.pop();
-        const top = stack[stack.length - 1];
-        this.mergeElements(top.elements, group.elements, multiplier);
-        } else if (/[A-Z]/.test(char)) {
-        let element = formula[i++];
-        if (i < formula.length && /[a-z]/.test(formula[i])) {
-        element += formula[i++];
-        }
-        let num = '';
-        while (i < formula.length && /\d/.test(formula[i])) {
-        num += formula[i++];
-        }
-        const count = parseInt(num || '1', 10);
-        const top = stack[stack.length - 1];
-        top.elements[element] = (top.elements[element] || 0) + count;
-        } else if (char === ' ') {
-        i++;
-        } else {
-        throw new Error(`Invalid character '${char}' in formula: ${formula}`);
-        }
-        }
-        
-        return stack[0].elements;
-        }
+// compatibility function (kept so other code doesn't break)
+parseParentheticalFormula(formula) {
+    return this.parseFormula(formula);
+}
 
-        mergeElements(target, source, multiplier = 1) {
-        for (const [element, count] of Object.entries(source)) {
+mergeElements(target, source, multiplier = 1) {
+    for (const [element, count] of Object.entries(source)) {
         target[element] = (target[element] || 0) + count * multiplier;
-        }
-        }
+    }
+}
 
         // ==========================
         // COMPLETE ELEMENT EXTRACTION
@@ -654,6 +619,10 @@ function runBalance() {
     const stepsDiv = document.getElementById('stepsOutput');
 
     const result = solver.balanceEquation(input);
+    
+    if(result.coefs.every(c => c === 1)){
+   console.log("Equation may already be balanced");
+}
 
     if(result.error) {
         alert("Error: " + result.error);
@@ -701,3 +670,4 @@ function formatChemicalHTML(str) {
     <script src="header.js"></script>
 </body>
 </html>
+
