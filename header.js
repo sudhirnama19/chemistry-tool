@@ -1,11 +1,15 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v5.4)
- * FIX: Side-bleed text visibility, Desktop/Mobile spacing, Layer priority.
+ * Chemistry Spark Lab - Universal Header (v5.6)
+ * FEATURES: 
+ * - Global Auto-Hide for old headers
+ * - Scroll-Bleed Protection (Solid Barrier)
+ * - Ultra-Tight Mobile Spacing
+ * - Smooth Fade-In Animation
  */
 
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Remove ANY existing header elements to prevent duplicates or layout issues
+    // 1. CLEANUP: Instantly find and delete old headers from the HTML
     const legacyHeaders = ['.main-header', '.top-header', 'header', '#header', '.universal-nav', '.spark-nav', '.ios-nav'];
     legacyHeaders.forEach(selector => {
         const el = document.querySelectorAll(selector);
@@ -82,18 +86,19 @@ document.addEventListener("DOMContentLoaded", function() {
             --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        /* FIX: Prevents text from bleeding through the side gaps during scroll */
-        html { background-color: #0a0f1c !important; }
-        body { padding-top: 90px !important; background-color: #0a0f1c !important; }
+        /* HIDE OLD CALCULATOR HEADER */
+        .main-header { display: none !important; opacity: 0 !important; pointer-events: none !important; }
 
-        /* The Barrier creates a solid dark block behind the floating pill */
+        /* SCROLL PROTECTION: Matches site background to hide text bleeding through side gaps */
+        html { background-color: #0a0f1c !important; }
+        body { padding-top: 90px !important; background-color: #0a0f1c !important; position: relative; }
+
         .header-barrier {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 90px;
-            background: #0a0f1c;
-            z-index: 999998;
+            position: fixed; top: 0; left: 0; width: 100%; height: 90px;
+            background: #0a0f1c; z-index: 999998; pointer-events: none;
         }
 
+        /* HEADER DESIGN & ANIMATION */
         .spark-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
             width: 95%; max-width: 1200px; height: 60px; 
@@ -102,6 +107,13 @@ document.addEventListener("DOMContentLoaded", function() {
             border: 1px solid var(--glass-border); background: var(--dense-glass);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: navEntrance 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes navEntrance {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
         }
 
         .nav-container { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
@@ -116,19 +128,18 @@ document.addEventListener("DOMContentLoaded", function() {
             cursor: pointer; transition: 0.3s;
         }
 
+        .nav-link:hover, .drop-trigger:hover { background: rgba(255,255,255,0.1); color: var(--nav-accent); }
+
+        /* DROPDOWN MENU */
         .nav-dropdown { position: relative; }
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
-            background: var(--dense-glass); 
-            border-radius: 15px;
-            border: 1px solid var(--glass-border); 
-            padding: 20px; 
-            width: 750px;
+            background: var(--dense-glass); border-radius: 15px;
+            border: 1px solid var(--glass-border); padding: 20px; width: 750px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             z-index: 1000000;
         }
         
@@ -145,6 +156,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         .chevron { display: inline-block; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-left: 8px; transition: 0.3s; }
 
+        /* MOBILE MENU & COMPACT SPACING */
         .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 5px; }
         .bar { width: 22px; height: 2px; background: var(--nav-accent); transition: 0.3s; }
 
@@ -152,16 +164,13 @@ document.addEventListener("DOMContentLoaded", function() {
             .mobile-toggle { display: flex; }
             .nav-menu {
                 position: absolute; top: 75px; left: 0; width: 100%;
-                background: var(--dense-glass); 
-                backdrop-filter: var(--glass-blur);
-                -webkit-backdrop-filter: var(--glass-blur);
+                background: var(--dense-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
                 flex-direction: column; 
-                padding: 12px; /* Tighter padding for mobile */
-                gap: 5px;      /* Reduced gap between items */
+                padding: 12px; 
+                gap: 5px; /* TIGHT SPACING FOR EASY REACH */
                 border-radius: 15px; border: 1px solid var(--glass-border);
                 transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
-                max-height: 80vh; overflow-y: auto;
-                z-index: 1000001;
+                max-height: 80vh; overflow-y: auto; z-index: 1000001;
             }
             .nav-link, .drop-trigger { width: 100%; text-align: left; padding: 12px; }
             .nav-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -172,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 backdrop-filter: none;
             }
             .nav-dropdown.active .drop-menu { display: block; }
-            .drop-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; }
+            .drop-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 0; }
         }
     </style>
     `;
@@ -180,6 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.insertAdjacentHTML('beforeend', navStyles);
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
 
+    // LOGIC CONTROLS
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     const dropTrigger = document.getElementById('dropTrigger');
