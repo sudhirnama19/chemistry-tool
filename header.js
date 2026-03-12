@@ -1,7 +1,7 @@
 
 /**
- * Chemistry Spark Lab - Universal Header (v5.0)
- * FIX: Mobile 2-column grid, Desktop click-to-close logic, Click-away listener.
+ * Chemistry Spark Lab - Universal Header (v5.1)
+ * FIX: Dense Frost Blur for Dropdown, Mobile 2-column grid, Click-away listener.
  */
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -75,9 +75,9 @@ document.addEventListener("DOMContentLoaded", function() {
     <style>
         :root {
             --nav-accent: #00f2ff;
-            --dense-glass: rgba(10, 15, 28, 0.95);
-            --glass-blur: blur(40px) saturate(200%);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --dense-glass: rgba(10, 15, 28, 0.98); /* Increased Opacity */
+            --glass-blur: blur(50px) saturate(200%); /* Stronger Blur */
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
         body { padding-top: 85px !important; }
@@ -103,26 +103,32 @@ document.addEventListener("DOMContentLoaded", function() {
             cursor: pointer; transition: 0.3s;
         }
 
-        /* DESKTOP DROPDOWN */
+        /* DESKTOP DROPDOWN - FIXED BLUR */
         .nav-dropdown { position: relative; }
         .drop-menu {
             position: absolute; top: calc(100% + 15px); right: 0;
-            background: var(--dense-glass); border-radius: 15px;
-            border: 1px solid var(--glass-border); padding: 20px; width: 750px;
+            background: var(--dense-glass); 
+            border-radius: 15px;
+            border: 1px solid var(--glass-border); 
+            padding: 20px; 
+            width: 750px;
             opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            /* Force Blur on the dropdown itself */
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            z-index: 10001;
         }
         
-        /* State for Active Dropdown (Desktop & Mobile) */
         .nav-dropdown.active .drop-menu { opacity: 1; visibility: visible; transform: translateY(0); }
         .nav-dropdown.active .chevron { transform: rotate(180deg); }
 
         .drop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .drop-menu a {
-            color: rgba(255,255,255,0.85); padding: 10px; text-decoration: none;
+            color: rgba(255,255,255,0.9); padding: 10px; text-decoration: none;
             font-size: 0.82rem; font-weight: 600; border-radius: 8px;
-            background: rgba(255,255,255,0.03); transition: 0.2s;
+            background: rgba(255,255,255,0.05); transition: 0.2s;
         }
         .drop-menu a:hover { background: var(--nav-accent); color: #000; }
 
@@ -136,7 +142,10 @@ document.addEventListener("DOMContentLoaded", function() {
             .mobile-toggle { display: flex; }
             .nav-menu {
                 position: absolute; top: 75px; left: 0; width: 100%;
-                background: var(--dense-glass); flex-direction: column; padding: 20px;
+                background: var(--dense-glass); 
+                backdrop-filter: var(--glass-blur);
+                -webkit-backdrop-filter: var(--glass-blur);
+                flex-direction: column; padding: 20px;
                 border-radius: 15px; border: 1px solid var(--glass-border);
                 transform: translateY(-10px); opacity: 0; visibility: hidden; transition: 0.4s;
                 max-height: 80vh; overflow-y: auto;
@@ -146,9 +155,9 @@ document.addEventListener("DOMContentLoaded", function() {
             .drop-menu { 
                 position: static; width: 100%; opacity: 1; visibility: visible; 
                 display: none; transform: none; background: transparent; border: none; box-shadow: none;
+                backdrop-filter: none; /* Disable nested blur on mobile to avoid lag */
             }
             .nav-dropdown.active .drop-menu { display: block; }
-            /* 2-COLUMN GRID FOR MOBILE */
             .drop-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; }
         }
     </style>
@@ -162,7 +171,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const dropTrigger = document.getElementById('dropTrigger');
     const dropdownWrapper = document.getElementById('dropdownWrapper');
 
-    // 1. Mobile Menu Toggle
     mobileToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         navMenu.classList.toggle('active');
@@ -176,13 +184,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // 2. Dropdown Toggle (Desktop & Mobile)
     dropTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownWrapper.classList.toggle('active');
     });
 
-    // 3. Click-Away Listener (Closes everything when clicking outside)
     document.addEventListener('click', (e) => {
         if (!dropdownWrapper.contains(e.target)) {
             dropdownWrapper.classList.remove('active');
