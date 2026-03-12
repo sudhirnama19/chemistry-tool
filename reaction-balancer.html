@@ -371,8 +371,59 @@
         // ==========================
         
         parseFormula(formula) {
-        formula = formula.trim();
-        const elements = {};
+
+    formula = formula.trim();
+
+    // Support complex ions like K4[Fe(CN)6]
+    formula = formula.replace(/\[/g, '(').replace(/\]/g, ')');
+
+    // Support hydrates like CuSO4·5H2O or CuSO4.5H2O
+    formula = formula.replace(/·/g, '.');
+    if (formula.includes('.')) {
+        let parts = formula.split('.');
+        let main = parts[0];
+        for (let i = 1; i < parts.length; i++) {
+            let m = parts[i].match(/^(\d+)(.*)$/);
+            if (m) {
+                main += '(' + m[2] + ')' + m[1];
+            } else {
+                main += '(' + parts[i] + ')';
+            }
+        }
+        formula = main;
+    }
+
+    const elements = {};
+
+    // Handle complex compounds with parentheses
+    if (formula.includes('(')) {
+        return this.parseParentheticalFormula(formula, elements);
+    }
+
+    // Simple formula parsing
+    let i = 0;
+    while (i < formula.length) {
+
+        let element = formula[i];
+        i++;
+
+        if (i < formula.length && /[a-z]/.test(formula[i])) {
+            element += formula[i];
+            i++;
+        }
+
+        let number = '';
+        while (i < formula.length && /\d/.test(formula[i])) {
+            number += formula[i];
+            i++;
+        }
+
+        const count = parseInt(number || '1', 10);
+        elements[element] = (elements[element] || 0) + count;
+    }
+
+    return elements;
+}
         
         // Handle complex compounds with parentheses
         if (formula.includes('(')) {
