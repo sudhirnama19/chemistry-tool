@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Water Hardness Calculator | CaCO3 Equivalent Solver | Chemistry Spark Lab</title>
+    <meta name="description" content="Calculate total water hardness in mg/L of CaCO3. Comprehensive guide on temporary vs permanent hardness, molar equivalents, and industrial water treatment.">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --glass: rgba(30, 41, 59, 0.7); }
+        
+        body { 
+            background-color: var(--bg); 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; line-height: 1.6;
+        }
+
+        /* Fixed Glassmorphism Header */
+        .main-header {
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+        }
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .content-section { max-width: 1000px; margin: 120px auto 40px auto; padding: 20px 15px; }
+
+        .info-section { margin-top: 60px; }
+        .info-section h2, .info-section h3 { 
+            margin-bottom: 25px; border-left: 5px solid var(--accent); 
+            padding-left: 15px; font-weight: 800; color: #ffffff;
+        }
+        
+        .grid-layout { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; 
+        }
+        
+        .info-card { 
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .info-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .example-box { 
+            background: rgba(0, 255, 213, 0.05); 
+            padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid var(--accent);
+        }
+
+        /* Calculator Styling */
+        .solver-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 20px; padding: 40px;
+            border: 1px solid rgba(0, 255, 213, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 213, 0.15);
+        }
+        
+        /* Input Visibility */
+        .form-control {
+            background-color: #0f172a !important;
+            color: var(--accent) !important;
+            border: 2px solid #334155 !important;
+            padding: 12px; font-weight: 700; margin-bottom: 15px;
+        }
+        .form-control:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.3);
+            outline: none;
+        }
+        .form-control::placeholder { color: #475569; }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #007bff, var(--accent));
+            color: #0f172a; font-weight: 800; padding: 15px;
+            width: 100%; border-radius: 12px; border: none;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn-solve:hover { transform: scale(1.02); cursor: pointer; opacity: 0.9; }
+        
+        /* Unit Toggle Styling */
+.btn-group {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    padding: 5px;
+    border: 1px solid rgba(0, 255, 213, 0.2);
+}
+.btn-check:checked + .btn-outline-info {
+    background-color: var(--accent) !important;
+    color: #0f172a !important;
+    border-color: var(--accent) !important;
+}
+.btn-outline-info {
+    border-color: transparent !important;
+    color: var(--accent) !important;
+    font-weight: 700;
+    transition: 0.3s;
+    border-radius: 8px !important;
+}
+
+        .result-display {
+            display: none; margin-top: 30px; padding: 25px;
+            background: rgba(15, 23, 42, 0.8); border-radius: 15px; border: 1px dashed var(--accent);
+        }
+
+        .card-q { color: var(--accent); font-weight: 700; margin-bottom: 12px; font-size: 1.15rem; }
+        .card-a { color: #cbd5e1; font-size: 0.95rem; }
+        
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        table { width: 100%; color: white; border-collapse: collapse; background: rgba(30, 41, 59, 0.4); }
+        th, td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        th { background: rgba(0, 255, 213, 0.15); color: var(--accent); font-weight: 800; }
+
+        .formula-text { font-family: 'Courier New', monospace; color: var(--accent); font-weight: bold; background: #000; padding: 2px 5px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Advanced Chemistry Calculators</a>
+    </header>
+
+    <div class="content-section">
+        <section id="intro">
+            <h2>Understanding Water Hardness</h2>
+            <div class="info-card">
+                <p class="card-a"><strong>Water Hardness</strong> is a measure of the concentration of multivalent cations, primarily <strong>Calcium (Ca²⁺)</strong> and <strong>Magnesium (Mg²⁺)</strong>, dissolved in water. While other metals like Iron and Manganese contribute, they are usually negligible. Hardness is expressed as an equivalent concentration of <strong>Calcium Carbonate (CaCO₃)</strong> to provide a standardized scale for water quality analysis.</p>
+                <div class="example-box">
+                    <strong>Standard Total Hardness Formula:</strong>
+                    <p class="mt-2 formula-text">Total Hardness (mg/L as CaCO₃) = 2.497[Ca²⁺ mg/L] + 4.118[Mg²⁺ mg/L]</p>
+                    <p class="small mb-0">The constants 2.497 and 4.118 represent the ratio of the molar mass of CaCO₃ to the molar mass of Calcium and Magnesium respectively.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="solver-card">
+                <h3 class="text-center mb-4">Water Hardness Solver</h3>
+                <div class="text-center mb-4">
+    <div class="btn-group" role="group" aria-label="Unit Toggle">
+        <input type="radio" class="btn-check" name="unitType" id="unitMgL" checked onclick="updateLabels()">
+        <label class="btn btn-outline-info" for="unitMgL">mg/L (ppm)</label>
+
+        <input type="radio" class="btn-check" name="unitType" id="unitGPG" onclick="updateLabels()">
+        <label class="btn btn-outline-info" for="unitGPG">GPG (Grains)</label>
+
+        <input type="radio" class="btn-check" name="unitType" id="unitMmol" onclick="updateLabels()">
+        <label class="btn btn-outline-info" for="unitMmol">mmol/L</label>
+    </div>
+</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Calcium Concentration (mg/L)</label>
+                        <input type="text" id="caInput" class="form-control" placeholder="e.g., 40 or 1.2e1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Magnesium Concentration (mg/L)</label>
+                        <input type="text" id="mgInput" class="form-control" placeholder="e.g., 12 or 5^1">
+                    </div>
+                </div>
+                <button onclick="calculateHardness()" class="btn btn-solve">Calculate Total Hardness</button>
+
+                <div id="results" class="result-display">
+                    <h4 id="resHardness" style="color: var(--accent); font-weight: bold;"></h4>
+                    <p id="resCategory" class="card-a mb-1"></p>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <small class="text-info">Result is expressed as mg/L (ppm) of Calcium Carbonate equivalent.</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Detailed Calculation Logics</h3>
+            <div class="info-card">
+                <p class="card-a">To understand how to put values into the calculator, follow these scientific rules:</p>
+                <ul class="card-a">
+                    <li><strong>Step 1: Measurement.</strong> Obtain the concentration of Calcium and Magnesium from a water lab report (usually in mg/L or ppm).</li>
+                    <li><strong>Step 2: Conversion.</strong> The calculator uses the <strong>Molar Equivalent Rule</strong>. Since 1 mole of Ca weighs ~40g and 1 mole of CaCO₃ weighs ~100g, the factor is 100/40.08 = <strong>2.497</strong>.</li>
+                    <li><strong>Step 3: Summation.</strong> The individual CaCO₃ equivalents are added to find the <i>Total Hardness</i>.</li>
+                </ul>
+                <div class="example-box">
+                    <strong>Solved Example: Well Water Analysis</strong>
+                    <br>• <strong>Measured Ca:</strong> 100 mg/L
+                    <br>• <strong>Measured Mg:</strong> 30 mg/L
+                    <br><strong>Calculation:</strong> (100 × 2.497) + (30 × 4.118) = 249.7 + 123.54 = <strong>373.24 mg/L</strong>
+                    <br><strong>Status:</strong> Very Hard Water.
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Aspects & Applications</h3>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <div class="card-q">Temporary vs Permanent</div>
+                    <p class="card-a">Temporary hardness (Carbonate) can be removed by boiling. Permanent hardness (Sulfate/Chloride) requires chemical ion exchange or reverse osmosis.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Industrial Cooling</div>
+                    <p class="card-a">In power plants, hardness must be near zero to prevent 'scaling' in boilers, which acts as an insulator and causes catastrophic failure.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Soap & Detergents</div>
+                    <p class="card-a">Hard water reacts with soap to form 'scum' (calcium stearate), reducing cleaning efficiency and increasing detergent costs by up to 50%.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Water Hardness Classification Table</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Classification</th>
+                            <th>Hardness (mg/L as CaCO₃)</th>
+                            <th>Hardness (grains/gallon)</th>
+                            <th>Common Sources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Soft</td><td>0 - 60</td><td>0 - 3.5</td><td>Rainwater, Distilled</td></tr>
+                        <tr><td>Moderately Hard</td><td>61 - 120</td><td>3.5 - 7.0</td><td>City surface water</td></tr>
+                        <tr><td>Hard</td><td>121 - 180</td><td>7.0 - 10.5</td><td>Groundwater, Wells</td></tr>
+                        <tr><td>Very Hard</td><td>Over 180</td><td>Over 10.5</td><td>Aquifers in limestone</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Hardness in Scientific Research</h3>
+            <div class="info-card">
+                <p class="card-a">In <strong>Aquatic Biology</strong>, water hardness is vital for the calcification of shells in mollusks and the skeletal development of fish. Researchers in <strong>Environmental Chemistry</strong> use hardness ratios to determine the source of pollution; high magnesium-to-calcium ratios often indicate seawater intrusion into freshwater aquifers. Furthermore, in <strong>Textile Engineering</strong>, hardness must be strictly controlled to ensure dye uniformity and fabric longevity.</p>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="grid-layout" id="faq-grid">
+                </div>
+        </section>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script>
+
+let currentUnit = "mg";
+
+/* -------- Detect Selected Unit -------- */
+
+function updateLabels(){
+
+if(document.getElementById("unitMgL").checked){
+currentUnit = "mg";
+}
+
+if(document.getElementById("unitGPG").checked){
+currentUnit = "gpg";
+}
+
+if(document.getElementById("unitMmol").checked){
+currentUnit = "mmol";
+}
+
+}
+
+
+/* -------- Smart Input Parser -------- */
+
+function smartParser(input){
+
+if(!input) return 0;
+
+let val = input.toString().toLowerCase().trim();
+
+try{
+
+val = val.replace(/\^/g,"**");
+
+if(/^[0-9e.\-\+\*\/\(\)\s\*]+$/.test(val)){
+return eval(val);
+}
+
+return parseFloat(val);
+
+}catch(e){
+
+return parseFloat(val);
+
+}
+
+}
+
+
+/* -------- Hardness Calculation -------- */
+
+function calculateHardness(){
+
+updateLabels();
+
+const ca = smartParser(document.getElementById("caInput").value);
+const mg = smartParser(document.getElementById("mgInput").value);
+
+if(isNaN(ca) || isNaN(mg)){
+alert("Please enter valid numbers.");
+return;
+}
+
+
+/* Hardness formula */
+
+const hardnessMgL = (2.497 * ca) + (4.118 * mg);
+
+const hardnessGPG = hardnessMgL / 17.1;
+
+const hardnessMMOL = hardnessMgL / 100;
+
+
+/* Output based on selected unit */
+
+let result = "";
+
+if(currentUnit === "mg"){
+result = hardnessMgL.toFixed(2) + " mg/L (ppm)";
+}
+
+if(currentUnit === "gpg"){
+result = hardnessGPG.toFixed(2) + " gpg";
+}
+
+if(currentUnit === "mmol"){
+result = hardnessMMOL.toFixed(3) + " mmol/L";
+}
+
+
+/* Water hardness category */
+
+let category = "";
+
+if(hardnessMgL <= 60){
+category = "Status: Soft Water";
+}
+else if(hardnessMgL <= 120){
+category = "Status: Moderately Hard Water";
+}
+else if(hardnessMgL <= 180){
+category = "Status: Hard Water";
+}
+else{
+category = "Status: Very Hard Water";
+}
+
+
+/* Display result */
+
+document.getElementById("resHardness").innerHTML =
+"Total Hardness:<br>" + result;
+
+document.getElementById("resCategory").innerText = category;
+
+document.getElementById("results").style.display = "block";
+
+}
+
+    
+
+    /**
+     * FULL DETAILED FAQ CONTENT (16 EXPERT ENTRIES)
+     */
+    const faqs = [
+        [
+            "What exactly is ppm in water hardness measurement?", 
+            "PPM stands for Parts Per Million. In the context of water chemistry, 1 ppm is physically equivalent to 1 milligram of a substance dissolved in 1 liter of water (mg/L). Because the density of water is approximately 1kg/L, one milligram is exactly one-millionth of a kilogram, hence the term. This unit allows scientists to quantify tiny concentrations of Calcium and Magnesium in a standardized way."
+        ],
+        [
+            "Can drinking hard water cause long-term health issues?", 
+            "According to the World Health Organization (WHO), there is no convincing evidence that water hardness causes adverse health effects in humans. In fact, hard water can be a secondary source of essential minerals like Calcium (for bone health) and Magnesium (for cardiovascular function). However, very high levels can affect the taste and may contribute to minor issues like constipation in sensitive individuals."
+        ],
+        [
+            "Why does hard water specifically ruin water heaters and kettles?", 
+            "When hard water is heated, the thermal energy triggers a chemical reaction where soluble Calcium Bicarbonate decomposes into insoluble Calcium Carbonate ($CaCO_3$). This solid precipitate, commonly known as 'limescale,' attaches to heating elements. Because scale is an excellent thermal insulator, it forces the heater to work longer to reach the same temperature, eventually leading to burned-out elements and clogged pipes."
+        ],
+        [
+            "What is the most effective scientific method to soften water?", 
+            "The gold standard for residential use is Ion Exchange. This process involves a resin bed charged with Sodium ions. As hard water passes through, the Calcium and Magnesium ions (which have a stronger charge) 'swap' places with the Sodium ions. For industrial applications, Reverse Osmosis (RO) or Lime Softening are also used to achieve near-zero hardness levels."
+        ],
+        [
+            "How does boiling actually remove 'temporary' hardness?", 
+            "Temporary hardness is caused by dissolved bicarbonate minerals. Boiling the water causes the bicarbonate ($HCO_3^-$) to break down into Carbonate ($CO_3^{2-}$), Carbon Dioxide, and water. The Carbonate then bonds with Calcium to form a solid precipitate that sinks to the bottom. Once you filter out these solids, the water is technically 'softer' than it was before boiling."
+        ],
+        [
+            "Does a Reverse Osmosis (RO) system remove all hardness?", 
+            "Yes, RO systems are incredibly effective. They use a semi-permeable membrane with pores so small that they physically block large, multivalent ions like $Ca^{2+}$ and $Mg^{2+}$. While a standard RO system can remove over 95% of water hardness, very hard water can eventually 'foul' the membrane, so a pre-filter softener is often recommended for longevity."
+        ],
+        [
+            "What is the chemistry behind 'soap scum'?", 
+            "Soap scum is a chemical byproduct (calcium stearate) formed when the fatty acids in soap react with the calcium and magnesium ions in hard water. Instead of creating a lather, the soap becomes an insoluble curd. This not only makes it harder to get clean but also leaves a greyish film on tiles, glass, and even your skin and hair."
+        ],
+        [
+            "Why is rainwater considered soft if it comes from the sky?", 
+            "Rainwater begins as evaporated water, which is a natural distillation process. During evaporation, minerals like Calcium and Magnesium are left behind on the earth. Consequently, when the water vapor condenses and falls as rain, it is naturally soft. It only becomes 'hard' once it hits the ground and seeps through limestone or chalk deposits, dissolving minerals along the way."
+        ],
+        [
+            "Why is Calcium Carbonate ($CaCO_3$) used as the universal standard?", 
+            "To compare different types of hardness (like Magnesium vs. Calcium), chemists need a common 'yardstick.' Calcium Carbonate was chosen because it is the most prevalent cause of hardness globally and has a convenient molar mass of exactly 100.09 g/mol. This simplifies the stoichiometry, allowing researchers to report 'total hardness' as a single consolidated number."
+        ],
+        [
+            "Is it safe to drink softened water if you are on a low-sodium diet?", 
+            "Ion exchange softeners replace hardness minerals with Sodium. For most people, the amount of sodium added is negligible compared to a typical diet. However, for individuals on strictly medically-supervised low-sodium diets, this extra intake could be significant. In such cases, using Potassium Chloride instead of Sodium Chloride in the softener or using a separate RO tap for drinking is advised."
+        ],
+        [
+            "What is a GPG unit and how does it relate to mg/L?", 
+            "GPG stands for Grains Per Gallon. It is an older unit often used by plumbing professionals in the US. One grain of hardness is equivalent to 17.1 milligrams per liter (mg/L). If your water test shows 10 GPG, your water is considered very hard (approx. 171 mg/L), and a softener is usually a necessity to protect your home's infrastructure."
+        ],
+        [
+            "How does water hardness influence pool chemistry and pH?", 
+            "Hardness (specifically 'Calcium Hardness') acts as a stabilizer for pool water. If hardness is too low, the water becomes aggressive and may corrode concrete and metal parts. If it is too high, it creates cloudy water and scale. Furthermore, high calcium levels act as a buffer, making it much more difficult to adjust the pH and Total Alkalinity of the pool."
+        ],
+        [
+            "Can hard water contribute to skin conditions like eczema?", 
+            "Research suggests a link. Because soap doesn't rinse away well in hard water, it stays on the skin, causing irritation and dryness. The minerals themselves can also strip away the skin's natural oils. For people with sensitive skin or eczema, installing a water softener can often lead to a significant reduction in flare-ups and the need for topical creams."
+        ],
+        [
+            "Is Total Dissolved Solids (TDS) the same as Total Hardness?", 
+            "Absolutely not. TDS is a broad measure of every single thing dissolved in the water, including salt, nitrates, and organic matter. Hardness is a very specific subset of TDS that only counts multivalent metal cations (mostly Ca and Mg). You can have water with high TDS (like salty water) that is actually quite soft."
+        ],
+        [
+            "How frequently should I test the hardness of my water supply?", 
+            "If you rely on a private well, you should test at least once a year, as groundwater mineral levels can shift with the seasons or nearby construction. If you are on city water, the levels are more stable, but you should test if you notice new white spotting on dishes, reduced soap lather, or if you are installing a new appliance like a dishwasher."
+        ],
+        [
+            "Does water hardness affect the taste of coffee and tea?", 
+            "Yes, significantly. Specialty coffee researchers have found that a moderate amount of magnesium helps extract the best flavors from coffee beans. However, 'very hard' water can make coffee taste flat or chalky, and it often creates a metallic 'film' on the surface of hot tea due to reactions with the tannins in the leaves."
+        ]
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const faqGrid = document.getElementById('faq-grid');
+        if (faqGrid) {
+            faqs.forEach(f => {
+                faqGrid.innerHTML += `
+                    <div class="info-card">
+                        <div class="card-q">${f[0]}</div>
+                        <p class="card-a">${f[1]}</p>
+                    </div>`;
+            });
+        }
+        
+        if (window.location.protocol !== 'file:') {
+            fetch("footer.html")
+                .then(res => res.text())
+                .then(data => {
+                    const footerCont = document.getElementById("footer-container");
+                    if (footerCont) footerCont.innerHTML = data;
+                })
+                .catch(e => console.log("Footer load handled."));
+        }
+    });
+    
+    
+    
+    
+</script>
+
+
+    <script src="header.js"></script>
+    
+</body>
+</html>
