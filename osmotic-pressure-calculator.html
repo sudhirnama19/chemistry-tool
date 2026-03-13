@@ -1,0 +1,599 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Osmotic Pressure & Molar Mass Calculator | Chemistry Spark Lab</title>
+    <meta name="description" content="Calculate Osmotic Pressure (Π) or determine Molar Mass of solutes using the Van't Hoff equation. Includes full step-by-step solved examples, scientific applications, and expert FAQs.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --bg: #030712;
+            --glass: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* STRICT MOBILE FIXES */
+        * { box-sizing: border-box; }
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+        }
+
+        body {
+            background-image: radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%);
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding-top: 100px;
+        }
+
+        /* Clickable Header */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 25px 0;
+            text-align: center;
+        }
+
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .accent-text { color: var(--accent); font-weight: 600; }
+        
+        /* PILL TAB DESIGN */
+        .pill-wrapper {
+            display: flex;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 5px;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
+        }
+
+        .pill-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            color: #94a3b8;
+        }
+
+        .pill-tab.active {
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            color: #030712;
+        }
+
+        /* Input Styles */
+        .form-label { font-weight: 600; color: #94a3b8; margin-bottom: 5px; }
+        /* FIXED INPUT TEXT VISIBILITY */
+.form-control, .form-select {
+    background-color: #1a2236 !important; /* Deep solid blue-black for contrast */
+    border: 1px solid #334155 !important;
+    color: #ffffff !important;             /* Force white text */
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 16px;                     /* Prevents iOS zoom on focus */
+    -webkit-appearance: none;            /* Removes mobile default styling */
+}
+
+/* Ensure text remains visible when typing/focused */
+.form-control:focus, .form-select:focus {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 242, 255, 0.25);
+    outline: none;
+}
+
+/* Fix for placeholder visibility */
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-weight: 400;
+}
+
+/* Fix for dark-mode browser autofill colors */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1a2236 inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            color: #030712;
+            border: none;
+            font-weight: 800;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        #result-box {
+            display: none;
+            margin-top: 25px;
+            border-top: 2px dashed var(--accent);
+            padding-top: 20px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .info-table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        .info-table th, .info-table td { padding: 12px; border: 1px solid var(--card-border); text-align: left; }
+        .info-table th { background: rgba(255,255,255,0.05); color: var(--accent); }
+
+        .faq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .faq-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .faq-q { color: var(--accent); font-weight: 800; margin-bottom: 15px; }
+        .faq-a { font-size: 0.95rem; color: #cbd5e1; }
+
+        .formula-box { font-size: 1.1rem; font-family: 'Courier New', monospace; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Advanced Chemistry Calculators</a>
+    </header>
+
+    <div class="container">
+        
+        <div class="glass-card">
+            <h1 class="accent-text">Principles of Osmotic Pressure (Π)</h1>
+            <p><strong>Osmotic Pressure (Π)</strong> is the external pressure required to halt the natural flow of solvent into a solution across a semi-permeable membrane. As a colligative property, it provides the most effective means for measuring the molar mass of complex macromolecules and understanding cellular dynamics.</p>
+            
+            <div class="row mt-4 align-items-center">
+                <div class="col-md-6">
+                    <h5 class="text-white">Core Van't Hoff Equations:</h5>
+                    <div class="p-3 bg-dark rounded border border-info formula-box">
+                        Pressure: Π = i · M · R · T <br>
+                        Molar Mass: M<sub>m</sub> = (i·w·R·T) / (Π·V)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <ul class="small mt-2 text-white">
+                        <li><strong>Π</strong> = Osmotic Pressure (atm)</li>
+                        <li><strong>M<sub>m</sub></strong> = Molar Mass (g/mol)</li>
+                        <li><strong>w</strong> = Mass of solute (g)</li>
+                        <li><strong>V</strong> = Volume of solution (L)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card" id="calculator">
+    <div class="pill-wrapper">
+        <div class="pill-tab active" id="tabPressure" onclick="switchMode('pressure')">Calculate Pressure</div>
+        <div class="pill-tab" id="tabMass" onclick="switchMode('mass')">Calculate Molar Mass</div>
+        <div class="pill-tab" id="tabMixer" onclick="switchMode('mixer')">Solution Mixer</div>
+    </div>
+    
+    <h2 class="calc-title" id="calcTitle">Osmotic Pressure Solver</h2>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6" id="iFactorBox">
+            <label class="form-label">Van't Hoff Factor (i)</label>
+            <input type="text" id="vhoffI" class="form-control" placeholder="1 for Glucose, 2 for NaCl">
+        </div>
+        <div class="col-md-6" id="pressureInputs">
+            <label class="form-label">Molarity (M) (mol/L)</label>
+            <input type="text" id="molarityInput" class="form-control" placeholder="e.g. 0.15">
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3" id="massModeInputs" style="display: none;">
+        <div class="col-md-4">
+            <label class="form-label">Solute Mass (g)</label>
+            <input type="text" id="massG" class="form-control" placeholder="e.g. 5.0">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Solution Vol (L)</label>
+            <input type="text" id="volL" class="form-control" placeholder="e.g. 0.25">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Measured Π (atm)</label>
+            <input type="text" id="measuredP" class="form-control" placeholder="e.g. 1.25">
+        </div>
+    </div>
+
+    <div id="mixerModeInputs" style="display: none;">
+        <div class="row g-3 mb-3">
+            <div class="col-6">
+                <label class="form-label">Sol. 1 Molarity (M)</label>
+                <input type="text" id="mixM1" class="form-control" placeholder="M1">
+            </div>
+            <div class="col-6">
+                <label class="form-label">Sol. 1 Vol (L)</label>
+                <input type="text" id="mixV1" class="form-control" placeholder="V1">
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-6">
+                <label class="form-label">Sol. 2 Molarity (M)</label>
+                <input type="text" id="mixM2" class="form-control" placeholder="M2">
+            </div>
+            <div class="col-6">
+                <label class="form-label">Sol. 2 Vol (L)</label>
+                <input type="text" id="mixV2" class="form-control" placeholder="V2">
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4" id="tempRow">
+        <div class="col-md-6">
+            <label class="form-label">Temperature Value</label>
+            <input type="text" id="tempInput" class="form-control" placeholder="e.g. 25">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Temperature Unit</label>
+            <select id="tempUnit" class="form-select">
+                <option value="celsius">Celsius (°C)</option>
+                <option value="kelvin">Kelvin (K)</option>
+                <option value="fahrenheit">Fahrenheit (°F)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button class="btn-calculate" onclick="performCalculation()" style="flex: 3;">Calculate Now</button>
+        <button class="btn-calculate" onclick="clearFields()" style="flex: 1; background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--card-border);">Clear</button>
+    </div>
+
+    <div id="result-box">
+        <div class="row text-center mb-4 g-2" id="resRow">
+            <div class="col-4">
+                <small class="text-secondary d-block" id="label1">Result (atm)</small>
+                <span id="res1" class="accent-text" style="font-size: 1.1rem;">--</span>
+            </div>
+            <div class="col-4">
+                <small class="text-secondary d-block" id="label2">Result (bar)</small>
+                <span id="res2" class="text-white" style="font-size: 1.1rem;">--</span>
+            </div>
+            <div class="col-4">
+                <small class="text-secondary d-block" id="label3">Result (mmHg)</small>
+                <span id="res3" class="text-info" style="font-size: 1.1rem;">--</span>
+            </div>
+        </div>
+    </div>
+</div>
+        
+       
+        <div class="glass-card">
+            <h3>How to Use the Calculator: Expert Technical Logic</h3>
+            <ul>
+                <li><strong>Van't Hoff Factor (i):</strong> For non-electrolytes (Glucose/Sucrose), use <code>i = 1</code>. For salts, use the number of ions (NaCl = 2, MgCl<sub>2</sub> = 3).</li>
+                <li><strong>Molar Mass Mode:</strong> When calculating molecular weight, the calculator uses the rearranged formula: M<sub>m</sub> = (wRT) / (ΠV). This is the gold standard for protein analysis.</li>
+                <li><strong>Temperature Rules:</strong> Always provide the temperature of the solution *at the time of the osmotic measurement*. The calculator converts all units to Absolute Kelvin automatically.</li>
+            </ul>
+
+            <h4 class="mt-4">Step-by-Step Solved Example:</h4>
+            <div class="p-4 bg-dark rounded border border-secondary">
+                <p><strong>Scenario:</strong> Determining the Molar Mass of an unknown protein.</p>
+                <p><strong>Data:</strong> 2.0g of protein in 100mL (0.1L) water. Measured Π = 0.025 atm at 298 K.</p>
+                <p><strong>Step 1:</strong> Identify variables: i=1, w=2.0g, R=0.0821, T=298, Π=0.025, V=0.1.</p>
+                <p><strong>Step 2:</strong> M<sub>m</sub> = (1 · 2.0 · 0.0821 · 298) / (0.025 · 0.1).</p>
+                <p class="accent-text text-center mt-2"><strong>Result: 19,572.64 g/mol</strong></p>
+            </div>
+        </div>
+        
+        
+        
+        <div class="glass-card">
+    <h3 class="accent-text">Expert Reference: Van't Hoff Factors (<i>i</i>)</h3>
+    <p class="small text-secondary">Crucial for JEE Advanced, GATE, and CSIR-NET calculations involving non-ideal solutions and electrolytic dissociation.</p>
+    
+    <div class="table-responsive">
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>Solute Type</th>
+                    <th>Common Examples</th>
+                    <th>Theoretical <i>i</i></th>
+                    <th>Exam Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Non-Electrolytes</strong></td>
+                    <td>Glucose, Urea, Sucrose, Ethanol</td>
+                    <td class="text-info">1</td>
+                    <td>No dissociation/association.</td>
+                </tr>
+                <tr>
+                    <td><strong>Strong Electrolytes (1:1)</strong></td>
+                    <td>NaCl, KCl, MgSO<sub>4</sub>, KNO<sub>3</sub></td>
+                    <td class="text-info">2</td>
+                    <td>Observed <i>i</i> is often ~1.9 due to ion-pairing.</td>
+                </tr>
+                <tr>
+                    <td><strong>Strong Electrolytes (1:2 / 2:1)</strong></td>
+                    <td>MgCl<sub>2</sub>, Na<sub>2</sub>SO<sub>4</sub>, CaCl<sub>2</sub>, K<sub>2</sub>CO<sub>3</sub></td>
+                    <td class="text-info">3</td>
+                    <td>Produces 3 ions per formula unit.</td>
+                </tr>
+                <tr>
+                    <td><strong>Strong Electrolytes (1:3 / 3:1)</strong></td>
+                    <td>AlCl<sub>3</sub>, K<sub>3</sub>[Fe(CN)<sub>6</sub>], FeCl<sub>3</sub></td>
+                    <td class="text-info">4</td>
+                    <td>Common in complex salt questions.</td>
+                </tr>
+                <tr>
+                    <td><strong>Strong Electrolytes (2:3)</strong></td>
+                    <td>Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>, Ca<sub>3</sub>(PO<sub>4</sub>)<sub>2</sub></td>
+                    <td class="text-info">5</td>
+                    <td>Maximum particle count for simple salts.</td>
+                </tr>
+                <tr>
+                    <td><strong>Dimerization (Association)</strong></td>
+                    <td>Acetic Acid in Benzene</td>
+                    <td class="text-warning">0.5</td>
+                    <td>Molecules pair up; Π decreases.</td>
+                </tr>
+                <tr>
+                    <td><strong>Complex Ions</strong></td>
+                    <td>K<sub>4</sub>[Fe(CN)<sub>6</sub>] (Potassium Ferrocyanide)</td>
+                    <td class="text-info">5</td>
+                    <td>Dissociates into 4K<sup>+</sup> and 1[Fe(CN)<sub>6</sub>]<sup>4-</sup>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="p-3 mt-3 rounded" style="background: rgba(0, 242, 255, 0.05); border-left: 4px solid var(--accent);">
+        <p class="small mb-0"><strong>Advanced Formulas for competitive exams:</strong><br>
+        <span class="text-white">Dissociation: <i>i</i> = 1 + (n - 1)α</span><br>
+        <span class="text-white">Association: <i>i</i> = 1 + (1/n - 1)α</span>
+        </p>
+    </div>
+</div>
+
+
+
+        <div class="glass-card">
+            <h3>Scientific Applications & Research Rules</h3>
+            <p>Osmotic dynamics are essential for medical, industrial, and ecological research.</p>
+            
+            <div class="table-responsive">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>Application</th>
+                            <th>Molarity (M)</th>
+                            <th>Temp (K)</th>
+                            <th>Π (atm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Human IV Saline</td><td>0.154</td><td>310</td><td>~7.8 atm</td></tr>
+                        <tr><td>Seawater RO Desalination</td><td>~0.60</td><td>288</td><td>~28 atm</td></tr>
+                        <tr><td>Plant Cell Turgor</td><td>Variable</td><td>293</td><td>5-15 atm</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="mt-4">Rules for Osmotic Dynamics:</h4>
+            <ul>
+                <li><strong>Rule 1:</strong> Π is a colligative property; it ignores the solute's shape and identity, counting only particle concentration.</li>
+                <li><strong>Rule 2:</strong> Higher dissociation (higher i) linearly increases Π.</li>
+                <li><strong>Rule 3:</strong> Dilution reduces Π proportional to the volume increase.</li>
+            </ul>
+        </div>
+
+        <h3 class="mb-4">Expert FAQs</h3>
+        <div class="faq-grid" id="faq-container"></div>
+
+    </div>
+
+    <div id="footer-container"></div>
+    
+
+    <script>
+        
+        /** * Smart Parser [2026-03-06] * Handles basic math, scientific notation (e), and power (^)
+ */
+function smartParser(input) {
+    if (!input || input.toString().trim() === "") return 0;
+    let val = input.toString().toLowerCase().trim();
+    try {
+        val = val.replace(/\^/g, '**');
+        if (/^[0-9e.\-\+\*\/\(\)\s\*]+$/.test(val) || val.includes('**')) {
+            return eval(val);
+        }
+        return parseFloat(val) || 0;
+    } catch (e) {
+        return parseFloat(val) || 0;
+    }
+}
+
+let currentMode = 'pressure';
+
+function switchMode(mode) {
+    currentMode = mode;
+    
+    // UI: Tab Highlight
+    document.getElementById('tabPressure').classList.toggle('active', mode === 'pressure');
+    document.getElementById('tabMass').classList.toggle('active', mode === 'mass');
+    document.getElementById('tabMixer').classList.toggle('active', mode === 'mixer');
+
+    // UI: Input Visibility Logic
+    document.getElementById('pressureInputs').style.display = (mode === 'pressure') ? 'block' : 'none';
+    document.getElementById('iFactorBox').style.display = (mode === 'mixer') ? 'none' : 'block';
+    document.getElementById('massModeInputs').style.display = (mode === 'mass') ? 'flex' : 'none';
+    document.getElementById('mixerModeInputs').style.display = (mode === 'mixer') ? 'block' : 'none';
+    
+    const titleMap = {
+        'pressure': 'Osmotic Pressure Solver',
+        'mass': 'Molar Mass Solver',
+        'mixer': 'Solution Mixer Solver'
+    };
+    document.getElementById('calcTitle').innerText = titleMap[mode];
+    document.getElementById('result-box').style.display = 'none';
+}
+
+function performCalculation() {
+    const R = 0.082057;
+    const tVal = smartParser(document.getElementById('tempInput').value);
+    const tUnit = document.getElementById('tempUnit').value;
+
+    let T = tVal;
+    if (tUnit === 'celsius') T += 273.15;
+    else if (tUnit === 'fahrenheit') T = (tVal - 32) * 5/9 + 273.15;
+
+    const res1 = document.getElementById('res1');
+    const res2 = document.getElementById('res2');
+    const res3 = document.getElementById('res3');
+    const l1 = document.getElementById('label1');
+    const l2 = document.getElementById('label2');
+    const l3 = document.getElementById('label3');
+
+    if (currentMode === 'pressure') {
+        const i = smartParser(document.getElementById('vhoffI').value) || 1;
+        const M = smartParser(document.getElementById('molarityInput').value);
+        const atm = i * M * R * T;
+        l1.innerText = "Result (atm)"; l2.innerText = "Result (bar)"; l3.innerText = "Result (mmHg)";
+        res1.innerText = atm.toFixed(3);
+        res2.innerText = (atm * 1.01325).toFixed(3);
+        res3.innerText = (atm * 760).toFixed(1);
+
+    } else if (currentMode === 'mass') {
+        const i = smartParser(document.getElementById('vhoffI').value) || 1;
+        const w = smartParser(document.getElementById('massG').value);
+        const V = smartParser(document.getElementById('volL').value);
+        const P = smartParser(document.getElementById('measuredP').value);
+        const molarMass = (w * i * R * T) / (P * V);
+        l1.innerText = "Molar Mass"; l2.innerText = "Solute Mass"; l3.innerText = "Volume";
+        res1.innerText = isFinite(molarMass) && molarMass > 0 ? molarMass.toFixed(2) + " g/mol" : "Error";
+        res2.innerText = w + " g";
+        res3.innerText = V + " L";
+
+    } else if (currentMode === 'mixer') {
+        const m1 = smartParser(document.getElementById('mixM1').value);
+        const v1 = smartParser(document.getElementById('mixV1').value);
+        const m2 = smartParser(document.getElementById('mixM2').value);
+        const v2 = smartParser(document.getElementById('mixV2').value);
+        const finalM = ((m1 * v1) + (m2 * v2)) / (v1 + v2);
+        const finalP = finalM * R * T; 
+        l1.innerText = "Mixed (atm)"; l2.innerText = "Final (M)"; l3.innerText = "Total Vol";
+        res1.innerText = finalP.toFixed(3);
+        res2.innerText = isNaN(finalM) ? "0.0000" : finalM.toFixed(4);
+        res3.innerText = (v1 + v2).toFixed(2) + " L";
+    }
+    document.getElementById('result-box').style.display = 'block';
+}
+
+function clearFields() {
+    const inputs = document.querySelectorAll('#calculator input');
+    inputs.forEach(input => input.value = "");
+    document.getElementById('result-box').style.display = 'none';
+}
+
+
+        const faqs = [
+    ["What is an Isotonic Solution in Clinical Research?", "An isotonic solution is one where two fluids have the exact same osmotic pressure (Π) across a semi-permeable membrane. In medical research, 0.9% Normal Saline is considered isotonic to human blood (approx 7.7-7.8 atm). This prevents net water movement, ensuring that red blood cells maintain their shape and do not undergo crenation (shrinking) or hemolysis (bursting)."],
+    
+    ["Why is Osmotic Pressure preferred for Molar Mass determination?", "Π is far more sensitive than other colligative properties like boiling point elevation or freezing point depression. For high-molecular-weight polymers or proteins (e.g., 50,000 g/mol), the freezing point change might be too small to detect (0.0001°C). However, that same concentration produces a measurable osmotic pressure of several millimeters of Mercury (mmHg), making it the gold standard for macromolecular weight analysis."],
+    
+    ["How does Reverse Osmosis (RO) technically function?", "Reverse Osmosis occurs when an external hydraulic pressure is applied to a concentrated solution that exceeds its natural osmotic pressure. This forces solvent molecules through the semi-permeable membrane in the 'reverse' direction—from high solute concentration to low. This process is the primary scientific method for seawater desalination and ultra-pure laboratory water production."],
+    
+    ["Does Osmotic Pressure apply to non-aqueous (Organic) solvents?", "Yes. The Van't Hoff equation is a general thermodynamic rule. As long as there is a semi-permeable membrane that is chemically compatible with the organic solvent (like toluene or ethanol) and blocks the solute, osmotic pressure will develop. This is used in polymer science to study the behavior of plastics dissolved in organic liquids."],
+    
+    ["Exactly how does the Van't Hoff Factor (i) affect the result?", "The factor 'i' accounts for the dissociation of ionic compounds. Because Π is a colligative property, it depends on the total number of particles. For example, 1 mole of MgCl2 dissociates into 3 ions (1 Mg²⁺ and 2 Cl⁻). Therefore, the 'i' factor is 3, making the osmotic pressure three times higher than an equivalent molarity of a non-dissociating substance like glucose."],
+    
+    ["Why is the Kelvin scale mandatory for these calculations?", "Thermodynamic laws, including the Ideal Gas Law and Van't Hoff equation, are based on absolute molecular motion. The Celsius scale is arbitrary (based on water's freezing point), but Kelvin starts at absolute zero—the point where all molecular vibration stops. Using 0°C in a denominator would cause a mathematical error, whereas 273.15 K correctly represents the energy state of the system."],
+    
+    ["What is Turgor Pressure in plant biology?", "Turgor pressure is the internal osmotic pressure exerted by the cell sap against the rigid plant cell wall. When a plant is well-watered, the vacuoles fill via osmosis, creating high turgor pressure that keeps the plant upright. When Π drops due to dehydration, the cells become flaccid, leading to the visible wilting of the plant."],
+    
+    ["Why does salt application lead to plant or pest death?", "When high concentrations of salt are applied (like on a slug or over-fertilized soil), it creates an extremely 'hypertonic' environment. Because the Π outside is much higher than inside the biological cells, water is rapidly sucked out through the membranes to try and achieve equilibrium. This results in cellular dehydration and rapid death through plasmolysis."],
+    
+    ["Is Osmotic Pressure truly a Colligative Property?", "Yes. By definition, a colligative property depends solely on the number of solute particles in a given volume, not the chemical nature or mass of those particles. Whether you have 1 million atoms of Gold or 1 million molecules of Sugar in the same volume, the Osmotic Pressure generated will be identical, provided the temperature is the same."],
+    
+    ["What defines a 'Semi-Permeable' membrane?", "A semi-permeable membrane is a biological or synthetic barrier with microscopic pores large enough to allow small solvent molecules (like H₂O) to pass through via kinetic motion, but small enough to block larger solute molecules (like salts, proteins, or sugars). Common examples include cell membranes, parchment paper, and synthetic cellulose acetate."],
+    
+    ["Does Osmotic Pressure change with the depth of a liquid?", "No. Π is an intrinsic chemical property of the solution's concentration and temperature. While the 'hydrostatic' pressure increases as you go deeper into a tank, the osmotic potential (the 'thirst' for water) remains constant throughout a uniform solution because the molarity (M) and Temperature (T) are uniform."],
+    
+    ["Can we visually observe the process of Osmosis?", "While we cannot see individual molecules, we can see the 'Macro' results. This is best observed in the 'shrinking' of a grape placed in strong salt water, or the 'swelling' of a dried raisin placed in pure water. In laboratories, a 'U-tube' experiment shows the liquid level physically rising on the side of the more concentrated solution."],
+    
+    ["Does the stirring speed affect the final Osmotic Pressure?", "Stirring can speed up the 'rate' at which equilibrium is reached by ensuring the concentration is uniform across the membrane, but it does not change the final Π. Osmotic pressure is a thermodynamic state property; once equilibrium is achieved, it depends only on the chemical potential of the particles, not on mechanical movement."],
+    
+    ["How does Dialysis differ from simple Osmosis?", "Dialysis is a specific type of osmosis where the semi-permeable membrane is slightly more 'loose.' It allows not only the solvent (water) but also small waste molecules (like urea or ions) to pass through, while still blocking large proteins and blood cells. This is the scientific principle used in kidney dialysis machines to clean human blood."],
+    
+    ["How does Osmotic Pressure behave in zero gravity (Space)?", "Π remains effectively the same in zero-g as it does on Earth. Since the Van't Hoff equation is based on molecular collisions and thermal energy (Kinetic Theory), and not on gravity, the 'pull' for water across a membrane remains consistent. This is vital for the water recycling systems used on the International Space Station (ISS)."],
+    
+    ["Can the Van't Hoff Factor (i) be a decimal value?", "Yes, in advanced chemistry, 'i' is often a decimal. This happens when a solute does not dissociate 100%. For example, weak acids or bases only partially break into ions. In these cases, the degree of dissociation (alpha) is used to calculate a precise 'i' (e.g., 1.45), representing the average number of particles per original molecule."]
+];
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const faqCont = document.getElementById('faq-container');
+    if (faqCont && typeof faqs !== 'undefined') {
+        faqs.forEach(f => {
+            faqCont.innerHTML += `<div class="faq-card"><div class="faq-q">${f[0]}</div><p class="faq-a">${f[1]}</p></div>`;
+        });
+    }
+    if (window.location.protocol !== 'file:') {
+        fetch("footer.html").then(res => res.text()).then(data => {
+            if (document.getElementById("footer-container")) document.getElementById("footer-container").innerHTML = data;
+        });
+    }
+});
+        
+    </script>
+    
+    <script src="header.js"></script>
+    
+</body>
+</html>
