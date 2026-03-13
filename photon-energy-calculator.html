@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Photon Energy Calculator | Scientific Quantum Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --bg: #030712;
+            --glass: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* STRICT LAYOUT FIXES FOR SCREEN OVERFLOW */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden; /* Prevents horizontal shifting */
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+        }
+
+        body {
+            background-image: radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%);
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding-top: 100px; /* Space for fixed header */
+        }
+
+        /* Clickable Header */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .main-header a:hover {
+            text-shadow: 0 0 15px var(--accent);
+        }
+
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Glass Morph Cards */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            overflow: hidden; /* Contains internal elements */
+        }
+
+        .accent-text { color: var(--accent); font-weight: 600; }
+        
+        /* Calculator Elements */
+        .calc-title { font-weight: 800; text-align: center; margin-bottom: 25px; }
+        .form-label { font-weight: 600; color: #94a3b8; }
+        
+        /* Fixed Input visibility - High Contrast */
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border: 1px solid #334155 !important;
+            color: #ffffff !important; 
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            color: #030712;
+            border: none;
+            font-weight: 800;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
+        }
+
+        #result-box {
+            display: none;
+            margin-top: 25px;
+            border-top: 2px dashed var(--accent);
+            padding-top: 20px;
+        }
+
+        /* Spectral Graph Styles */
+        .spectrum-container {
+            height: 40px;
+            width: 100%;
+            background: linear-gradient(to right, #4b0082, #0000ff, #00ff00, #ffff00, #ff7f00, #ff0000);
+            border-radius: 8px;
+            position: relative;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .spectrum-indicator {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 50px;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+            transition: left 0.5s ease;
+        }
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        /* Table Responsive Wrapper to prevent layout shift */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+        }
+
+        .info-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 500px; /* Ensures table doesn't squash too much */
+        }
+        
+        .info-table th, .info-table td { 
+            padding: 12px; 
+            border: 1px solid var(--card-border); 
+            text-align: left; 
+        }
+        .info-table th { background: rgba(255,255,255,0.05); color: var(--accent); }
+
+        .faq-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .faq-card:hover { border-color: var(--accent); }
+        .faq-q { color: var(--accent); font-weight: 800; margin-bottom: 8px; font-size: 1.1rem; }
+        .faq-a { font-size: 0.95rem; color: #cbd5e1; margin: 0; }
+
+        code { color: #f472b6; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; }
+        .formula-box { font-size: 1.1rem; font-family: 'Courier New', Courier, monospace; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Advanced Chemistry Calculators</a>
+    </header>
+
+    <div class="container">
+        
+        <div class="glass-card">
+            <h1 class="accent-text">Understanding Photon Energy</h1>
+            <p>A photon is a fundamental particle representing a quantum of light or other electromagnetic radiation. Unlike matter, photons have zero rest mass but carry discrete packets of energy. The <strong>Photon Energy Calculator</strong> allows you to determine the energy carried by a single photon based on its frequency or wavelength.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5 class="text-white">The Core Formula:</h5>
+                    <div class="p-3 bg-dark rounded border border-info formula-box">
+                        E = h · f <br>
+                        E = (h · c) / λ
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <ul class="small mt-2">
+                        <li><strong>E</strong> = Photon Energy (Joules)</li>
+                        <li><strong>h</strong> = Planck's Constant (6.626 × 10<sup>-34</sup> J·s)</li>
+                        <li><strong>c</strong> = Speed of Light (2.998 × 10<sup>8</sup> m/s)</li>
+                        <li><strong>f</strong> = Frequency (Hz)</li>
+                        <li><strong>λ</strong> = Wavelength (m)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card" id="calculator">
+            <h2 class="calc-title">Photon Energy Solver</h2>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Input Type</label>
+                    <select id="inputType" class="form-select" onchange="toggleInputs()">
+                        <option value="frequency">Frequency (Hz)</option>
+                        <option value="wavelength">Wavelength (nm)</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label" id="inputLabel">Enter Frequency (Hz)</label>
+                    <input type="text" id="mainInput" class="form-control" placeholder="e.g. 5e14">
+                </div>
+            </div>
+
+            <button class="btn-calculate" onclick="calculatePhoton()">Calculate Energy</button>
+
+            <div id="result-box">
+                <div class="row text-center mb-4 g-2">
+                    <div class="col-4">
+                        <small class="text-secondary d-block">Energy (J)</small>
+                        <span id="resJoules" class="accent-text" style="font-size: 0.9rem;">--</span>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-secondary d-block">Energy (eV)</small>
+                        <span id="resEV" class="text-white" style="font-size: 0.9rem;">--</span>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-secondary d-block">Category</small>
+                        <span id="resType" class="text-info" style="font-size: 0.85rem;">--</span>
+                    </div>
+                </div>
+
+                <div id="spectrum-section" style="display:none;">
+                    <label class="form-label d-block text-center">Visual Spectrum Position</label>
+                    <div class="spectrum-container">
+                        <div class="spectrum-indicator" id="spectrumPos" style="left: 50%;"></div>
+                    </div>
+                    <div class="spectrum-labels">
+                        <span>400nm (Violet)</span>
+                        <span>550nm (Green)</span>
+                        <span>700nm (Red)</span>
+                    </div>
+                    </div>
+    </div>
+</div>
+                    
+                    
+                    
+                    
+                    <div class="glass-card">
+    <h3 class="accent-text">Inverse Solver: Energy to Wavelength</h3>
+    <p class="small text-secondary">Input the Energy in Electron-Volts (eV) to find the corresponding frequency and wavelength.</p>
+    
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label class="form-label">Enter Energy (eV)</label>
+            <input type="text" id="inverseInput" class="form-control" placeholder="e.g. 2.25">
+        </div>
+    </div>
+
+    <button class="btn-calculate" onclick="calculateInverse()">Solve for Frequency/λ</button>
+
+    <div id="inverse-result" style="display:none; margin-top:20px; border-top: 1px solid var(--card-border); padding-top:15px;">
+        <div class="row text-center">
+            <div class="col-6">
+                <small class="text-secondary">Resulting Wavelength</small>
+                <h5 id="invWave" class="text-white">--</h5>
+            </div>
+            <div class="col-6">
+                <small class="text-secondary">Resulting Frequency</small>
+                <h5 id="invFreq" class="accent-text">--</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="glass-card">
+            <h3>How to use this Calculator</h3>
+            <p>Follow these detailed steps to perform quantum energy calculations:</p>
+            <ol>
+                <li><strong>Select Input:</strong> Choose Frequency (Hz) or Wavelength (nm).</li>
+                <li><strong>Scientific Notation:</strong> For values like 5.0 × 10<sup>14</sup>, type <code>5e14</code>. Our smart parser correctly interprets <code>e</code> and <code>^</code> symbols.</li>
+                <li><strong>Interpret Results:</strong> The tool provides energy in both Joules (standard SI unit) and Electron-Volts (standard atomic unit).</li>
+            </ol>
+
+            <h4 class="mt-4">Step-by-Step Example:</h4>
+            <div class="p-3 bg-dark rounded border">
+                <p><strong>Problem:</strong> Energy of green light (550 nm).</p>
+                <p><strong>Step 1:</strong> Convert nm to m: 550 × 10<sup>-9</sup> m.</p>
+                <p><strong>Step 2:</strong> Formula E = (h · c) / λ.</p>
+                <p><strong>Step 3:</strong> Result ≈ 3.61 x 10<sup>-19</sup> Joules.</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Scientific Applications & Rules</h3>
+            <p>Photon energy is essential for understanding laser physics, chemical reactions, and semiconductor behavior.</p>
+            
+            <div class="table-responsive">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th>Wavelength</th>
+                            <th>Energy (eV)</th>
+                            <th>Application</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>X-Rays</td><td>0.01 - 10 nm</td><td>124 eV - 124 keV</td><td>Medical Imaging</td></tr>
+                        <tr><td>Ultraviolet</td><td>10 - 400 nm</td><td>3.1 - 124 eV</td><td>Sterilization</td></tr>
+                        <tr><td>Visible</td><td>400 - 700 nm</td><td>1.8 - 3.1 eV</td><td>Human Vision</td></tr>
+                        <tr><td>Infrared</td><td>700 nm - 1 mm</td><td>1.2 meV - 1.8 eV</td><td>Thermal Sensing</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="mt-4">Rules of Photon Behavior:</h4>
+            <ul>
+                <li><strong>Quantization Rule:</strong> Energy is transferred in discrete "packets." You cannot have half a photon.</li>
+                <li><strong>Proportionality Rule:</strong> Energy increases with higher frequency but decreases with longer wavelength.</li>
+                <li><strong>Constant Speed Rule:</strong> In a vacuum, all photons travel at 299,792,458 m/s.</li>
+            </ul>
+        </div>
+        
+        <div class="glass-card">
+    <h3 class="accent-text">Quantum Research & Laser Applications</h3>
+    <p>In high-level quantum research, photon energy determines the precision of laser systems. Different laser technologies rely on specific energy thresholds to manipulate atoms or transmit data through fiber optics.</p>
+
+    <div class="table-responsive">
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>Laser Type</th>
+                    <th>Wavelength</th>
+                    <th>Photon Energy</th>
+                    <th>Research Application</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Titanium-Sapphire</td><td>800 nm</td><td>1.55 eV</td><td>Ultrafast spectroscopy</td></tr>
+                <tr><td>Helium-Neon (HeNe)</td><td>632.8 nm</td><td>1.96 eV</td><td>Nanometer alignment</td></tr>
+                <tr><td>Argon-Ion</td><td>488 nm</td><td>2.54 eV</td><td>Confocal microscopy</td></tr>
+                <tr><td>Excimer (ArF)</td><td>193 nm</td><td>6.42 eV</td><td>Deep-UV Lithography</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4 class="mt-4">Research Solved Examples</h4>
+    
+    <div class="p-3 mb-3 bg-dark rounded border border-secondary">
+        <p class="mb-1"><strong>Case A: Laser Cooling</strong></p>
+        <p class="small text-secondary">A researcher uses a laser to cool Rubidium atoms. The laser operates at 780 nm. What is the energy of a single cooling photon?</p>
+        <p class="mb-0"><strong>Logic:</strong> E = (h · c) / λ</p>
+        <p class="mb-0"><strong>Calculation:</strong> (6.626e<sup>-34</sup> · 2.998e<sup>8</sup>) / 780e<sup>-9</sup> = 2.54e<sup>-19</sup> J</p>
+        <p class="text-info"><strong>Result: 1.59 eV</strong></p>
+    </div>
+
+    <div class="p-3 bg-dark rounded border border-secondary">
+        <p class="mb-1"><strong>Case B: Fiber Optic Communication</strong></p>
+        <p class="small text-secondary">Telecommunication lasers often use 1550 nm for minimum signal loss. Determine the photon energy.</p>
+        <p class="mb-0"><strong>Logic:</strong> Convert nm to m (1.55e<sup>-6</sup> m), apply E = hc/λ.</p>
+        <p class="mb-0"><strong>Calculation:</strong> 1.28e<sup>-19</sup> J</p>
+        <p class="text-info"><strong>Result: 0.80 eV</strong> (Infrared region)</p>
+    </div>
+
+    <h4 class="mt-4">Applying Photon Energy in Research:</h4>
+    <ul>
+        <li><strong>Atomic Transitions:</strong> Research into "Quantum Jumps" requires photons that match the exact energy gap between electron orbitals.</li>
+        <li><strong>Laser Ablation:</strong> In materials science, UV lasers (high photon energy) are used to break molecular bonds without causing heat damage.</li>
+        <li><strong>Quantum Cryptography:</strong> Single-photon energy levels are monitored to detect eavesdropping in secure communication channels.</li>
+    </ul>
+</div>
+        
+
+        <h3 class="mb-3">Frequently Asked Questions</h3>
+        <div id="faq-container"></div>
+
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script>
+        /** * Smart Parser [2026-03-06]
+         */
+        function smartParser(input) {
+            if (!input) return 0;
+            let val = input.toString().toLowerCase().trim();
+            try {
+                val = val.replace(/\^/g, '**');
+                if (/^[0-9e.\-\+\*\/\(\)\s\*]+$/.test(val) || val.includes('**')) {
+                    return eval(val);
+                }
+                return parseFloat(val);
+            } catch (e) { return parseFloat(val); }
+        }
+
+        function toggleInputs() {
+            const type = document.getElementById('inputType').value;
+            const label = document.getElementById('inputLabel');
+            label.innerText = type === 'frequency' ? 'Enter Frequency (Hz)' : 'Enter Wavelength (nm)';
+        }
+
+        function calculatePhoton() {
+            const type = document.getElementById('inputType').value;
+            const inputVal = smartParser(document.getElementById('mainInput').value);
+            
+            // Element Safeguards for Photon Page
+            const resJoules = document.getElementById('resJoules');
+            const resEV = document.getElementById('resEV');
+            const resType = document.getElementById('resType');
+            const resBox = document.getElementById('result-box');
+
+            if (!resJoules || !resEV || !resType || !resBox) return;
+
+            if (!inputVal || inputVal <= 0) {
+                alert("Please enter a valid positive value.");
+                return;
+            }
+
+            const h = 6.62607015e-34;
+            const c = 299792458;
+            let energyJ = 0;
+            let wavelengthNM = 0;
+
+            if (type === 'frequency') {
+                energyJ = h * inputVal;
+                wavelengthNM = (c / inputVal) * 1e9;
+            } else {
+                wavelengthNM = inputVal;
+                let meters = inputVal * 1e-9;
+                energyJ = (h * c) / meters;
+            }
+
+            const energyEV = energyJ / 1.602176634e-19;
+
+            let cat = "Other";
+            if (energyEV > 100) cat = "X-Ray / Gamma";
+            else if (energyEV > 3.1) cat = "Ultraviolet";
+            else if (energyEV > 1.8) cat = "Visible Light";
+            else if (energyEV > 0.001) cat = "Infrared";
+            else cat = "Radio / Micro";
+
+            const spectrumSection = document.getElementById('spectrum-section');
+            const indicator = document.getElementById('spectrumPos');
+            if (wavelengthNM >= 400 && wavelengthNM <= 700) {
+                spectrumSection.style.display = 'block';
+                let percent = ((wavelengthNM - 400) / (700 - 400)) * 100;
+                indicator.style.left = percent + '%';
+            } else {
+                spectrumSection.style.display = 'none';
+            }
+
+            resJoules.innerText = energyJ.toExponential(3);
+            resEV.innerText = energyEV.toFixed(4);
+            resType.innerText = cat;
+            resBox.style.display = 'block';
+        }
+
+        const faqs = [
+            ["What is Planck's constant?", "Planck's constant (h) is a fundamental physical constant that relates the energy of a photon to its frequency. Its value is approximately 6.626 x 10^-34 Joule-seconds."],
+            ["Why is wavelength in nanometers (nm)?", "In quantum optics, wavelengths for visible light and UV are extremely small. Using nanometers (10^-9 meters) makes the numbers easier to read."],
+            ["What is an Electron-Volt (eV)?", "An eV is the kinetic energy gained by an electron accelerating through 1 volt. It is the standard unit for energy at the atomic scale."],
+            ["Does a photon have mass?", "No. A photon is a massless particle. However, it does have momentum, which allows it to exert pressure on objects."],
+            ["How does photon energy relate to color?", "Visible light is energy-coded. Blue photons have higher energy (short wavelength), while red photons have lower energy (long wavelength)."],
+            ["Can high-energy photons be dangerous?", "Yes. UV, X-ray, and Gamma photons carry enough energy to strip electrons from atoms (ionization), which can damage living tissue."],
+            ["What is the Photoelectric Effect?", "It is the emission of electrons from a material when light hits it. This only occurs if the photon energy exceeds the material's work function."],
+            ["Is photon energy affected by intensity?", "No. Increasing intensity simply increases the *number* of photons. The energy of each individual photon remains dependent only on its frequency."],
+            ["How do solar panels use photon energy?", "Photovoltaic cells absorb photons to knock electrons loose from semiconductor atoms, creating an electric current flow."],
+            ["What is the highest energy photon?", "Gamma rays are the highest energy photons, often resulting from radioactive decay or high-energy cosmic events."],
+            ["Does light slow down in water?", "Light travels slower in media than in a vacuum, which changes its wavelength, but its frequency and energy remain unchanged."],
+            ["What is a 'Quantum' of light?", "It is the smallest indivisible unit of electromagnetic radiation. You cannot split a single photon into smaller energy units."],
+            ["How are photons produced?", "Typically, they are emitted when an electron in an atom transitions from a high-energy shell to a lower-energy shell."],
+            ["Can humans see individual photons?", "Under laboratory conditions of absolute darkness, human rod cells can detect a handful of photons, though the brain usually requires more for a 'sight' signal."],
+            ["What is wave-particle duality?", "The principle that photons exhibit wave-like behavior (interference) and particle-like behavior (discrete energy collisions) simultaneously."],
+            ["Does temperature affect photon emission?", "Yes. Hotter objects emit higher-energy photons. This is why a heating element glows red, then orange, then white as it gets hotter."]
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqCont = document.getElementById('faq-container');
+            if (faqCont) {
+                faqs.forEach(f => {
+                    faqCont.innerHTML += `
+                        <div class="faq-card">
+                            <div class="faq-q">${f[0]}</div>
+                            <p class="faq-a">${f[1]}</p>
+                        </div>`;
+                });
+            }
+
+            // Footer safety logic
+            if (window.location.protocol !== 'file:') {
+                fetch("footer.html")
+                    .then(res => res.text())
+                    .then(data => {
+                        const footerCont = document.getElementById("footer-container");
+                        if (footerCont) footerCont.innerHTML = data;
+                    })
+                    .catch(e => console.log("Footer load handled."));
+            }
+        });
+    </script>
+    
+    
+    <script src="header.js"></script>
+    
+</body>
+</html>
