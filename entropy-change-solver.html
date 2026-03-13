@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Entropy Change Calculator | Thermodynamics Research Tool</title>
+    <meta name="description" content="Calculate entropy change (ΔS) for isothermal expansion, compression, phase transitions, and temperature changes. Expert tool for JEE, GATE, and CSIR-NET.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Theme updated to match your other calculators (Cyan/Blue) */
+            --accent: #00f2ff; 
+            --bg: #030712;
+            --glass: rgba(17, 24, 39, 0.75);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --input-bg: #1a2236;
+        }
+
+        * { box-sizing: border-box; }
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg);
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0;
+            padding-top: 70px;
+        }
+
+        .main-header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 15px 0;
+            text-align: center;
+        }
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .accent-text { color: var(--accent); font-weight: 700; }
+
+        /* FIXED PILL TAB: NO SCROLLING */
+        .pill-wrapper {
+            display: flex;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 4px;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
+            width: 100%; /* Spans full width */
+            justify-content: space-between;
+        }
+        .pill-tab {
+            flex: 1;
+            padding: 12px 5px; /* Reduced side padding to fit on mobile */
+            text-align: center;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.75rem; /* Adjusted for mobile fit */
+            transition: 0.3s;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .pill-tab.active {
+            background: linear-gradient(135deg, #00f2ff, #0066ff);
+            color: #ffffff;
+        }
+
+        /* INPUT VISIBILITY: HIGH CONTRAST */
+        .form-control, .form-select {
+            background-color: var(--input-bg) !important;
+            border: 1px solid #334155 !important;
+            color: #ffffff !important; 
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+            border-color: var(--accent) !important;
+        }
+        .form-control::placeholder { color: rgba(255,255,255,0.3); }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #00f2ff, #0066ff);
+            color: white; border: none; font-weight: 800;
+            width: 100%; padding: 15px; border-radius: 12px;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .btn-calculate:active { transform: scale(0.98); }
+
+        .formula-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            margin: 15px 0;
+            color: #e2e8f0;
+        }
+
+        .table-responsive { overflow-x: auto; margin: 20px 0; border-radius: 12px; }
+        .info-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .info-table th, .info-table td { padding: 12px; border: 1px solid var(--card-border); }
+        .info-table th { background: rgba(0, 242, 255, 0.1); color: var(--accent); }
+
+        .faq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .faq-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 15px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+        .faq-card:hover { border-color: var(--accent); }
+
+        @media (max-width: 480px) {
+            .pill-tab { font-size: 0.65rem; padding: 10px 2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Chemistry Tools</a>
+    </header>
+
+    <div class="container">
+        <div class="glass-card">
+            <h1 class="accent-text">Entropy Change (&Delta;S) Analysis</h1>
+            <p>Entropy Change (&Delta;S) is the thermodynamic property representing the change in a system's thermal energy per unit temperature that is unavailable for doing useful work. It is a direct measure of the molecular disorder or randomness within a system.</p>
+            
+            <h4 class="mt-4">Primary Thermodynamic Formulas:</h4>
+            <div class="formula-box">
+                1. Isothermal Gas Process: &Delta;S = nR ln(V<sub>2</sub>/V<sub>1</sub>) or nR ln(P<sub>1</sub>/P<sub>2</sub>)<br>
+                2. Phase Transitions: &Delta;S = &Delta;H<sub>rev</sub> / T<br>
+                3. Temperature Changes: &Delta;S = nC<sub>p</sub> ln(T<sub>2</sub>/T<sub>1</sub>)
+            </div>
+        </div>
+
+        <div class="glass-card" id="calculator">
+            <div class="pill-wrapper">
+                <div class="pill-tab active" id="tabGas" onclick="switchMode('gas')">Gas Process</div>
+                <div class="pill-tab" id="tabPhase" onclick="switchMode('phase')">Phase Change</div>
+                <div class="pill-tab" id="tabHeat" onclick="switchMode('heat')">Temp Change</div>
+            </div>
+
+            <h2 id="calcTitle" class="mb-4">Entropy of Gas Expansion</h2>
+
+            <div id="gasInputs">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Moles (n)</label>
+                        <input type="text" id="moles" class="form-control" placeholder="e.g. 1.0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Gas Constant (R)</label>
+                        <select id="gasR" class="form-select">
+                            <option value="8.314">8.314 J/(mol&middot;K)</option>
+                            <option value="1.987">1.987 cal/(mol&middot;K)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Initial Vol (V<sub>1</sub>)</label>
+                        <input type="text" id="v1" class="form-control" placeholder="Start Vol">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Final Vol (V<sub>2</sub>)</label>
+                        <input type="text" id="v2" class="form-control" placeholder="End Vol">
+                    </div>
+                </div>
+            </div>
+
+            <div id="phaseInputs" style="display:none;">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Enthalpy Change (&Delta;H) (J/mol)</label>
+                        <input type="text" id="enthalpy" class="form-control" placeholder="e.g. 6008">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Constant Temp (T) (K)</label>
+                        <input type="text" id="tempK" class="form-control" placeholder="e.g. 273.15">
+                    </div>
+                </div>
+            </div>
+
+            <div id="heatInputs" style="display:none;">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Moles (n)</label>
+                        <input type="text" id="heatMoles" class="form-control" placeholder="1.0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Molar Heat Cap (C<sub>p</sub>)</label>
+                        <input type="text" id="cpVal" class="form-control" placeholder="e.g. 75.3">
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Initial Temp (T<sub>1</sub>)</label>
+                        <input type="text" id="t1" class="form-control" placeholder="T1 (K)">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Final Temp (T<sub>2</sub>)</label>
+                        <input type="text" id="t2" class="form-control" placeholder="T2 (K)">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-calculate mt-3" onclick="calculateEntropy()">Run Entropy Calculation</button>
+
+            <div id="result-box" style="display:none; margin-top:25px; border-top: 1px solid var(--card-border); padding-top: 20px;">
+                <h4 class="text-secondary text-center small uppercase">Calculated Entropy Change</h4>
+                <div id="finalRes" class="accent-text text-center" style="font-size: 2.5rem;">--</div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>How it Works: Rules & Logical Application</h3>
+            <p>Entropy change is path-independent (a state function). To use this calculator effectively, follow these research rules:</p>
+            <ul>
+                <li><strong>Rule of Sign:</strong> If disorder increases (solid to liquid, gas expansion, heating), &Delta;S is <strong>Positive (+)</strong>. If order increases (freezing, compression, cooling), &Delta;S is <strong>Negative (-)</strong>.</li>
+                <li><strong>Unit Consistency:</strong> Always ensure Temperature is in Kelvin (K). The gas constant R must match your desired energy unit (Joules or Calories).</li>
+                <li><strong>Expansion vs Compression:</strong> In the Gas Tab, if V<sub>2</sub> > V<sub>1</sub>, the log result is positive, correctly reflecting increased spatial disorder.</li>
+            </ul>
+            
+            <h4 class="mt-4">Solved Example: Isothermal Expansion</h4>
+            <p class="small text-secondary">Calculate &Delta;S for 2 moles of an ideal gas expanding from 5L to 15L at 298K.</p>
+            <div class="formula-box">
+                &Delta;S = nR ln(V<sub>2</sub>/V<sub>1</sub>)<br>
+                &Delta;S = (2) * (8.314) * ln(15/5) = 16.628 * 1.098 = <strong>18.26 J/K</strong>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Applications in Scientific Research</h3>
+            <p>In chemical engineering and molecular biology, entropy calculations are vital for predicting the spontaneity of protein folding, the efficiency of heat engines (Carnot Cycle), and the behavior of polymers under stress.</p>
+            
+            <div class="table-responsive">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>Process Type</th>
+                            <th>Common Substance</th>
+                            <th>Standard &Delta;S (J/mol&middot;K)</th>
+                            <th>Research Context</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Vaporization</td><td>Water (H<sub>2</sub>O)</td><td>109.1</td><td>Steam turbine efficiency</td></tr>
+                        <tr><td>Fusion</td><td>Benzene</td><td>38.0</td><td>Crystallography studies</td></tr>
+                        <tr><td>Expansion</td><td>Helium Gas</td><td>Variable</td><td>Cryogenic cooling systems</td></tr>
+                        <tr><td>Heating</td><td>Solid Copper</td><td>~24.4</td><td>Metallurgical thermodynamics</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h3 class="mb-4">Entropy Expert FAQ Gallery</h3>
+<div class="faq-grid">
+    <div class="faq-card">
+        <div class="accent-text mb-1">How does the 2nd Law of Thermodynamics define Entropy?</div>
+        <p class="small">The 2nd Law states that in any spontaneous process, the total entropy of the universe (system + surroundings) must always increase. Mathematically, &Delta;S<sub>total</sub> &ge; 0. This implies that energy naturally spreads out and becomes less concentrated, moving the universe toward a state of maximum equilibrium.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">Under what specific conditions is &Delta;S exactly Zero?</div>
+        <p class="small">Entropy change is zero for a <strong>perfectly reversible adiabatic process</strong>, also known as an isentropic process. In such a case, no heat is exchanged (q<sub>rev</sub> = 0), and since &Delta;S = q<sub>rev</sub>/T, the change remains zero. This is a theoretical ideal used in the study of Carnot heat engines.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">What is the significance of the 3rd Law of Thermodynamics?</div>
+        <p class="small">The 3rd Law establishes a baseline: the entropy of a pure, perfectly crystalline substance at absolute zero (0 Kelvin) is exactly zero. This allows scientists to calculate "Absolute Entropy" (S&deg;) for substances at any temperature, unlike Enthalpy where we can only measure changes (&Delta;H).</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">Why does mixing two different gases always increase Entropy?</div>
+        <p class="small">Even if the temperature and pressure remain constant, mixing increases the number of possible microstates (W) for each gas molecule. This "Entropy of Mixing" occurs because each gas now occupies a larger total volume, increasing the spatial disorder of the system. It is an irreversible process.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">Why is &Delta;S negative when a liquid freezes into a solid?</div>
+        <p class="small">Freezing involves a transition from a fluid state where molecules move randomly to a rigid crystalline lattice where molecules only vibrate in fixed positions. This reduction in the "positional microstates" results in a negative entropy change (&Delta;S < 0). However, the heat released to the surroundings increases the surroundings' entropy even more.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">How do you define Molar Entropy in research?</div>
+        <p class="small">Standard Molar Entropy (S&deg;<sub>m</sub>) is the entropy of one mole of a pure substance at 1 bar of pressure and a specified temperature (usually 298.15 K). Gases generally have higher molar entropies than liquids, which in turn are higher than solids, reflecting their relative molecular freedom.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">What is the conceptual difference between Entropy and Heat?</div>
+        <p class="small">Heat is the <em>transfer</em> of thermal energy due to a temperature difference, whereas Entropy is a <em>state function</em> that describes the quality or "usefulness" of that energy. Adding heat to a system increases its entropy because it increases the kinetic energy and random motion of the molecules.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">How is Entropy linked to Gibbs Free Energy (&Delta;G)?</div>
+        <p class="small">The relationship is &Delta;G = &Delta;H - T&Delta;S. Spontaneity requires a negative &Delta;G. Therefore, a positive entropy change (&Delta;S > 0) acts as a "driving force" for reactions, especially at high temperatures, helping to overcome endothermic (&Delta;H > 0) barriers.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">What is Boltzmann's Statistical Definition of Entropy?</div>
+        <p class="small">Ludwig Boltzmann revolutionized thermodynamics by proposing S = k<sub>B</sub> ln W, where k<sub>B</sub> is the Boltzmann constant and W is the number of microstates (ways to arrange particles). This bridged the gap between microscopic molecular behavior and macroscopic thermodynamic properties.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">What does Trouton's Rule predict about Vaporization?</div>
+        <p class="small">Trouton's Rule observes that for many non-polar liquids, the entropy of vaporization (&Delta;S<sub>vap</sub>) is remarkably similar, approximately 85-88 J/(mol&middot;K). This is because the change in volume from liquid to gas is roughly the same for most substances, leading to a similar increase in disorder.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">Is Entropy an Intensive or Extensive property?</div>
+        <p class="small">Entropy is an <strong>Extensive property</strong>, meaning its value is proportional to the amount of matter in the system. If you double the amount of substance, you double the total entropy. In contrast, temperature and pressure are intensive properties as they do not depend on system size.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">What is meant by the "Heat Death" of the Universe?</div>
+        <p class="small">This is a cosmological theory suggesting that since the entropy of the universe is always increasing, it will eventually reach a state of maximum entropy. At this point, all energy will be uniformly distributed as waste heat, no more work can be performed, and all physical processes will cease.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">How does increasing Pressure affect the Entropy of a gas?</div>
+        <p class="small">Increasing the pressure on a gas (at constant temperature) forces molecules into a smaller volume. This reduces the number of available positions (microstates) for the molecules, thereby <strong>decreasing</strong> the entropy. This is why &Delta;S for compression is always negative.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">Why does this calculator use the value R = 8.314?</div>
+        <p class="small">The Universal Gas Constant R = 8.314 J/(mol&middot;K) is the SI unit standard. Using this value ensures that your calculated &Delta;S is in Joules per Kelvin. If you require the result in calories, the value R = 1.987 cal/(mol&middot;K) should be selected instead.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">How is an Isentrope used in Engineering?</div>
+        <p class="small">An isentrope is a curve on a graph (like a P-V or T-S diagram) where entropy is constant. Engineers use these to model "ideal" cycles for turbines and compressors, comparing the actual performance of a machine to the isentropic ideal to determine its efficiency.</p>
+    </div>
+
+    <div class="faq-card">
+        <div class="accent-text mb-1">How do you calculate the Entropy Change for a chemical reaction?</div>
+        <p class="small">You use Hess's Law style summation: &Delta;S&deg;<sub>rxn</sub> = &Sigma;nS&deg;(products) - &Sigma;mS&deg;(reactants). If a reaction produces more moles of gas than it consumes (e.g., CaCO<sub>3</sub> &rarr; CaO + CO<sub>2</sub>), the entropy change will generally be large and positive.</p>
+    </div>
+</div>
+
+    <div id="footer-container" style="margin-top: 50px;"></div>
+
+    <script>
+        // INTEGRATED SMART PARSER [2026-03-06]
+        function smartParser(input) {
+            if (!input || input.toString().trim() === "") return 0;
+            let val = input.toString().toLowerCase().trim();
+            try {
+                val = val.replace(/\^/g, '**');
+                if (/^[0-9e.\-\+\*\/\(\)\s\*]+$/.test(val) || val.includes('**')) return eval(val);
+                return parseFloat(val) || 0;
+            } catch (e) { return parseFloat(val) || 0; }
+        }
+
+        let currentMode = 'gas';
+
+        function switchMode(m) {
+            currentMode = m;
+            document.getElementById('tabGas').classList.toggle('active', m === 'gas');
+            document.getElementById('tabPhase').classList.toggle('active', m === 'phase');
+            document.getElementById('tabHeat').classList.toggle('active', m === 'heat');
+
+            document.getElementById('gasInputs').style.display = (m === 'gas') ? 'block' : 'none';
+            document.getElementById('phaseInputs').style.display = (m === 'phase') ? 'block' : 'none';
+            document.getElementById('heatInputs').style.display = (m === 'heat') ? 'block' : 'none';
+
+            const titles = {
+                'gas': 'Entropy of Gas Expansion',
+                'phase': 'Entropy of Phase Change',
+                'heat': 'Entropy of Heating/Cooling'
+            };
+            document.getElementById('calcTitle').innerText = titles[m];
+            document.getElementById('result-box').style.display = 'none';
+        }
+
+        function calculateEntropy() {
+            let res = 0;
+            if (currentMode === 'gas') {
+                const n = smartParser(document.getElementById('moles').value);
+                const r = smartParser(document.getElementById('gasR').value);
+                const v1 = smartParser(document.getElementById('v1').value);
+                const v2 = smartParser(document.getElementById('v2').value);
+                if (v1 <= 0 || v2 <= 0) { alert("Volumes must be positive!"); return; }
+                res = n * r * Math.log(v2 / v1);
+            } else if (currentMode === 'phase') {
+                const h = smartParser(document.getElementById('enthalpy').value);
+                const t = smartParser(document.getElementById('tempK').value);
+                if (t <= 0) { alert("Temperature must be > 0 Kelvin!"); return; }
+                res = h / t;
+            } else if (currentMode === 'heat') {
+                const n = smartParser(document.getElementById('heatMoles').value);
+                const cp = smartParser(document.getElementById('cpVal').value);
+                const t1 = smartParser(document.getElementById('t1').value);
+                const t2 = smartParser(document.getElementById('t2').value);
+                if (t1 <= 0 || t2 <= 0) { alert("Temperatures must be > 0 Kelvin!"); return; }
+                res = n * cp * Math.log(t2 / t1);
+            }
+            document.getElementById('finalRes').innerText = res.toFixed(4) + " J/K";
+            document.getElementById('result-box').style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol !== 'file:') {
+                fetch("footer.html").then(r => r.text()).then(d => {
+                    if(document.getElementById("footer-container")) document.getElementById("footer-container").innerHTML = d;
+                });
+            }
+        });
+    </script>
+    
+    <script src="header.js"></script>
+    
+</body>
+</html>
