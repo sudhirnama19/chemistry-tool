@@ -3261,6 +3261,25 @@ function v3_buildIUPAC(raw){
   var hasF  = /-F(?![a-z])/i.test(sUp)||/F$/i.test(sUp)||/\(F\)/i.test(sUp);
   var hasI  = /-I(?![a-z])/i.test(sUp)||/I$/i.test(sUp)||/\(I\)/i.test(sUp);
   var hasHal = hasBr||hasCl||hasF||hasI;
+   /* ===== Detect halogen position ===== */
+
+var halogenPos = null;
+
+/* terminal halogen → last carbon */
+if(hasBr_terminal || hasCl_terminal || /-F(?![a-z])/i.test(sUp) || /-I(?![a-z])/i.test(sUp)){
+  halogenPos = carbonCount;
+}
+
+/* branch halogen e.g. CH3-CH(Br)-CH3 */
+var branchMatch = sUp.match(/CH\((Br|Cl|F|I)\)/i);
+if(branchMatch){
+  halogenPos = 2;
+}
+   /* ===== Apply IUPAC lowest locant rule ===== */
+
+if(halogenPos!==null){
+  halogenPos = v3_applyLowestLocants([halogenPos], carbonCount)[0];
+}
 
   /* Detect alkene (= not part of =O/=N/=S) and alkyne */
   var sStrip=sUp.replace(/=O/g,'#CARBONYL#').replace(/C=N/g,'#IMINE#').replace(/C=S/g,'#THIONE#');
