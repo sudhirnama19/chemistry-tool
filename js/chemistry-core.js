@@ -1,16 +1,17 @@
 (function(){
 
-/* AUTO DEBUG FLAG (only when ?debug=true) */
-var DEBUG = window.location.href.includes("debug=true");
+var DEBUG = true;
 
-/* SAFE DEBUG BOX (won’t break if body not ready) */
 function showDebug(msg){
 
 if(!DEBUG) return;
 
-/* wait until body exists */
+/* FORCE WAIT UNTIL BODY EXISTS */
+function tryShow(){
+
 if(!document.body){
-return setTimeout(function(){ showDebug(msg); }, 50);
+setTimeout(tryShow, 100);
+return;
 }
 
 var box = document.getElementById("chem-debug-box");
@@ -21,48 +22,33 @@ box.id = "chem-debug-box";
 box.style.position = "fixed";
 box.style.bottom = "10px";
 box.style.left = "10px";
-box.style.zIndex = "99999";
+box.style.zIndex = "999999";
 box.style.background = "black";
 box.style.color = "lime";
-box.style.fontSize = "10px";
-box.style.padding = "6px";
-box.style.maxWidth = "200px";
-box.style.opacity = "0.8";
+box.style.fontSize = "12px";
+box.style.padding = "8px";
+box.style.maxWidth = "250px";
+box.style.opacity = "0.9";
 document.body.appendChild(box);
 }
 
 box.innerHTML += msg + "<br>";
+
 }
 
-/* SIMPLE CONTEXT CHECK (independent, no conflict) */
-function __checkNoiseContext(){
-
-let text = document.title.toLowerCase();
-
-if(text.includes("redox")) return "redox";
-if(text.includes("reaction")) return "reaction";
-if(text.includes("molarity")) return "molarity";
-if(text.includes("ph")) return "ph";
-
-return "general";
+tryShow();
 }
 
-/* RUN SAFELY */
-(function(){
-
-var context = __checkNoiseContext();
-
-showDebug("Noise Engine Loaded");
-showDebug("Context: " + context);
-
-/* simulate fake activity */
-for(let i=0;i<5;i++){
-showDebug("Fake Exec " + i);
-}
+/* TEST OUTPUT */
+showDebug("DEBUG WORKING");
+showDebug("JS LOADED");
 
 })();
 
-})();
+
+
+
+
 
 
 
