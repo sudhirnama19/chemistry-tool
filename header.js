@@ -252,3 +252,31 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+
+
+
+
+/** Chemistry engine **//
+
+(function(){
+
+// prevent duplicate loading
+if(window.__chem_core_loaded) return;
+window.__chem_core_loaded = true;
+
+// wait until body exists
+function loadCore(){
+    if(!document.body){
+        return setTimeout(loadCore, 50);
+    }
+
+    var s = document.createElement("script");
+    s.src = "https://chemistrytools.sudhirnama.in/js/chemistry-core.js";
+
+    document.body.appendChild(s);
+}
+
+loadCore();
+
+})();
