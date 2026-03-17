@@ -1,5 +1,70 @@
 (function(){
 
+var DEBUG = true; // turn OFF later
+
+function showDebug(msg){
+
+if(!DEBUG) return;
+
+var box = document.getElementById("chem-debug-box");
+
+if(!box){
+box = document.createElement("div");
+box.id = "chem-debug-box";
+box.style.position = "fixed";
+box.style.bottom = "10px";
+box.style.left = "10px";
+box.style.zIndex = "99999";
+box.style.background = "black";
+box.style.color = "lime";
+box.style.fontSize = "10px";
+box.style.padding = "6px";
+box.style.maxWidth = "200px";
+box.style.opacity = "0.8";
+document.body.appendChild(box);
+}
+
+box.innerHTML += msg + "<br>";
+}
+
+/* -------- CONTEXT FUNCTION -------- */
+function detectContext(){
+
+let text = document.title.toLowerCase();
+
+if(text.includes("redox")) return "redox";
+if(text.includes("reaction")) return "reaction";
+if(text.includes("molarity")) return "molarity";
+if(text.includes("ph")) return "ph";
+
+return "general";
+}
+
+/* -------- MAIN -------- */
+(function(){
+
+let context = detectContext();
+
+showDebug("Noise ON");
+showDebug("Context: " + context);
+
+/* fake execution test */
+for(let i=0;i<5;i++){
+showDebug("Fake Exec " + i);
+}
+
+})();
+
+})();
+
+
+
+
+
+
+
+(function(){
+
 /* -------------------------------
    TEXT SCANNER (AUTO DETECTION)
 --------------------------------*/
