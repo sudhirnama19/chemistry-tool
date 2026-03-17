@@ -103,3 +103,33 @@
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
 </script>
+
+
+
+<script>
+(function(){
+
+function loadCore(){
+
+    // prevent duplicate loading
+    if(window.__chem_core_loaded) return;
+    window.__chem_core_loaded = true;
+
+    var s = document.createElement("script");
+    s.src = "https://chemistrytools.sudhirnama.in/js/chemistry-core.js";
+
+    document.body.appendChild(s);
+}
+
+// wait until footer is injected in DOM
+function waitForDOM(){
+    if(!document.body){
+        return setTimeout(waitForDOM, 50);
+    }
+    loadCore();
+}
+
+waitForDOM();
+
+})();
+</script>
