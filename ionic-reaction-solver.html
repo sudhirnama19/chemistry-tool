@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal Redox Equation Balancer | Half-Reaction Method Solver</title>
+<meta name="description" content="Advanced Universal Redox Equation Balancer using the half-reaction method and RREF linear algebra. Instantly balance ionic redox equations in acidic or basic medium with atom and charge verification.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Syne:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #00f2ff;
+  --glass: rgba(15, 23, 42, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --bg: #0a1120;
+  --success: #00ff88;
+  --error: #ff4d4d;
+  --info: #a855f7;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --gold: #f59e0b;
+  --amber: #fbbf24;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Syne', sans-serif; line-height: 1.7; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 10%, rgba(0,242,255,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 90% 80%, rgba(168,85,247,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 45%, rgba(0,255,136,.03) 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ─── GLASS CARD ─── */
+.glass-card {
+  background: var(--glass); backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border); border-radius: 24px;
+  padding: 35px; margin-bottom: 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  position: relative; overflow: hidden; transition: box-shadow .3s, border-color .3s;
+}
+.glass-card:hover { border-color: rgba(0,242,255,.3); box-shadow: 0 24px 70px rgba(0,0,0,.7), 0 0 0 1px rgba(0,242,255,.1); }
+.glass-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,242,255,.4), transparent);
+}
+
+/* ─── LAYOUT ─── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+main { padding: 70px 0 60px; }
+
+/* ─── HERO ─── */
+.hero-card {
+  background: linear-gradient(135deg, rgba(0,242,255,.08) 0%, rgba(168,85,247,.08) 100%);
+  border: 1px solid rgba(0,242,255,.25); border-radius: 28px;
+  padding: 50px 40px 40px; margin-bottom: 25px; position: relative; overflow: hidden;
+}
+.hero-card::after { content: '⚛'; position: absolute; right: 36px; top: 20px; font-size: 90px; opacity: .06; }
+.page-tag {
+  display: inline-block; background: rgba(0,242,255,.1); border: 1px solid rgba(0,242,255,.3);
+  color: var(--accent); font-family: 'Orbitron', monospace; font-size: 10px;
+  letter-spacing: 3px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
+}
+.page-title {
+  font-family: 'Orbitron', monospace; font-size: clamp(24px,5vw,42px); font-weight: 800; line-height: 1.2;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--info) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 14px;
+}
+.page-subtitle { color: var(--text-dim); font-size: 16px; max-width: 720px; }
+
+/* ─── HEADINGS ─── */
+.sec-heading {
+  font-family: 'Orbitron', monospace; font-size: clamp(15px,2.8vw,20px); font-weight: 700;
+  color: var(--accent); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+}
+.sec-heading::before {
+  content: ''; display: inline-block; width: 4px; height: 22px;
+  background: linear-gradient(180deg, var(--accent), var(--info)); border-radius: 3px;
+}
+.sub-heading { font-size: 15px; font-weight: 700; color: #cbd5e1; margin: 18px 0 8px; }
+.divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(0,242,255,.2),transparent); margin: 10px 0 22px; }
+
+/* ─── FORMULA GRID ─── */
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 14px; margin: 16px 0; }
+.formula-box {
+  background: rgba(0,0,0,.35); border: 1px solid rgba(0,242,255,.2);
+  border-radius: 14px; padding: 18px; font-family: 'JetBrains Mono', monospace;
+}
+.formula-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; font-family: 'Syne',sans-serif; }
+.formula-box .eq { font-size: clamp(12px,2vw,16px); color: #fff; line-height: 1.6; }
+.formula-box .eq .sym { color: var(--accent); }
+.formula-box .eq .gn  { color: var(--success); }
+.formula-box .eq .pu  { color: var(--info); }
+.formula-desc { font-size: 11px; color: var(--text-dim); margin-top: 7px; font-family: 'Syne',sans-serif; }
+
+/* ─── CALCULATOR CARD ─── */
+.calc-card {
+  background: linear-gradient(135deg, rgba(0,242,255,.06) 0%, rgba(168,85,247,.06) 100%);
+  border: 1px solid rgba(0,242,255,.3); border-radius: 24px; padding: 38px; margin-bottom: 25px;
+}
+
+/* ─── TEXTAREA ─── */
+.eq-textarea {
+  width: 100%; min-height: 90px; background: rgba(0,0,0,.45);
+  border: 1px solid var(--glass-border); border-radius: 14px;
+  color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 15px;
+  padding: 14px 16px; resize: vertical; line-height: 1.7;
+  transition: border-color .2s, box-shadow .2s; outline: none;
+}
+.eq-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,242,255,.15); }
+.eq-textarea::placeholder { color: var(--text-dim); }
+
+/* ─── CHIPS ─── */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.chip {
+  background: rgba(0,0,0,.3); border: 1px solid var(--glass-border);
+  border-radius: 8px; padding: 5px 13px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-dim); cursor: pointer; transition: all .15s;
+}
+.chip:hover { background: rgba(0,242,255,.08); border-color: var(--accent); color: var(--accent); }
+
+/* ─── SELECT ─── */
+.input-group label {
+  display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 7px; font-weight: 600;
+}
+.input-group select {
+  width: 100%; padding: 12px 15px; background: rgba(0,0,0,.4);
+  border: 1px solid var(--glass-border); border-radius: 12px;
+  color: #fff; font-family: 'Syne', sans-serif; font-size: 14px;
+  transition: border-color .2s; outline: none; appearance: none; cursor: pointer;
+}
+.input-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,242,255,.15); }
+.input-group select option { background: #0a1120; }
+
+.calc-btn {
+  width: 100%; margin-top: 20px; padding: 16px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
+  color: #0a1120; font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 13px; letter-spacing: 2px; border: none; border-radius: 14px;
+  cursor: pointer; transition: all .3s; box-shadow: 0 6px 25px rgba(0,242,255,.3);
+}
+.calc-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(0,242,255,.45); }
+.calc-btn:active { transform: translateY(0); }
+
+/* ─── INPUT RULES BOX ─── */
+.input-rules {
+  margin-top: 18px; padding: 14px 18px;
+  background: rgba(245,158,11,.05); border: 1px solid rgba(245,158,11,.2); border-radius: 12px;
+}
+.input-rules p { font-size: 12px; color: #9a8a60; line-height: 1.8; }
+.input-rules strong { color: var(--amber); }
+.input-rules code {
+  font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,.25);
+  padding: 1px 6px; border-radius: 4px; color: var(--accent);
+}
+
+/* ─── RESULT BOX ─── */
+.result-wrap {
+  margin-top: 22px; border-radius: 18px;
+  border: 1px solid var(--glass-border); overflow: hidden; display: none;
+  animation: slideUp .3s ease;
+}
+.result-wrap.ok  { border-color: rgba(0,255,136,.4); }
+.result-wrap.err { border-color: rgba(255,77,77,.4); }
+@keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.res-head {
+  padding: 13px 20px; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+}
+.result-wrap.ok  .res-head { background: rgba(0,255,136,.07); color: var(--success); }
+.result-wrap.err .res-head { background: rgba(255,77,77,.07); color: var(--error); }
+
+.eq-display {
+  padding: 24px 20px; font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(.9rem,2.5vw,1.2rem); text-align: center; line-height: 2.6;
+  color: var(--accent); background: rgba(0,242,255,.03);
+  border-bottom: 1px solid var(--glass-border); word-break: break-word;
+}
+.coeff { color: var(--amber); font-weight: 700; }
+.arrow-sym {
+  color: var(--info);
+  padding: 0 5px;
+  font-size: 1.9em;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(168,85,247,0.7);
+}
+
+.verify-wrap { padding: 18px 20px; }
+.verify-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+.verify-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 8px; }
+.v-chip {
+  background: rgba(0,0,0,.3); border: 1px solid var(--glass-border);
+  border-radius: 10px; padding: 9px 11px; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.v-chip .el { color: var(--text-dim); font-size: 10px; }
+.v-chip .vals { color: #fff; }
+.v-chip.ok   { border-color: rgba(0,255,136,.35); background: rgba(0,255,136,.05); }
+.v-chip.fail { border-color: rgba(255,77,77,.35);  background: rgba(255,77,77,.05); }
+
+.verdict {
+  margin-top: 14px; padding: 11px 15px; border-radius: 10px;
+  font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px;
+}
+.verdict.ok   { background: rgba(0,255,136,.08); color: var(--success); border: 1px solid rgba(0,255,136,.25); }
+.verdict.fail { background: rgba(255,77,77,.08);  color: var(--error);   border: 1px solid rgba(255,77,77,.25); }
+.err-body { padding: 22px 20px; color: var(--error); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; }
+
+/* ─── GENERAL CARDS ─── */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 16px; margin: 16px 0; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; margin: 16px 0; }
+.mini-card {
+  background: rgba(0,0,0,.3); border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 20px; transition: all .25s;
+}
+.mini-card:hover { border-color: rgba(0,242,255,.3); transform: translateY(-2px); }
+.mc-icon { font-size: 26px; margin-bottom: 9px; }
+.mc-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.mc-text  { font-size: 16px; color: var(--text-dim); }
+.purple-card { background: rgba(168,85,247,.05); border-color: rgba(168,85,247,.2); }
+.purple-card:hover { border-color: rgba(168,85,247,.4); }
+
+/* ─── PROCESS STEPS ─── */
+.process-steps { counter-reset: step-c; }
+.process-step {
+  display: flex; gap: 16px; margin-bottom: 16px; padding: 18px;
+  background: rgba(0,0,0,.25); border: 1px solid var(--glass-border);
+  border-radius: 14px; counter-increment: step-c; transition: border-color .2s;
+}
+.process-step:hover { border-color: rgba(0,242,255,.25); }
+.process-step::before {
+  content: counter(step-c, decimal-leading-zero); font-family: 'Orbitron', monospace;
+  font-size: 18px; font-weight: 800; color: var(--accent); opacity: .5; min-width: 34px; line-height: 1.3;
+}
+.ps-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.ps-body  { font-size: 13px; color: var(--text-dim); }
+
+/* ─── EXAMPLE BOX ─── */
+.example-box {
+  background: rgba(0,255,136,.04); border: 1px solid rgba(0,255,136,.2);
+  border-radius: 14px; padding: 20px; margin: 13px 0;
+}
+.example-box .ex-title { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--success); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.example-box p { font-size: 13px; color: var(--text-dim); margin-bottom: 7px; }
+.eq-line { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff; margin: 5px 0; padding: 7px 11px; background: rgba(0,0,0,.3); border-radius: 8px; }
+.answer { color: var(--success); font-weight: 700; }
+
+/* ─── RULES ─── */
+.rule-card {
+  background: rgba(168,85,247,.05); border: 1px solid rgba(168,85,247,.2);
+  border-radius: 14px; padding: 18px; transition: border-color .25s;
+}
+.rule-card:hover { border-color: rgba(168,85,247,.4); }
+.rule-badge { display: inline-block; padding: 2px 10px; background: rgba(168,85,247,.15); border-radius: 20px; font-size: 10px; color: var(--info); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 9px; font-weight: 700; }
+.rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 7px; }
+.rule-text  { font-size: 13px; color: var(--text-dim); }
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; margin: 14px 0; border-radius: 14px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: rgba(0,242,255,.1); }
+thead th { padding: 13px 14px; text-align: left; font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,.05); transition: background .15s; }
+tbody tr:hover { background: rgba(0,242,255,.04); }
+tbody td { padding: 12px 14px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+tbody td:first-child { color: #fff; font-family: 'Syne', sans-serif; font-size: 13px; }
+
+/* ─── FAQ ─── */
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 16px; margin: 16px 0; }
+.faq-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 18px; padding: 22px; cursor: pointer; transition: all .25s;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+.faq-card:hover { border-color: rgba(0,242,255,.3); }
+.faq-card.open { border-color: rgba(0,242,255,.4); background: rgba(0,242,255,.04); }
+.faq-q { font-size: 14px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.faq-icon { color: var(--accent); font-size: 18px; transition: transform .3s; flex-shrink: 0; }
+.faq-card.open .faq-icon { transform: rotate(45deg); }
+.faq-a { font-size: 13px; color: var(--text-dim); margin-top: 11px; display: none; line-height: 1.7; }
+.faq-card.open .faq-a { display: block; }
+
+/* ─── RESEARCH ─── */
+.gold-card { border-left: 3px solid var(--gold); border-radius: 0 14px 14px 0; background: rgba(0,0,0,.3); padding: 18px; transition: border-left-color .25s; }
+.gold-card:hover { border-left-color: var(--accent); }
+.gc-icon  { font-size: 20px; margin-bottom: 7px; }
+.gc-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.gc-text  { font-size: 12px; color: var(--text-dim); }
+
+/* ─── BADGES ─── */
+.badge-a { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; background: rgba(0,242,255,.1); color: var(--accent); border: 1px solid rgba(0,242,255,.25); }
+.badge-s { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; background: rgba(0,255,136,.1); color: var(--success); border: 1px solid rgba(0,255,136,.25); }
+.badge-i { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; background: rgba(168,85,247,.1); color: var(--info); border: 1px solid rgba(168,85,247,.25); }
+.hl  { color: var(--accent); font-weight: 700; }
+.hlg { color: var(--success); font-weight: 700; }
+.hlp { color: var(--info); font-weight: 700; }
+
+/* ─── HOW-NUM ─── */
+.how-num { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 800; color: var(--accent); opacity: .4; margin-bottom: 9px; }
+
+/* ─── FADE-IN ─── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 640px) {
+  .hero-card { padding: 28px 18px; }
+  .glass-card, .calc-card { padding: 20px 16px; }
+}
+sub { vertical-align: sub; font-size: .72em; }
+sup { vertical-align: super; font-size: .72em; }
+@keyframes loadFlash {
+  0%   { border-color: var(--success); box-shadow: 0 0 0 4px rgba(0,255,136,.35); }
+  60%  { border-color: var(--success); box-shadow: 0 0 0 6px rgba(0,255,136,.15); }
+  100% { border-color: var(--glass-border); box-shadow: none; }
+}
+.eq-textarea.loaded { animation: loadFlash .7s ease forwards; }
+</style>
+</head>
+<body>
+
+<script src="header.js"></script>
+
+<main>
+<div class="container">
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero-card fade-in">
+  <div class="page-tag">⚛ JEE Advanced Ready</div>
+  <h1 class="page-title">Universal Redox Equation Balancer</h1>
+  <p class="page-subtitle">
+    Balance any ionic redox equation instantly using the <strong>half-reaction method</strong> powered by
+    RREF linear algebra. Supports acidic and basic media, polyatomic ions (SO₄²⁻, Cr₂O₇²⁻),
+    and provides full atom + charge verification.
+  </p>
+</div>
+
+<!-- ══════════════ DEFINITION & FORMULAS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">What are Redox Reactions?</h2>
+  <p style="color:var(--text-dim);font-size:15px;margin-bottom:14px;">
+    <strong style="color:#fff;">Redox reactions</strong> (reduction–oxidation reactions) are chemical reactions in which
+    electrons are transferred between species. They are always coupled: one species is
+    <span class="hl">oxidised</span> (loses electrons — <em>OIL</em>) while another is
+    <span class="hlg">reduced</span> (gains electrons — <em>RIG</em>). The
+    <span class="hlp">oxidation state</span> of atoms changes, and the total charge must balance
+    on both sides of the equation.
+  </p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:18px;">
+    <div style="padding:16px;background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.2);border-radius:14px;">
+      <div style="font-size:11px;color:var(--error);font-weight:700;letter-spacing:2px;margin-bottom:8px;">OXIDATION</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#fff;margin-bottom:6px;">Fe²⁺ → Fe³⁺ + e⁻</div>
+      <p style="font-size:13px;color:var(--text-dim);">Loss of electrons. Oxidation state <strong>increases</strong>. The species is the <strong>reducing agent</strong> — it donates electrons to the other species.</p>
+    </div>
+    <div style="padding:16px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:14px;">
+      <div style="font-size:11px;color:var(--success);font-weight:700;letter-spacing:2px;margin-bottom:8px;">REDUCTION</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#fff;margin-bottom:6px;">MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O</div>
+      <p style="font-size:13px;color:var(--text-dim);">Gain of electrons. Oxidation state <strong>decreases</strong>. The species is the <strong>oxidising agent</strong> — it accepts electrons.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sec-heading">Key Formulas & Relationships</h3>
+  <div class="formula-grid">
+    <div class="formula-box">
+      <div class="label">Oxidation State Sum</div>
+      <div class="eq">Σ <span class="sym">(OS × n)</span> = <span class="gn">overall charge</span></div>
+      <div class="formula-desc">Sum of (oxidation state × number of atoms) = charge of ion or 0 for neutral molecule</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Electron Transfer</div>
+      <div class="eq"><span class="sym">e⁻ lost</span> = <span class="gn">e⁻ gained</span></div>
+      <div class="formula-desc">Total electrons lost by reducing agent = total electrons gained by oxidising agent</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Acidic Medium Balancing</div>
+      <div class="eq"><span class="sym">O</span>: add <span class="gn">H₂O</span> &nbsp;|&nbsp; <span class="sym">H</span>: add <span class="gn">H⁺</span></div>
+      <div class="formula-desc">In acidic solution: balance O with water, then balance H with H⁺ ions</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Basic Medium Balancing</div>
+      <div class="eq"><span class="sym">O</span>: add <span class="gn">OH⁻</span> &nbsp;|&nbsp; <span class="sym">H</span>: add <span class="gn">H₂O</span></div>
+      <div class="formula-desc">In basic solution: balance O with OH⁻, then balance H with H₂O</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Faraday's Law (Electrolysis)</div>
+      <div class="eq"><span class="sym">m</span> = <span class="gn">M × I × t</span> / <span class="pu">n × F</span></div>
+      <div class="formula-desc">m=mass deposited, M=molar mass, I=current (A), t=time (s), n=electrons, F=96485 C/mol</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Nernst Equation</div>
+      <div class="eq"><span class="sym">E</span> = <span class="gn">E°</span> − <span class="pu">(RT/nF)</span> ln Q</div>
+      <div class="formula-desc">Cell potential at non-standard conditions; links redox to electrochemistry</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sec-heading">Oxidation State Rules — Quick Reference</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px;margin-top:10px;">
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Free elements</span> — always OS = 0 (e.g. O₂, Zn, Fe)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Monatomic ions</span> — OS = charge (Fe²⁺ → OS = +2)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Oxygen</span> — usually −2 (except peroxides −1, OF₂ +2)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Hydrogen</span> — usually +1 (except metal hydrides −1)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Group 1 metals</span> — always +1 in compounds</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Group 2 metals</span> — always +2 in compounds</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Fluorine</span> — always −1 in compounds</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">Sum rule</span> — Σ(OS) = 0 for neutral, = charge for ions</div>
+  </div>
+</div>
+
+<!-- ══════════════ CALCULATOR ══════════════ -->
+<div class="calc-card fade-in" id="calculator">
+  <div class="page-tag">⚙️ Interactive Tool</div>
+  <h2 class="sec-heading" style="margin-top:12px;">Universal Redox Equation Balancer</h2>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">
+    Enter an unbalanced ionic redox equation below. Use spaces around + separators to preserve ionic charges.
+    Supports → or -&gt; as the reaction arrow.
+  </p>
+
+  <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;font-weight:600;">Ionic Equation</label>
+  <textarea class="eq-textarea" id="eqnInput"
+    placeholder="MnO4- + Fe2+ + H+ -> Mn2+ + Fe3+ + H2O&#10;Put SPACES around each + separator  |  Use ^ for multi-digit charges: SO4^2-, Cr2O7^2-"></textarea>
+
+  <div class="chip-row">
+    <span class="chip" onclick="loadEq(this)">MnO4- + I- + H+ -> Mn2+ + I2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">Fe2+ + MnO4- + H+ -> Fe3+ + Mn2+ + H2O</span>
+    <span class="chip" onclick="loadEq(this)">ClO3- + Cl- + H+ -> Cl2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">BrO3- + Br- + H+ -> Br2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">MnO4- + H2O2 + H+ -> Mn2+ + O2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">S2O8^2- + I- -> SO4^2- + I2</span>
+    <span class="chip" onclick="loadEq(this)">Cr2O7^2- + I- + H+ -> Cr3+ + I2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">Cr2O7^2- + Fe2+ + H+ -> Cr3+ + Fe3+ + H2O</span>
+    <span class="chip" onclick="loadEq(this)">MnO4- + C2O4^2- + H+ -> Mn2+ + CO2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">KMnO4 + C2O4^2- + H+ -> Mn2+ + CO2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">IO3- + I- + H+ -> I2 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">NO3- + Cu + H+ -> NO + Cu2+ + H2O</span>
+    <span class="chip" onclick="loadEq(this)">Cr2O7^2- + H2S + H+ -> Cr3+ + S + H2O</span>
+    <span class="chip" onclick="loadEq(this)">MnO4- + Fe2+ + SO4^2- + H+ -> MnSO4 + Fe2(SO4)3 + H2O</span>
+    <span class="chip" onclick="loadEq(this)">MnO4- + SO3^2- + H2O -> MnO2 + SO4^2- + OH-</span>
+    <span class="chip" onclick="loadEq(this)">Cr2O7^2- + SO3^2- + H+ -> Cr3+ + SO4^2- + H2O</span>
+    <span class="chip" onclick="loadEq(this)">H2O2 -> H2O + O2</span>
+    <span class="chip" onclick="loadEq(this)">ClO- + I- + H2O -> IO3- + Cl- + OH-</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+    <div class="input-group">
+      <label>Reaction Medium</label>
+      <select id="med">
+        <option value="acidic">Acidic — H⁺ medium</option>
+        <option value="basic">Basic — OH⁻ medium</option>
+      </select>
+    </div>
+    <div class="input-group" style="display:flex;align-items:flex-end;">
+      <div style="width:100%;">
+        <label>Quick Load</label>
+        <select id="quickLoadSel" onchange="quickLoad(this)">
+          <option value="">— Load classic example —</option>
+          <optgroup label="Permanganate (Acidic)">
+            <option value="MnO4- + Fe2+ + H+ -> Mn2+ + Fe3+ + H2O">Permanganate + Iron(II)</option>
+            <option value="MnO4- + C2O4^2- + H+ -> Mn2+ + CO2 + H2O">Permanganate + Oxalate</option>
+            <option value="KMnO4 + C2O4^2- + H+ -> Mn2+ + CO2 + H2O">KMnO4 + Oxalate (molecular)</option>
+            <option value="MnO4- + I- + H+ -> Mn2+ + I2 + H2O">Permanganate + Iodide</option>
+            <option value="MnO4- + H2O2 + H+ -> Mn2+ + O2 + H2O">Permanganate + Peroxide</option>
+          </optgroup>
+          <optgroup label="Dichromate (Acidic)">
+            <option value="Cr2O7^2- + Fe2+ + H+ -> Cr3+ + Fe3+ + H2O">Dichromate + Iron(II)</option>
+            <option value="Cr2O7^2- + I- + H+ -> Cr3+ + I2 + H2O">Dichromate + Iodide</option>
+            <option value="Cr2O7^2- + H2S + H+ -> Cr3+ + S + H2O">Dichromate + H₂S</option>
+            <option value="Cr2O7^2- + SO3^2- + H+ -> Cr3+ + SO4^2- + H2O">Dichromate + Sulfite</option>
+          </optgroup>
+          <optgroup label="Halogen Reactions">
+            <option value="ClO3- + Cl- + H+ -> Cl2 + H2O">Chlorate + Chloride</option>
+            <option value="BrO3- + Br- + H+ -> Br2 + H2O">Bromate + Bromide</option>
+            <option value="IO3- + I- + H+ -> I2 + H2O">Iodate + Iodide</option>
+            <option value="ClO- + I- + H2O -> IO3- + Cl- + OH-">Hypochlorite + Iodide</option>
+          </optgroup>
+          <optgroup label="Other">
+            <option value="S2O8^2- + I- -> SO4^2- + I2">Persulfate + Iodide</option>
+            <option value="NO3- + Cu + H+ -> NO + Cu2+ + H2O">Nitrate + Copper</option>
+            <option value="H2O2 -> H2O + O2">Peroxide Disproportionation</option>
+            <option value="MnO4- + SO3^2- + H2O -> MnO2 + SO4^2- + OH-">Permanganate + Sulfite (Basic)</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="runSolver()">⚡ BALANCE EQUATION</button>
+
+  <div class="result-wrap" id="resBox">
+    <div class="res-head" id="resHead"></div>
+    <div id="resBody"></div>
+  </div>
+
+  <div class="input-rules">
+    <p>
+      <strong>Input Format Rules:</strong>&nbsp;
+      Always put <strong>spaces around the + separator</strong> so ionic charges like <code>Fe2+</code> are not split.
+      &nbsp;|&nbsp;
+      Use <strong>^</strong> for multi-digit charges on polyatomic ions: <code>SO4^2-</code>, <code>Cr2O7^2-</code>, <code>S2O8^2-</code>.
+      &nbsp;|&nbsp;
+      Single-atom ions can omit ^: <code>Fe2+</code>, <code>Mn2+</code>, <code>Cr3+</code>.
+      &nbsp;|&nbsp;
+      Supports both → and -&gt; as the arrow. Unicode − and → are auto-normalised.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════ HOW TO USE ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How to Use This Calculator</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:18px;">Follow these steps to get a perfectly balanced ionic redox equation every time.</p>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="how-num">01</div>
+      <div class="mc-title">Write the Unbalanced Ionic Equation</div>
+      <div class="mc-text">List all reactant and product species separated by <code style="color:var(--accent)">+</code> with spaces. Use <code style="color:var(--accent)">-></code> as the arrow. Do not pre-balance — enter species only: <code style="color:var(--accent)">MnO4- + Fe2+ + H+ -> Mn2+ + Fe3+ + H2O</code></div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">02</div>
+      <div class="mc-title">Spaces Around the + Sign</div>
+      <div class="mc-text">This is the most common mistake. Write <code style="color:var(--accent)">Fe2+ + Cl-</code> NOT <code style="color:var(--error)">Fe2++Cl-</code>. The parser uses whitespace-delimited + to distinguish species separators from ionic charge signs like 2+.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">03</div>
+      <div class="mc-title">Polyatomic Ion Charges with ^</div>
+      <div class="mc-text">For multi-digit charges on polyatomic ions, use the caret: <code style="color:var(--accent)">SO4^2-</code>, <code style="color:var(--accent)">Cr2O7^2-</code>, <code style="color:var(--accent)">C2O4^2-</code>. Single-atom ions like <code style="color:var(--accent)">Fe2+</code> and <code style="color:var(--accent)">Mn2+</code> work without ^.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">04</div>
+      <div class="mc-title">Choose Acidic or Basic Medium</div>
+      <div class="mc-text">Select <em>Acidic</em> if the reaction occurs in acid (H⁺ present, e.g. KMnO₄ titrations). Select <em>Basic</em> for alkaline conditions (OH⁻ medium, e.g. bleach reactions). The algorithm adds H₂O, H⁺, or OH⁻ accordingly.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">05</div>
+      <div class="mc-title">Read the Verification Panel</div>
+      <div class="mc-text">After balancing, the atom/charge verification grid appears. Each tile shows left = right counts. <span class="hlg">Green tiles with ✓</span> mean correctly balanced. All green + "Fully balanced" verdict = correct answer.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">06</div>
+      <div class="mc-title">Use Example Chips</div>
+      <div class="mc-text">Click any teal chip above the button to instantly load a classic reaction (MnO₄⁻/Fe²⁺, Cr₂O₇²⁻, persulfate, etc.). These are pre-verified examples covering all major JEE/NEET reaction types.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sub-heading">Worked Input Example</h3>
+  <div class="example-box">
+    <div class="ex-title">📘 Dichromate Oxidation of Iron(II) — Acidic Medium</div>
+    <p><strong>Correct input:</strong></p>
+    <div class="eq-line">Cr2O7^2- + Fe2+ + H+ -> Cr3+ + Fe3+ + H2O</div>
+    <p><strong>Balanced output:</strong></p>
+    <div class="eq-line"><span class="answer">Cr2O7²⁻ + 6Fe²⁺ + 14H⁺ → 2Cr³⁺ + 6Fe³⁺ + 7H₂O</span></div>
+    <p><strong>Verification:</strong> Cr: 2=2 ✓ | Fe: 6=6 ✓ | O: 7=7 ✓ | H: 14=14 ✓ | Charge: +24=+24 ✓</p>
+  </div>
+</div>
+
+<!-- ══════════════ ASPECTS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Key Aspects of Redox Reactions</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mc-icon">⚡</div>
+      <div class="mc-title">Simultaneous Electron Transfer</div>
+      <div class="mc-text">Oxidation and reduction always occur simultaneously — you cannot have one without the other. The number of electrons lost by the reducing agent always equals the number gained by the oxidising agent, enforcing charge conservation.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">📊</div>
+      <div class="mc-title">Oxidation State Changes</div>
+      <div class="mc-text">Every redox reaction involves changes in oxidation states. Tracking OS changes is the fastest way to identify what's oxidised and reduced: increasing OS = oxidised; decreasing OS = reduced. This is essential for the ion-electron (half-reaction) method.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">🔋</div>
+      <div class="mc-title">Electrochemical Equivalence</div>
+      <div class="mc-text">Redox reactions are the chemical basis of all batteries and fuel cells. The same electron-transfer process that balances equations also determines cell voltage (EMF) through standard reduction potentials and the Nernst equation.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">💧</div>
+      <div class="mc-title">Medium Dependence</div>
+      <div class="mc-text">The same redox couple can behave differently in acidic vs basic media. KMnO₄ in acid gives Mn²⁺ (5e⁻ transfer); in neutral/slightly acidic gives MnO₂ (3e⁻); in strongly basic gives MnO₄²⁻ (1e⁻). The medium changes the products and coefficients.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">🔁</div>
+      <div class="mc-title">Reversibility & Equilibrium</div>
+      <div class="mc-text">Redox reactions have associated standard cell potentials E°. If E°cell > 0, the reaction is spontaneous (galvanic direction). If E° < 0, it proceeds in reverse. The equilibrium constant K is related to E° via ΔG° = −nFE° = −RT ln K.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">⚖️</div>
+      <div class="mc-title">Conservation Laws</div>
+      <div class="mc-text">Balanced redox equations must conserve both <strong>mass</strong> (atom count for every element) and <strong>charge</strong> (total ionic charge equal on both sides). This two-constraint system requires the linear algebra approach used by this solver.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ USES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Applications & Uses of Ionic Redox Reactions</h2>
+  <div class="grid-2">
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🔋</div>
+      <div class="mc-title">Batteries & Fuel Cells</div>
+      <div class="mc-text">All electrochemical cells (lead-acid, Li-ion, hydrogen fuel cells) operate by spatially separating the oxidation half-reaction (anode) from the reduction half-reaction (cathode), converting chemical energy directly to electrical energy.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🧪</div>
+      <div class="mc-title">Analytical Titrations</div>
+      <div class="mc-text">Permanganometric (KMnO₄), dichromate (K₂Cr₂O₇), and iodometric titrations use redox reactions with known stoichiometry to determine unknown concentrations. The balanced ionic equation provides the molar ratio for calculations.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🏭</div>
+      <div class="mc-title">Industrial Chemistry</div>
+      <div class="mc-text">Chlor-alkali process, bleach production, Mond process (Ni purification), thermite reaction, and the Bayer process (aluminium extraction) all depend on controlled redox reactions balanced by the half-reaction method.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🛡️</div>
+      <div class="mc-title">Corrosion Science</div>
+      <div class="mc-text">Iron rusting is an electrochemical redox process: Fe → Fe²⁺ + 2e⁻ (anode), O₂ + 4H⁺ + 4e⁻ → 2H₂O (cathode). Understanding and balancing these half-reactions underpins corrosion inhibition, galvanisation, and cathodic protection.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🧬</div>
+      <div class="mc-title">Biological Metabolism</div>
+      <div class="mc-text">Cellular respiration is a sequence of redox reactions: NADH is oxidised (−2e⁻) while O₂ is reduced (+4e⁻). The mitochondrial electron transport chain creates a proton gradient via these balanced electron transfers to synthesise ATP.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">💊</div>
+      <div class="mc-title">Pharmaceutical Synthesis</div>
+      <div class="mc-text">Selective oxidation and reduction steps are core to drug synthesis. From vitamin C production (glucose oxidation) to aspirin synthesis (ester reduction), balanced redox equations determine exact reagent stoichiometry and yield calculations.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP BY STEP ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Half-Reaction Method — Step-by-Step</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px;">The half-reaction (ion-electron) method is the standard approach for balancing ionic redox equations. Follow these 7 steps systematically.</p>
+  <div class="process-steps">
+    <div class="process-step">
+      <div><div class="ps-title">Identify Oxidation State Changes</div>
+      <div class="ps-body">Write the skeletal (unbalanced) ionic equation. Determine the oxidation state of every atom. Identify which atoms change OS (one increases → oxidised; one decreases → reduced).<br><em>Example: MnO₄⁻ + Fe²⁺ → Mn²⁺ + Fe³⁺ &nbsp;|&nbsp; Mn: +7→+2 (reduced); Fe: +2→+3 (oxidised)</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Write Separate Half-Reactions</div>
+      <div class="ps-body">Write two incomplete half-reactions — one showing only oxidation, one showing only reduction. Do not balance yet.<br><em>Oxidation: Fe²⁺ → Fe³⁺ &nbsp;|&nbsp; Reduction: MnO₄⁻ → Mn²⁺</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Balance All Atoms Except O and H</div>
+      <div class="ps-body">Balance all elements except oxygen and hydrogen first using stoichiometric coefficients.<br><em>Both half-reactions already have one Mn/Fe each. For Cr₂O₇²⁻: balance Cr first → Cr₂O₇²⁻ → 2Cr³⁺</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Balance Oxygen with H₂O (acidic) or OH⁻ (basic)</div>
+      <div class="ps-body">Acidic medium: add H₂O to balance O. Basic medium: add OH⁻ for each O needed, and add H₂O to opposite side.<br><em>Acidic: MnO₄⁻ → Mn²⁺ + 4H₂O (4 oxygens balanced with 4 H₂O)</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Balance Hydrogen with H⁺ (acidic) or H₂O (basic)</div>
+      <div class="ps-body">Acidic: add H⁺ to balance H. Basic: add H₂O to balance H, then simplify OH⁻/H₂O.<br><em>Acidic: MnO₄⁻ + 8H⁺ → Mn²⁺ + 4H₂O (8 H balanced with 8H⁺)</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Balance Charge with Electrons</div>
+      <div class="ps-body">Add electrons (e⁻) to whichever side has excess positive charge to equalise.<br><em>Reduction: MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O &nbsp;|&nbsp; Oxidation: Fe²⁺ → Fe³⁺ + e⁻</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Equalise Electrons and Add Half-Reactions</div>
+      <div class="ps-body">Multiply half-reactions so electrons cancel (LCM). Add, cancel common species, write final balanced equation.<br><em>×1 reduction + ×5 oxidation: MnO₄⁻ + 5Fe²⁺ + 8H⁺ → Mn²⁺ + 5Fe³⁺ + 4H₂O ✓</em></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SOLVED EXAMPLES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Solved Examples</h2>
+
+  <div class="example-box">
+    <div class="ex-title">📗 Example 1 — KMnO₄ + FeSO₄ (Acidic) — JEE Classic</div>
+    <p><strong>Input:</strong> MnO4- + Fe2+ + H+ → Mn2+ + Fe3+ + H2O</p>
+    <p>Oxidation half: Fe²⁺ → Fe³⁺ + e⁻ (×5) | Reduction half: MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O (×1)</p>
+    <div class="eq-line">MnO₄⁻ + <span class="answer">5</span>Fe²⁺ + <span class="answer">8</span>H⁺ → Mn²⁺ + <span class="answer">5</span>Fe³⁺ + <span class="answer">4</span>H₂O</div>
+    <p><strong>Verification:</strong> Mn 1=1 ✓ | Fe 5=5 ✓ | O 4=4 ✓ | H 8=8 ✓ | Charge: +17=+17 ✓</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📘 Example 2 — Dichromate Oxidation of I⁻ (Acidic)</div>
+    <p><strong>Input:</strong> Cr2O7^2- + I- + H+ → Cr3+ + I2 + H2O</p>
+    <p>Cr: +6→+3 (gain 3e⁻ ×2 = 6e⁻ per Cr₂O₇²⁻) | I: −1→0 (lose 1e⁻, ×2 for I₂, so 2e⁻ per pair)</p>
+    <div class="eq-line">Cr₂O₇²⁻ + <span class="answer">6</span>I⁻ + <span class="answer">14</span>H⁺ → <span class="answer">2</span>Cr³⁺ + <span class="answer">3</span>I₂ + <span class="answer">7</span>H₂O</div>
+    <p><strong>Note:</strong> 6 electrons transferred. Charge check: LHS = 2−+6−+14+ = +6 | RHS = 6++0+0 = +6 ✓</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📙 Example 3 — Persulfate Oxidation of Iodide</div>
+    <p><strong>Input:</strong> S2O8^2- + I- → SO4^2- + I2</p>
+    <p>S: +7→+6 (each S gains 1e⁻, so S₂O₈²⁻ gains 2e⁻) | 2I⁻ → I₂ + 2e⁻</p>
+    <div class="eq-line">S₂O₈²⁻ + <span class="answer">2</span>I⁻ → <span class="answer">2</span>SO₄²⁻ + I₂</div>
+    <p><strong>Elegant result:</strong> No H⁺/H₂O needed — oxygen already balanced. Total charge: −2+(−2)=−4 | −4+0=−4 ✓</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📕 Example 4 — Permanganate + Oxalate (Acidic, Self-Indicator)</div>
+    <p><strong>Input:</strong> MnO4- + C2O4^2- + H+ → Mn2+ + CO2 + H2O</p>
+    <p>Mn: +7→+2 (5e⁻); C: +3→+4 (1e⁻ per C, 2e⁻ per C₂O₄²⁻). LCM(5,2)=10: ×2 reduction, ×5 oxidation</p>
+    <div class="eq-line"><span class="answer">2</span>MnO₄⁻ + <span class="answer">5</span>C₂O₄²⁻ + <span class="answer">16</span>H⁺ → <span class="answer">2</span>Mn²⁺ + <span class="answer">10</span>CO₂ + <span class="answer">8</span>H₂O</div>
+    <p><strong>Application:</strong> This is the basis of KMnO₄ standardisation in the laboratory. The reaction self-indicates: pink/purple disappears at endpoint.</p>
+  </div>
+</div>
+
+<!-- ══════════════ RULES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Rules & Principles for Balancing Redox Equations</h2>
+  <div class="grid-2">
+    <div class="rule-card">
+      <div class="rule-badge">Rule 01</div>
+      <div class="rule-title">Electrons Lost = Electrons Gained</div>
+      <div class="rule-text">The fundamental constraint: total e⁻ transferred from reducing agent must exactly equal e⁻ received by oxidising agent. This is what allows you to find the LCM multipliers when combining half-reactions.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 02</div>
+      <div class="rule-title">Net Charge Must Balance</div>
+      <div class="rule-text">After balancing atoms and electrons, the total ionic charge on the left side must equal the total on the right. Charge imbalance after all other steps means an error in the half-reaction electron count or atom balance.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 03</div>
+      <div class="rule-title">H₂O and H⁺ are Spectator Aids in Acidic Medium</div>
+      <div class="rule-text">In acidic solution, H₂O and H⁺ are freely available and can be added to either side to balance O and H atoms respectively. They are not "used up" in any irreversible sense — this is why acids serve as the reaction medium.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 04</div>
+      <div class="rule-title">Basic Medium — Convert After Balancing in Acid</div>
+      <div class="rule-text">Quickest method for basic medium: balance in acid first, then add equal OH⁻ to both sides to neutralise H⁺ (H⁺ + OH⁻ → H₂O), then simplify. This avoids confusion in basic medium balancing directly.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 05</div>
+      <div class="rule-title">Never Cancel Reactants Against Products</div>
+      <div class="rule-text">Only cancel species that appear on both sides after combining half-reactions (e.g. water and H⁺ often appear on both sides). Never cancel species that are on the same side — they represent different compounds and are not interchangeable.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 06</div>
+      <div class="rule-title">Coefficients Must Be Smallest Positive Integers</div>
+      <div class="rule-text">The final balanced equation should have the smallest set of whole-number coefficients (divided by GCD). If you get fractions, multiply all coefficients by the LCM of denominators. Never report fractional coefficients for ionic equations.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TABLE ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Common Ionic Redox Reactions — Reference Table</h2>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px;">All balanced in acidic medium unless specified. Electron transfers (n) shown for each reaction.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reaction Name</th><th>Balanced Ionic Equation</th><th>n (e⁻)</th><th>OS Change</th><th>Application</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>MnO₄⁻ / Fe²⁺</td>
+          <td>MnO₄⁻ + 5Fe²⁺ + 8H⁺ → Mn²⁺ + 5Fe³⁺ + 4H₂O</td>
+          <td>5</td>
+          <td>Mn: +7→+2</td>
+          <td>KMnO₄ titration</td>
+        </tr>
+        <tr>
+          <td>Cr₂O₇²⁻ / Fe²⁺</td>
+          <td>Cr₂O₇²⁻ + 6Fe²⁺ + 14H⁺ → 2Cr³⁺ + 6Fe³⁺ + 7H₂O</td>
+          <td>6</td>
+          <td>Cr: +6→+3</td>
+          <td>Dichromate titration</td>
+        </tr>
+        <tr>
+          <td>MnO₄⁻ / C₂O₄²⁻</td>
+          <td>2MnO₄⁻ + 5C₂O₄²⁻ + 16H⁺ → 2Mn²⁺ + 10CO₂ + 8H₂O</td>
+          <td>10</td>
+          <td>Mn: +7→+2</td>
+          <td>KMnO₄ standardisation</td>
+        </tr>
+        <tr>
+          <td>Cr₂O₇²⁻ / I⁻</td>
+          <td>Cr₂O₇²⁻ + 6I⁻ + 14H⁺ → 2Cr³⁺ + 3I₂ + 7H₂O</td>
+          <td>6</td>
+          <td>Cr: +6→+3</td>
+          <td>Iodometric analysis</td>
+        </tr>
+        <tr>
+          <td>MnO₄⁻ / I⁻</td>
+          <td>2MnO₄⁻ + 10I⁻ + 16H⁺ → 2Mn²⁺ + 5I₂ + 8H₂O</td>
+          <td>10</td>
+          <td>Mn: +7→+2</td>
+          <td>Iodimetric titration</td>
+        </tr>
+        <tr>
+          <td>S₂O₈²⁻ / I⁻</td>
+          <td>S₂O₈²⁻ + 2I⁻ → 2SO₄²⁻ + I₂</td>
+          <td>2</td>
+          <td>S: +7→+6</td>
+          <td>Persulfate oxidation</td>
+        </tr>
+        <tr>
+          <td>ClO₃⁻ / Cl⁻</td>
+          <td>ClO₃⁻ + 5Cl⁻ + 6H⁺ → 3Cl₂ + 3H₂O</td>
+          <td>5</td>
+          <td>Cl: +5→0/−1</td>
+          <td>Chlorate reduction</td>
+        </tr>
+        <tr>
+          <td>BrO₃⁻ / Br⁻</td>
+          <td>BrO₃⁻ + 5Br⁻ + 6H⁺ → 3Br₂ + 3H₂O</td>
+          <td>5</td>
+          <td>Br: +5→0/−1</td>
+          <td>Bromate oxidimetry</td>
+        </tr>
+        <tr>
+          <td>MnO₄⁻ / H₂O₂</td>
+          <td>2MnO₄⁻ + 5H₂O₂ + 6H⁺ → 2Mn²⁺ + 5O₂ + 8H₂O</td>
+          <td>10</td>
+          <td>Mn:+7→+2; O:−1→0</td>
+          <td>H₂O₂ determination</td>
+        </tr>
+        <tr>
+          <td>IO₃⁻ / I⁻</td>
+          <td>IO₃⁻ + 5I⁻ + 6H⁺ → 3I₂ + 3H₂O</td>
+          <td>5</td>
+          <td>I: +5→0/−1</td>
+          <td>Iodate/iodide reaction</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════ HOW IT WORKS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How This Solver Works — Algorithm</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:16px;">This balancer uses rigorous linear algebra, not guessing or pattern matching. Here's the exact algorithm:</p>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div style="background:rgba(0,242,255,.05);border:1px solid rgba(0,242,255,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STEP 1: PARSE & MATRIX BUILD</div>
+      <p style="font-size:13px;color:var(--text-dim);">Each species is parsed for atom counts and ionic charge. A matrix is built where each row represents an element or charge constraint, and each column represents a species. Reactant coefficients are positive; product coefficients are negative.</p>
+    </div>
+    <div style="background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--success);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STEP 2: NULL SPACE (RREF)</div>
+      <p style="font-size:13px;color:var(--text-dim);">Reduced Row Echelon Form (RREF) finds the null space of the matrix — the set of coefficient vectors that satisfy all element and charge balance constraints simultaneously. This is the complete mathematical solution to the balancing problem.</p>
+    </div>
+    <div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--info);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STEP 3: POSITIVE VECTOR SEARCH</div>
+      <p style="font-size:13px;color:var(--text-dim);">A chemically valid solution requires all coefficients to be positive. For 2D null spaces (under-determined systems), a parametric interval search finds a strictly positive linear combination of basis vectors. All edge cases are handled.</p>
+    </div>
+    <div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STEP 4: INTEGER REDUCTION</div>
+      <p style="font-size:13px;color:var(--text-dim);">The floating-point solution is converted to minimal positive integers using rational approximation (Stern-Brocot / Farey sequence approach) followed by LCM scaling and GCD reduction. The result is the simplest whole-number balanced equation.</p>
+    </div>
+  </div>
+  <div style="padding:14px;background:rgba(0,0,0,.3);border-radius:12px;font-size:13px;color:var(--text-dim);">
+    ⚡ <strong style="color:#fff;">Bugs Fixed in This Version:</strong>
+    The solver includes 5 documented bug fixes: (1) charge parser no longer confuses atom subscripts with charge magnitudes for polyatomic ions like ClO₃⁻ and MnO₄⁻; (2) 2D null spaces are handled via parametric interval search; (3) Unicode minus signs and arrows are normalised; (4) RREF loop has row boundary guard; (5) + splitter uses whitespace-delimited tokens to preserve ionic charges.
+  </div>
+</div>
+
+<!-- ══════════════ SCIENTIFIC RESEARCH ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Redox Reactions in Scientific Research</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:14px 0;">
+    <div class="gold-card">
+      <div class="gc-icon">🔋</div>
+      <div class="gc-title">Next-Generation Battery Research</div>
+      <div class="gc-text">Researchers use balanced redox equations to calculate theoretical energy densities of new electrode materials. For Li-S batteries: S₈ + 16Li → 8Li₂S involves 16e⁻ transfer, giving theoretical capacity of 1675 mAh/g — calculated directly from the balanced equation.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">💧</div>
+      <div class="gc-title">Water Treatment & Environmental Chemistry</div>
+      <div class="gc-text">Chlorination of water, ozonation, and advanced oxidation processes (AOPs) all rely on balanced redox equations. Cr(VI) remediation: CrO₄²⁻ + 3Fe²⁺ + 8H⁺ → Cr³⁺ + 3Fe³⁺ + 4H₂O is used to convert toxic Cr(VI) to less toxic Cr(III) in contaminated sites.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🧬</div>
+      <div class="gc-title">Biochemical Redox Assays</div>
+      <div class="gc-text">Spectrophotometric assays like the Folin-Ciocalteu method (phenol assay), DPPH radical scavenging, and FRAP (ferric reducing antioxidant power) all require precise stoichiometric redox equations to relate absorbance to concentration of antioxidants.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🌱</div>
+      <div class="gc-title">Nitrogen Cycle & Geochemistry</div>
+      <div class="gc-text">Nitrification: NH₄⁺ → NO₂⁻ → NO₃⁻ and denitrification: NO₃⁻ → N₂ are microbial redox reactions. Balancing these ionic equations is essential for modelling nitrogen flux in soils, determining fertiliser requirements, and predicting groundwater nitrate levels.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">⚗️</div>
+      <div class="gc-title">Synthetic Organic Chemistry</div>
+      <div class="gc-text">Selective oxidation of alcohols to aldehydes/ketones using Cr₂O₇²⁻, PCC, or MnO₄⁻, and reductions using LiAlH₄ or NaBH₄ all require balanced redox equations to calculate exact molar ratios of oxidant/reductant — critical for atom economy calculations.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🛸</div>
+      <div class="gc-title">Semiconductor & Nanotechnology</div>
+      <div class="gc-text">Chemical vapour deposition (CVD) and electroless plating reactions are precisely controlled redox processes. Nanoparticle synthesis via citrate reduction of HAuCl₄ requires balanced ionic equations to control particle size distribution and surface coverage.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Frequently Asked Questions</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px;">Comprehensive answers covering theory, balancing technique, and real-world redox chemistry.</p>
+  <div class="faq-grid">
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between molecular and ionic equations?<span class="faq-icon">+</span></div>
+      <div class="faq-a">A molecular equation shows complete formulas of all reactants and products (e.g. KMnO₄ + FeSO₄ + H₂SO₄ → ...). An ionic equation replaces all strong electrolytes with their dissociated ions. A net ionic equation further removes spectator ions (ions that appear unchanged on both sides). Redox solvers work with net ionic equations because the actual electron transfer occurs between the ionic species, not the neutral formula units.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why must I put spaces around the + separator?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Ionic charges use + and − symbols (e.g. Fe2+, Cr3+, SO4^2-). If the parser splits on every + character, it would destroy "Fe2+" into "Fe2" and "" — losing the charge information entirely. By requiring whitespace before the +, the parser distinguishes between "+2" as a charge suffix and " + " as a species separator. This is the most common user error and is specifically documented in the input rules box.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How does the RREF method balance equations mathematically?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The balancing problem is recast as a homogeneous linear system Ax = 0, where A is the element/charge matrix and x is the vector of unknown coefficients. RREF (Reduced Row Echelon Form) finds the null space of A — all coefficient vectors satisfying all atom and charge conservation laws simultaneously. The null space vector with all positive components is the balanced equation. This method is mathematically complete and finds solutions that inspection or half-reaction algebra might miss.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between acidic and basic medium balancing?<span class="faq-icon">+</span></div>
+      <div class="faq-a">In acidic medium, the available species are H⁺ and H₂O: use H₂O to balance oxygen, then H⁺ to balance hydrogen. In basic medium, the available species are OH⁻ and H₂O: use OH⁻ for oxygen, H₂O for hydrogen. The key difference affects KMnO₄: in acid, Mn goes from +7 to +2 (5e⁻); in neutral/alkaline, it goes to MnO₂ (+4, 3e⁻); in strongly basic, to MnO₄²⁻ (+6, 1e⁻). The same reagent can be a weaker or stronger oxidant depending on pH.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you identify the oxidising agent and reducing agent?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The oxidising agent contains the atom that gets reduced (oxidation state decreases). The reducing agent contains the atom that gets oxidised (oxidation state increases). Memory aid: OIL RIG — Oxidation Is Loss (of electrons), Reduction Is Gain (of electrons). The oxidising agent itself is reduced (gains electrons); the reducing agent itself is oxidised (loses electrons). In MnO₄⁻ + Fe²⁺: MnO₄⁻ is the oxidising agent (Mn goes +7→+2); Fe²⁺ is the reducing agent (Fe goes +2→+3).</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why does KMnO₄ give different products in different media?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The reduction product of MnO₄⁻ depends on pH because H⁺ participates directly in the half-reaction. In strongly acidic medium (excess H⁺): MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O (colourless/pale pink, +7 to +2). In neutral/weakly acidic/alkaline: MnO₄⁻ + 2H₂O + 3e⁻ → MnO₂ + 4OH⁻ (brown precipitate, +7 to +4). In strongly alkaline: MnO₄⁻ + e⁻ → MnO₄²⁻ (manganate, +7 to +6). These reflect how H⁺ availability changes the thermodynamically favoured reduction product.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is disproportionation? Can this solver handle it?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Disproportionation is a redox reaction where the same element is simultaneously oxidised and reduced. Example: 2H₂O₂ → 2H₂O + O₂ (O goes from −1 to both −2 and 0). Yes, this solver handles disproportionation — the RREF approach treats it as any other atom/charge balance problem. Enter: H2O2 -> H2O + O2 and the solver will find the correct balanced equation 2H₂O₂ → 2H₂O + O₂.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the n-factor and why does it matter?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The n-factor (equivalence factor) is the number of electrons transferred per formula unit of a species in a redox reaction. For KMnO₄ in acid: n = 5 (Mn changes by 5). For FeSO₄: n = 1. The n-factor is used in equivalent calculations: Normality = Molarity × n-factor, and at equivalence point: N₁V₁ = N₂V₂. The n-factor can vary with conditions — KMnO₄ has n=5 (acid), n=3 (neutral), n=1 (basic). This solver displays the balanced equation from which n can be directly read.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you balance redox equations with organic compounds?<span class="faq-icon">+</span></div>
+      <div class="faq-a">For organic redox reactions in ionic form, treat the carbon species as you would any formula: enter the formula of the organic ion (e.g. C2O4^2- for oxalate, CH3COO- for acetate). The solver parses C, H, O atoms and balances normally. Full organic mechanism balancing (keeping molecular structure intact) requires the aldehyde/ketone/carboxylic acid hierarchy knowledge, but for competitive exams, the ionic approach with C, H, O, charge conservation is sufficient and this solver handles it.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why do some equations have fractional coefficients as intermediate steps?<span class="faq-icon">+</span></div>
+      <div class="faq-a">During the RREF calculation, the null space vector is computed as a float vector, which often contains fractions (e.g. 0.5, 0.333...). The solver uses rational approximation to convert these to exact fractions, finds the LCM of all denominators to produce integers, then divides by the GCD to give the smallest whole-number coefficients. The user only ever sees the final integer result. If you see an equation like ½O₂ in a textbook, multiply all coefficients by 2 to get integers — this solver does that automatically.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between oxidation number method and half-reaction method?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The oxidation number (change) method tracks OS changes directly: find total OS change for oxidised species and reduced species, then cross-multiply to make them equal. Simpler for straightforward reactions. The half-reaction (ion-electron) method splits the reaction into two half-equations, balances each separately (atoms, H, O, charge, electrons), then combines. More rigorous and essential for complex ionic equations in aqueous solution. This solver implements the mathematical equivalent of the half-reaction method via linear algebra, handling both methods' edge cases.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Can this solver balance reactions with multiple simultaneous redox changes?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Yes. The RREF linear algebra approach handles any number of simultaneous constraints (elements + charge). Reactions where two different elements are simultaneously oxidised and reduced — or where the same element undergoes multiple OS changes — are handled as additional rows in the constraint matrix. There is no theoretical limit to the complexity of reactions this solver can handle, as long as all species are correctly entered.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you use a balanced ionic equation to calculate titration results?<span class="faq-icon">+</span></div>
+      <div class="faq-a">From the balanced equation, extract the molar ratio. For MnO₄⁻ + 5Fe²⁺ + 8H⁺ → ..., the ratio is 1:5. If 25.00 mL of 0.02 M KMnO₄ is used: moles MnO₄⁻ = 0.025 × 0.02 = 5×10⁻⁴ mol. Moles Fe²⁺ = 5 × 5×10⁻⁴ = 2.5×10⁻³ mol. If this is from a 250 mL solution, molarity = 0.0025/0.250 = 0.01 M. Every titration calculation starts with the correctly balanced stoichiometry.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What happens if I enter a non-redox equation?<span class="faq-icon">+</span></div>
+      <div class="faq-a">If no oxidation state changes are required (e.g. a precipitation reaction or acid-base neutralisation), the solver still works correctly by balancing atoms and charge — it doesn't check whether the reaction is truly "redox". For H⁺ + OH⁻ → H₂O, the solver gives the correct balanced equation. However, the solver is specifically designed and optimised for ionic redox reactions where the half-reaction method is most needed, and the pre-loaded examples represent the most important redox systems.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do I balance redox equations involving complexes or ligands?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Enter complex ions using the ^ notation for charge: e.g. Fe(CN)6^4- for ferrocyanide, Co(NH3)6^3+ for cobalt hexammine. Remove brackets or the solver will strip them automatically. The atom parser handles parenthetical groups like (NH3)6 correctly by expanding them: N×6, H×18. This covers most transition metal complexes encountered in analytical and inorganic chemistry at undergraduate level.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why does the verification panel sometimes show "Balance check failed"?<span class="faq-icon">+</span></div>
+      <div class="faq-a">This usually means: (1) incorrect input — missing a product species (e.g. forgetting H₂O), which makes the equation mathematically imbalanceable; (2) wrong ionic charges — verify that species like SO₄²⁻ are entered correctly as SO4^2-; (3) the equation itself is not chemically valid (products don't match actual chemistry). The solver attempts the best mathematical solution for any input, but "Fully balanced" confirmation requires both atom counts and net charge to match on both sides. Use the colour-coded verification tiles to find which element or charge is mismatched.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+</main>
+
+<div id="footer-container"></div>
+<script>fetch('footer.html').then(r=>r.text()).then(h=>{document.getElementById('footer-container').innerHTML=h;}).catch(()=>{});</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   UNIVERSAL IONIC REDOX BALANCER — v5 (fully verified + fixed)
+   Fixes: spectator metal auto-strip, polyatomic/hydrated ions,
+          Quick Load UX, improved charge parser, better errors.
+   Algorithm: RREF null-space linear algebra.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Quick Load helpers ──────────────────────────────────────────── */
+function loadEq(el) {
+  const inp = document.getElementById('eqnInput');
+  inp.value = (typeof el === 'string') ? el : el.textContent.trim();
+  inp.classList.remove('loaded');
+  void inp.offsetWidth; // force reflow to restart animation
+  inp.classList.add('loaded');
+  inp.focus();
+  inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Keep legacy load() alias so any remaining onclick="load(this)" still works
+function load(el) { loadEq(el); }
+
+function quickLoad(sel) {
+  if (!sel.value) return;
+  loadEq(sel.value);
+  setTimeout(() => { sel.selectedIndex = 0; }, 150);
+}
+
+/* ── Math helpers ────────────────────────────────────────────────── */
+function gcd(a, b) {
+  a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+  while (b) { const t = b; b = a % b; a = t; }
+  return a || 1;
+}
+function lcm(a, b) { return Math.abs(a) / gcd(a, b) * Math.abs(b); }
+
+/* ── Normalise input string ──────────────────────────────────────── */
+function normalise(s) {
+  return s
+    .replace(/\u2212/g, '-').replace(/\u2013/g, '-').replace(/\u2014/g, '-')
+    .replace(/\u2192/g, '->').replace(/\u21d2/g, '->')
+    .replace(/\u2192/g, '->').replace(/\u00b7/g, '').replace(/\u22c5/g, '') // strip middle dots (hydrates)
+    .replace(/·/g, '')           // hydrate dot
+    .replace(/\u00d7/g, '')      // multiplication sign sometimes used in hydrates
+    .replace(/\s*->\s*/g, ' -> ')// normalise arrow spacing
+    .trim();
+}
+
+/* ── Split equation side on " + " (preserving ionic charges) ─────── */
+function splitSide(str) {
+  // Split only on '+' that is surrounded by whitespace (not part of a charge like Fe2+)
+  return str.trim()
+    .split(/(?<=\s)\+(?=\s|$)|(?<=^)\+(?=\s)|\s+\+\s+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+/* ── Expand parenthetical groups: (SO4)2 -> SO4SO4 etc. ─────────── */
+function expandParens(f) {
+  let prev = '';
+  while (f !== prev) {
+    prev = f;
+    f = f.replace(/\(([^()]+)\)(\d*)/g, (_, g, n) => {
+      const m = parseInt(n) || 1;
+      return g.replace(/([A-Z][a-z]?)(\d*)/g, (__, el, c) => el + (parseInt(c) || 1) * m);
+    });
+  }
+  return f;
+}
+
+/* ── Parse a molecular formula into atom counts ──────────────────── */
+function parseFormula(raw) {
+  // Remove any remaining brackets (complex ion notation)
+  raw = raw.replace(/\[|\]/g, '');
+  const f = expandParens(raw);
+  const atoms = {};
+  const re = /([A-Z][a-z]?)(\d*)/g;
+  let m;
+  while ((m = re.exec(f)) !== null) {
+    if (m[1]) atoms[m[1]] = (atoms[m[1]] || 0) + (parseInt(m[2]) || 1);
+  }
+  return atoms;
+}
+
+/* ── Spectator-metal stripping ───────────────────────────────────────
+   Group 1/2 metals are ALWAYS +1/+2 cations in compounds.
+   If a neutral formula starts with one or more of them followed by
+   another element, strip them and compute the residual anion charge.
+   E.g.  KMnO4   → {formula:"MnO4",  chargeOffset:+1}  → MnO4-
+         K2Cr2O7 → {formula:"Cr2O7", chargeOffset:+2}  → Cr2O7^2-
+         Na2SO4  → {formula:"SO4",   chargeOffset:+2}  → SO4^2-
+         NaOH    → {formula:"OH",    chargeOffset:+1}  → OH-
+   ─────────────────────────────────────────────────────────────────── */
+const SPECTATOR_METALS = [
+  // Longer symbols first to avoid matching 'Na' in 'NaCl' as 'N'+'a'
+  { sym: 'Ba', chg: 2 }, { sym: 'Ca', chg: 2 }, { sym: 'Sr', chg: 2 },
+  { sym: 'Mg', chg: 2 }, { sym: 'Rb', chg: 1 }, { sym: 'Cs', chg: 1 },
+  { sym: 'Li', chg: 1 }, { sym: 'Na', chg: 1 }, { sym: 'K',  chg: 1 }
+];
+
+function stripSpectatorMetals(formula) {
+  let f = formula, totalCharge = 0, changed = true;
+  while (changed) {
+    changed = false;
+    for (const { sym, chg } of SPECTATOR_METALS) {
+      // Must be followed by a capital letter or ( or [ (another element/group follows)
+      const re = new RegExp('^' + sym + '(\\d*)(?=[A-Z(\\[])');
+      const m = f.match(re);
+      if (m) {
+        const count = parseInt(m[1] || '1');
+        totalCharge += chg * count;
+        f = f.slice(sym.length + m[1].length);
+        changed = true;
+        break;
+      }
+    }
+  }
+  return { formula: f, chargeOffset: totalCharge };
+}
+
+/* ── Parse a single species (formula + optional charge) ──────────────
+   Handles:
+     SO4^2-    polyatomic ^N+/- notation          → charge = -2
+     C2O4^2-   same                               → charge = -2
+     Fe2+      single-atom ion with numeric charge → charge = +2
+     Mn2+      same                               → charge = +2
+     MnO4-     polyatomic with trailing sign       → charge = -1
+     NO3-      same                               → charge = -1
+     NH4+      ammonium                           → charge = +1
+     OH-       hydroxide                          → charge = -1
+     KMnO4     neutral salt → strip K → MnO4-    → charge = -1
+     K2Cr2O7   → strip 2K → Cr2O7^2-             → charge = -2
+     [Fe(CN)6]^4-  complex ion                   → charge = -4
+     Fe(H2O)6^3+   hydrated ion                  → charge = +3
+     CO2, H2O  neutral molecules                  → charge = 0
+   ─────────────────────────────────────────────────────────────────── */
+function parseSpecies(raw) {
+  raw = raw.trim().replace(/\[|\]/g, '').replace(/\s+/g, '');
+  let charge = 0;
+
+  /* ---- Pattern 1: explicit caret notation  SO4^2-  C2O4^2- ---- */
+  let cm = raw.match(/\^(\d+)([+-])$/);
+  if (cm) {
+    charge = (cm[2] === '+' ? 1 : -1) * parseInt(cm[1]);
+    raw = raw.slice(0, -cm[0].length);
+    return { atoms: parseFormula(raw), charge };
+  }
+
+  /* ---- Pattern 2: trailing single ^+ or ^- ---- */
+  cm = raw.match(/\^([+-])$/);
+  if (cm) {
+    charge = cm[1] === '+' ? 1 : -1;
+    raw = raw.slice(0, -cm[0].length);
+    return { atoms: parseFormula(raw), charge };
+  }
+
+  /* ---- Pattern 3: N+  or  N-  suffix ---- */
+  cm = raw.match(/(\d+)([+-])$/);
+  if (cm) {
+    const digits = cm[1], sign = cm[2];
+    const without = raw.slice(0, -cm[0].length); // everything before "N+/-"
+    // Only treat as "charge = N" if what's left is a single element symbol
+    // e.g. Fe2+ → without="Fe" ✓;  MnO4- has cm=["4-","4","-"] without="MnO" ✗
+    if (/^[A-Z][a-z]?$/.test(without)) {
+      charge = (sign === '+' ? 1 : -1) * parseInt(digits);
+      return { atoms: parseFormula(without), charge };
+    }
+    // Otherwise only the trailing +/- is the charge; the digit is a subscript
+    charge = sign === '+' ? 1 : -1;
+    raw = raw.slice(0, -1);  // strip only the sign character
+    return { atoms: parseFormula(raw), charge };
+  }
+
+  /* ---- Pattern 4: trailing lone +  or  - ---- */
+  cm = raw.match(/([+-])$/);
+  if (cm) {
+    charge = cm[1] === '+' ? 1 : -1;
+    raw = raw.slice(0, -1);
+    return { atoms: parseFormula(raw), charge };
+  }
+
+  /* ---- Pattern 5: neutral compound — try stripping Group 1/2 spectators ---- */
+  const { formula: stripped, chargeOffset } = stripSpectatorMetals(raw);
+  if (chargeOffset > 0 && stripped.length > 0) {
+    // The stripped part is the anion; its charge = −(total cation charge)
+    return { atoms: parseFormula(stripped), charge: -chargeOffset };
+  }
+
+  /* ---- Pattern 6: truly neutral (elements, covalent molecules) ---- */
+  return { atoms: parseFormula(raw), charge: 0 };
+}
+
+/* ── RREF null-space computation ─────────────────────────────────── */
+function nullBasis(A) {
+  const rows = A.length, cols = A[0].length;
+  if (cols === 0) return [];
+  const M = A.map(r => [...r.map(Number)]);
+  const pInfo = [];
+  let pr = 0;
+  for (let col = 0; col < cols && pr < rows; col++) {
+    let best = pr;
+    for (let r = pr + 1; r < rows; r++)
+      if (Math.abs(M[r][col]) > Math.abs(M[best][col])) best = r;
+    if (Math.abs(M[best][col]) < 1e-10) continue;
+    [M[pr], M[best]] = [M[best], M[pr]];
+    const piv = M[pr][col];
+    for (let j = 0; j < cols; j++) M[pr][j] /= piv;
+    for (let r = 0; r < rows; r++) {
+      if (r !== pr && Math.abs(M[r][col]) > 1e-10) {
+        const f = M[r][col];
+        for (let j = 0; j < cols; j++) M[r][j] -= f * M[pr][j];
+      }
+    }
+    pInfo.push({ row: pr, col });
+    pr++;
+  }
+  const pivotCols = new Set(pInfo.map(p => p.col));
+  const freeCols  = Array.from({ length: cols }, (_, c) => c).filter(c => !pivotCols.has(c));
+  return freeCols.map(fc => {
+    const v = new Array(cols).fill(0);
+    v[fc] = 1;
+    for (const { row: r, col: pc } of pInfo) v[pc] = -M[r][fc];
+    return v;
+  });
+}
+
+/* ── Find a strictly-positive null-space vector ─────────────────── */
+function findPositiveVector(basis) {
+  if (!basis.length) return null;
+  const n = basis[0].length;
+
+  if (basis.length === 1) {
+    const v = basis[0];
+    if (v.every(x => x >= -1e-9)) return [...v];
+    const vn = v.map(x => -x);
+    if (vn.every(x => x >= -1e-9)) return vn;
+    return null;
+  }
+
+  if (basis.length === 2) {
+    for (const s of [1, -1]) {
+      const u = basis[0].map(x => s * x);
+      const w = basis[1];
+      let lo = -Infinity, hi = Infinity, ok = true;
+      for (let j = 0; j < n; j++) {
+        if (Math.abs(w[j]) < 1e-9) { if (u[j] < -1e-9) { ok = false; break; } }
+        else if (w[j] > 0) lo = Math.max(lo, -u[j] / w[j]);
+        else               hi = Math.min(hi, -u[j] / w[j]);
+      }
+      if (!ok || lo >= hi - 1e-9) continue;
+      const t = isFinite(lo) && isFinite(hi) ? (lo + hi) / 2
+              : isFinite(lo) ? lo + 1 : isFinite(hi) ? hi - 1 : 0;
+      const sol = u.map((x, j) => x + t * w[j]);
+      if (sol.every(x => x >= -1e-9)) return sol;
+    }
+    return null;
+  }
+
+  // Higher-dimensional null space: try ±combinations of basis vectors
+  const k = basis.length;
+  // Extended search: try random positive combinations
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const weights = basis.map(() => attempt < (1 << k)
+      ? ((attempt >> (basis.indexOf(basis[0]))) & 1 ? 1 : -1)
+      : (Math.random() * 2 - 1));
+    const sum = new Array(n).fill(0);
+    for (let b = 0; b < k; b++)
+      for (let j = 0; j < n; j++) sum[j] += weights[b] * basis[b][j];
+    if (sum.every(x => x >= -1e-9) && sum.some(x => x > 1e-9)) return sum;
+  }
+
+  // Fallback: brute-force sign combinations
+  for (let mask = 0; mask < (1 << k); mask++) {
+    const sum = new Array(n).fill(0);
+    for (let b = 0; b < k; b++) {
+      const sg = (mask >> b) & 1 ? 1 : -1;
+      for (let j = 0; j < n; j++) sum[j] += sg * basis[b][j];
+    }
+    if (sum.every(x => x >= -1e-9)) return sum;
+  }
+  return null;
+}
+
+/* ── Convert float vector → minimal positive integers ──────────── */
+function toIntegers(floats) {
+  const vals = floats.map(f => Math.abs(f) < 1e-6 ? 0 : f);
+  const MAX_D = 600;
+  const rats = vals.map(f => {
+    f = Math.abs(f);
+    if (f < 1e-9) return { n: 0, d: 1 };
+    let bn = 1, bd = 1, be = Infinity;
+    for (let d = 1; d <= MAX_D; d++) {
+      const n = Math.round(f * d);
+      const e = Math.abs(f - n / d);
+      if (e < be) { be = e; bn = n; bd = d; }
+      if (e < 1e-8) break;
+    }
+    return { n: bn, d: bd };
+  });
+  const denom = rats.reduce((acc, r) => lcm(acc, r.d), 1);
+  let ints = rats.map(r => Math.round(r.n * denom / r.d));
+  const g = ints.filter(x => x > 0).reduce((a, b) => gcd(a, b), 0) || 1;
+  return ints.map(v => Math.round(v / g));
+}
+
+/* ── Render a species as HTML with sub/sup ──────────────────────── */
+function renderSpecies(raw) {
+  raw = raw.trim().replace(/\[|\]/g, '');
+  let chargeHtml = '', formulaPart = raw;
+
+  // ^N+/- notation
+  const cm1 = raw.match(/\^(\d+)([+-])$/);
+  if (cm1) {
+    chargeHtml  = `<sup>${cm1[1]}${cm1[2] === '-' ? '−' : '+'}</sup>`;
+    formulaPart = raw.slice(0, -cm1[0].length);
+  } else {
+    // ^+/- notation
+    const cm1b = raw.match(/\^([+-])$/);
+    if (cm1b) {
+      chargeHtml  = `<sup>${cm1b[1] === '-' ? '−' : '+'}</sup>`;
+      formulaPart = raw.slice(0, -cm1b[0].length);
+    } else {
+      const cm2 = raw.match(/(\d+)?([+-])$/);
+      if (cm2) {
+        const digits = cm2[1], sign = cm2[2];
+        if (digits && /^[A-Z][a-z]?$/.test(raw.slice(0, -cm2[0].length))) {
+          chargeHtml  = `<sup>${digits}${sign === '-' ? '−' : '+'}</sup>`;
+          formulaPart = raw.slice(0, -cm2[0].length);
+        } else {
+          chargeHtml  = `<sup>${sign === '-' ? '−' : '+'}</sup>`;
+          formulaPart = raw.slice(0, -1);
+        }
+      }
+    }
+  }
+
+  // Auto-render the display formula from parsed atoms for spectator-stripped species
+  // (We show the original user text, just with sub/superscripts)
+  const fmtFormula = formulaPart
+    .replace(/\(([^)]+)\)(\d+)/g, '($1)<sub>$2</sub>')
+    .replace(/([A-Z][a-z]?)(\d+)/g, '$1<sub>$2</sub>');
+  return fmtFormula + chargeHtml;
+}
+
+/* ── Render display label for a species (handles spectator-stripped) */
+function getDisplayLabel(rawSpecies) {
+  // If species had spectator metals stripped, reconstruct display from parsed data
+  return renderSpecies(rawSpecies);
+}
+
+/* ── Build the balanced equation HTML ──────────────────────────── */
+function buildEquationHtml(allSpecies, coeffs, reactants, products, parsedSpecies) {
+  const side = arr => arr.map(s => {
+    const idx = allSpecies.indexOf(s);
+    const c = coeffs[idx];
+    const ps = parsedSpecies[idx];
+    // Build display: use original raw string OR reconstruct from parsed atoms+charge
+    let displayHtml = renderSpeciesFromParsed(s, ps);
+    return `${c !== 1 ? `<span class="coeff">${c}</span>&thinsp;` : ''}${displayHtml}`;
+  }).join(' <span style="color:var(--text-dim)">+</span> ');
+  return `${side(reactants)} <span class="arrow-sym">→</span> ${side(products)}`;
+}
+
+function renderSpeciesFromParsed(rawOrig, parsed) {
+  // If spectator metals were stripped, rawOrig is still e.g. "KMnO4"
+  // but parsed.charge is now -1 and parsed.atoms is {Mn:1,O:4}.
+  // We should display the ionic form, not the molecular form.
+  const origParsed = parseSpecies(rawOrig);
+  const origAtomKeys = Object.keys(origParsed.atoms).sort().join();
+  const parsedAtomKeys = Object.keys(parsed.atoms).sort().join();
+
+  // If atoms differ (spectator stripping happened), rebuild display from parsed data
+  if (origAtomKeys !== parsedAtomKeys || origParsed.charge !== parsed.charge) {
+    // Build formula from atoms in Hill order (C first, then H, then alphabetical)
+    const atoms = parsed.atoms;
+    const keys = Object.keys(atoms);
+    const hill = [
+      ...keys.filter(k => k === 'C'),
+      ...keys.filter(k => k === 'H'),
+      ...keys.filter(k => k !== 'C' && k !== 'H').sort()
+    ];
+    let formula = hill.map(el => `${el}${atoms[el] > 1 ? '<sub>' + atoms[el] + '</sub>' : ''}`).join('');
+    const chg = parsed.charge;
+    let chargeHtml = '';
+    if (chg === 1)       chargeHtml = '<sup>+</sup>';
+    else if (chg === -1) chargeHtml = '<sup>−</sup>';
+    else if (chg > 1)    chargeHtml = `<sup>${chg}+</sup>`;
+    else if (chg < -1)   chargeHtml = `<sup>${Math.abs(chg)}−</sup>`;
+    return formula + chargeHtml;
+  }
+
+  return renderSpecies(rawOrig);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN SOLVER
+═══════════════════════════════════════════════════════════════════ */
+function runSolver() {
+  try {
+    let raw = normalise(document.getElementById('eqnInput').value.trim());
+    if (!raw) { showErr("Please enter a chemical equation."); return; }
+
+    // Accept both -> and → (already handled by normalise)
+    const ai = raw.indexOf('->');
+    if (ai < 0) { showErr("Use <code>-></code> or <code>→</code> as the reaction arrow."); return; }
+
+    const reactants = splitSide(raw.slice(0, ai));
+    const products  = splitSide(raw.slice(ai + 2));
+    if (!reactants.length || !products.length) {
+      showErr("Need at least one species on each side of the arrow."); return;
+    }
+
+    const allSpecies = [...reactants, ...products];
+    const parsed     = allSpecies.map(s => parseSpecies(s));
+
+    // Check for parse errors (empty atom sets)
+    for (let i = 0; i < allSpecies.length; i++) {
+      if (Object.keys(parsed[i].atoms).length === 0) {
+        showErr(`Could not parse species: <code>${allSpecies[i]}</code>. Check the formula syntax.`); return;
+      }
+    }
+
+    const elements = [...new Set(parsed.flatMap(p => Object.keys(p.atoms)))].sort();
+    if (!elements.length) { showErr("No chemical elements found — check formula syntax."); return; }
+
+    // Detect atoms that appear on only one side (potential unbalanceable atoms)
+    const leftAtoms  = new Set(reactants.flatMap((s,i) => Object.keys(parsed[i].atoms)));
+    const rightAtoms = new Set(products.flatMap((s,i) => Object.keys(parsed[reactants.length+i].atoms)));
+    const onlyLeft   = [...leftAtoms].filter(e => !rightAtoms.has(e));
+    const onlyRight  = [...rightAtoms].filter(e => !leftAtoms.has(e));
+
+    if (onlyLeft.length || onlyRight.length) {
+      const missing = [...onlyLeft.map(e=>`<b>${e}</b> (left only)`), ...onlyRight.map(e=>`<b>${e}</b> (right only)`)].join(', ');
+      showErr(`Atom(s) ${missing} appear on only one side — equation cannot be balanced as written.<br><br>
+        <span style="color:var(--text-dim);font-size:12px;">
+        Tip: Use net ionic form. E.g. write <code>MnO4-</code> instead of <code>KMnO4</code>,
+        or include all product species (like <code>SO4^2-</code> if a sulfate salt is a reactant).
+        Molecular salts of Group 1/2 metals (K, Na, Ca…) are auto-converted to ionic form.
+        </span>`);
+      return;
+    }
+
+    // Build constraint matrix: rows = [elements..., charge], cols = species
+    // Reactant atoms: +count; Product atoms: −count
+    const matrix = [
+      ...elements.map(el => allSpecies.map((s, i) => {
+        const cnt = parsed[i].atoms[el] || 0;
+        return reactants.includes(s) ? cnt : -cnt;
+      })),
+      allSpecies.map((s, i) => {
+        const q = parsed[i].charge;
+        return reactants.includes(s) ? q : -q;
+      })
+    ];
+
+    const basis    = nullBasis(matrix);
+    if (!basis.length) {
+      showErr("System is over-determined — equation may not be balanceable as written.<br>" +
+        "<span style='font-size:12px;color:var(--text-dim)'>Check that all species are chemically correct and that all product species are included.</span>");
+      return;
+    }
+
+    const floatVec = findPositiveVector(basis);
+    if (!floatVec) {
+      showErr("Could not find all-positive coefficients. Verify that species and charges are correct and that the reaction is chemically valid.");
+      return;
+    }
+
+    const coeffs = toIntegers(floatVec);
+    if (coeffs.some(c => c <= 0)) {
+      showErr("Degenerate solution (a coefficient is zero or negative). Verify the equation is chemically valid.");
+      return;
+    }
+
+    // ── Verification ──────────────────────────────────────────────
+    let allOK = true;
+    const vData = [];
+    for (const el of elements) {
+      let L = 0, R = 0;
+      allSpecies.forEach((s, i) => {
+        const cnt = (parsed[i].atoms[el] || 0) * coeffs[i];
+        reactants.includes(s) ? (L += cnt) : (R += cnt);
+      });
+      const ok = Math.abs(L - R) < 0.5;
+      if (!ok) allOK = false;
+      vData.push({ label: el, L, R, ok });
+    }
+    let Lq = 0, Rq = 0;
+    allSpecies.forEach((s, i) => {
+      const q = parsed[i].charge * coeffs[i];
+      reactants.includes(s) ? (Lq += q) : (Rq += q);
+    });
+    const chargeOK = Math.abs(Lq - Rq) < 0.5;
+    if (!chargeOK) allOK = false;
+    vData.push({ label: 'Charge', L: Lq, R: Rq, ok: chargeOK });
+
+    showResult(allSpecies, coeffs, reactants, products, parsed, vData, allOK);
+  } catch (err) {
+    console.error(err);
+    showErr("Unexpected error: " + err.message);
+  }
+}
+
+/* ── Render result ───────────────────────────────────────────────── */
+function showResult(allSpecies, coeffs, reactants, products, parsed, vData, allOK) {
+  const box  = document.getElementById('resBox');
+  const head = document.getElementById('resHead');
+  const body = document.getElementById('resBody');
+  box.className = 'result-wrap ok';
+  box.style.display = 'block';
+  head.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Balanced Equation`;
+
+  const chips = vData.map(v =>
+    `<div class="v-chip ${v.ok ? 'ok' : 'fail'}">
+       <span class="el">${v.label}</span>
+       <span class="vals">${v.L} = ${v.R} ${v.ok ? '✓' : '✗'}</span>
+     </div>`
+  ).join('');
+
+  const verdict = allOK
+    ? `<div class="verdict ok">✅ Fully balanced — every atom and charge matches</div>`
+    : `<div class="verdict fail">⚠ Balance check failed — verify your input equation</div>`;
+
+  body.innerHTML = `
+    <div class="eq-display">${buildEquationHtml(allSpecies, coeffs, reactants, products, parsed)}</div>
+    <div class="verify-wrap">
+      <div class="verify-title">Verification — Atom & Charge Count</div>
+      <div class="verify-grid">${chips}</div>
+      ${verdict}
+    </div>`;
+}
+
+function showErr(msg) {
+  const box = document.getElementById('resBox');
+  box.className = 'result-wrap err';
+  box.style.display = 'block';
+  document.getElementById('resHead').innerHTML =
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Error`;
+  document.getElementById('resBody').innerHTML = `<div class="err-body">❌ ${msg}</div>`;
+}
+
+function toggleFaq(card) { card.classList.toggle('open'); }
+
+document.getElementById('eqnInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runSolver(); }
+});
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: .1 });
+document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
