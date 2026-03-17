@@ -977,48 +977,6 @@ section { margin-bottom: 0; }
   </div>
 </div>
 
-<!-- REACTION TYPES TABLE -->
-<div class="glass-card">
-  <div class="section-head">
-    <div class="section-icon">⚗️</div>
-    <div>
-      <h2>Classification of Organic Reactions</h2>
-      <p>All major reaction categories with examples</p>
-    </div>
-  </div>
-  <div style="overflow-x:auto;">
-  <table class="rxn-table">
-    <thead>
-      <tr>
-        <th>Reaction Type</th>
-        <th>Class</th>
-        <th>Key Reagents</th>
-        <th>Example</th>
-        <th>Conditions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>SN2</td><td><span class="badge-type bt-sub">Substitution</span></td><td>Strong Nu⁻ (NaOH, NaCN, NaN₃)</td><td>CH₃Br + OH⁻ → CH₃OH + Br⁻</td><td>Polar aprotic, 1° substrate</td></tr>
-      <tr><td>SN1</td><td><span class="badge-type bt-sub">Substitution</span></td><td>Weak Nu (H₂O, ROH)</td><td>(CH₃)₃CBr + H₂O → (CH₃)₃COH</td><td>Polar protic, 3° substrate</td></tr>
-      <tr><td>E2</td><td><span class="badge-type bt-elim">Elimination</span></td><td>Strong base (KOH/EtOH)</td><td>CH₃CH₂Br + KOH → CH₂=CH₂</td><td>Conc. base, heat</td></tr>
-      <tr><td>E1</td><td><span class="badge-type bt-elim">Elimination</span></td><td>Weak base, heat</td><td>(CH₃)₃CBr →Δ (CH₃)₂C=CH₂</td><td>Dilute base, high T</td></tr>
-      <tr><td>Electrophilic Addition</td><td><span class="badge-type bt-add">Addition</span></td><td>HX, X₂, H₂SO₄</td><td>CH₂=CH₂ + HBr → CH₃CH₂Br</td><td>Room temp, Markovnikov</td></tr>
-      <tr><td>Nucleophilic Addition</td><td><span class="badge-type bt-add">Addition</span></td><td>RMgX, LiAlH₄, NaBH₄</td><td>RCHO + RMgBr → RR'CHOH</td><td>Anhydrous, then H₂O work-up</td></tr>
-      <tr><td>Electrophilic Aromatic Sub. (EAS)</td><td><span class="badge-type bt-sub">Substitution</span></td><td>HNO₃/H₂SO₄, X₂/FeBr₃</td><td>C₆H₆ + HNO₃ → C₆H₅NO₂</td><td>Acid catalyst</td></tr>
-      <tr><td>Nucleophilic Acyl Sub.</td><td><span class="badge-type bt-sub">Substitution</span></td><td>ROH, RNH₂, H₂O</td><td>RCOCl + ROH → RCOOR'</td><td>Base, anhydrous</td></tr>
-      <tr><td>Aldol Condensation</td><td><span class="badge-type bt-add">Addition</span></td><td>NaOH (cat), enol/enolate</td><td>2CH₃CHO → CH₃CH(OH)CH₂CHO</td><td>Aqueous base, low T</td></tr>
-      <tr><td>Claisen Condensation</td><td><span class="badge-type bt-add">Addition</span></td><td>NaOEt, ester enolate</td><td>2RCOOEt → RCOCHRCOOEt</td><td>EtOH/NaOEt</td></tr>
-      <tr><td>Oxidation (Primary Alcohol)</td><td><span class="badge-type bt-ox">Oxidation</span></td><td>KMnO₄, PCC, CrO₃</td><td>RCH₂OH → RCHO or RCOOH</td><td>Acidic/neutral</td></tr>
-      <tr><td>Reduction (Carbonyl)</td><td><span class="badge-type bt-red">Reduction</span></td><td>LiAlH₄, NaBH₄, H₂/Pd</td><td>RCHO → RCH₂OH</td><td>Anhydrous THF</td></tr>
-      <tr><td>Diels-Alder</td><td><span class="badge-type bt-cyclo">Cycloaddition</span></td><td>Diene + dienophile</td><td>Butadiene + ethylene → cyclohexene</td><td>Thermal, [4+2]</td></tr>
-      <tr><td>Grignard Reaction</td><td><span class="badge-type bt-add">Addition</span></td><td>RMgX in dry ether</td><td>RMgBr + RCHO → RR'CHOH</td><td>Anhydrous, then H₃O⁺</td></tr>
-      <tr><td>Fischer Esterification</td><td><span class="badge-type bt-sub">Substitution</span></td><td>H₂SO₄ (cat), ROH</td><td>RCOOH + R'OH ⇌ RCOOR' + H₂O</td><td>Acid cat., reflux, equil.</td></tr>
-      <tr><td>Wittig Reaction</td><td><span class="badge-type bt-add">Addition</span></td><td>Ph₃P=CR₂ (ylide)</td><td>RCHO + Ph₃P=CH₂ → RCH=CH₂</td><td>Anhydrous, base</td></tr>
-    </tbody>
-  </table>
-  </div>
-</div>
-
 
 <!-- ══════════════════════════════════════════ CALCULATOR ══ -->
 <div class="glass-card" id="calculator">
@@ -1117,7 +1075,50 @@ section { margin-bottom: 0; }
       <input type="text" id="parserInput" placeholder="Type: CH3COOH  or  2.5×10⁻³ mol/L  or  1-bromopropane..." style="flex:1;min-width:200px;">
       <button onclick="runSmartParser()" style="padding:12px 20px;border-radius:12px;background:rgba(168,85,247,0.15);border:1px solid var(--info);color:var(--info);font-family:'Syne',sans-serif;cursor:pointer;font-size:0.88rem;white-space:nowrap;">Identify</button>
     </div>
-    <div class="parse-output" id="parseOutput" style="margin-top:12px;">// Parser output will appear here…</div>
+    <div class="parse-output" id="parseOutput" style="margin-top:12px;">Results Will Appear Here</div>
+  </div>
+</div>
+
+
+  <!-- REACTION TYPES TABLE -->
+<div class="glass-card">
+  <div class="section-head">
+    <div class="section-icon">⚗️</div>
+    <div>
+      <h2>Classification of Organic Reactions</h2>
+      <p>All major reaction categories with examples</p>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="rxn-table">
+    <thead>
+      <tr>
+        <th>Reaction Type</th>
+        <th>Class</th>
+        <th>Key Reagents</th>
+        <th>Example</th>
+        <th>Conditions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>SN2</td><td><span class="badge-type bt-sub">Substitution</span></td><td>Strong Nu⁻ (NaOH, NaCN, NaN₃)</td><td>CH₃Br + OH⁻ → CH₃OH + Br⁻</td><td>Polar aprotic, 1° substrate</td></tr>
+      <tr><td>SN1</td><td><span class="badge-type bt-sub">Substitution</span></td><td>Weak Nu (H₂O, ROH)</td><td>(CH₃)₃CBr + H₂O → (CH₃)₃COH</td><td>Polar protic, 3° substrate</td></tr>
+      <tr><td>E2</td><td><span class="badge-type bt-elim">Elimination</span></td><td>Strong base (KOH/EtOH)</td><td>CH₃CH₂Br + KOH → CH₂=CH₂</td><td>Conc. base, heat</td></tr>
+      <tr><td>E1</td><td><span class="badge-type bt-elim">Elimination</span></td><td>Weak base, heat</td><td>(CH₃)₃CBr →Δ (CH₃)₂C=CH₂</td><td>Dilute base, high T</td></tr>
+      <tr><td>Electrophilic Addition</td><td><span class="badge-type bt-add">Addition</span></td><td>HX, X₂, H₂SO₄</td><td>CH₂=CH₂ + HBr → CH₃CH₂Br</td><td>Room temp, Markovnikov</td></tr>
+      <tr><td>Nucleophilic Addition</td><td><span class="badge-type bt-add">Addition</span></td><td>RMgX, LiAlH₄, NaBH₄</td><td>RCHO + RMgBr → RR'CHOH</td><td>Anhydrous, then H₂O work-up</td></tr>
+      <tr><td>Electrophilic Aromatic Sub. (EAS)</td><td><span class="badge-type bt-sub">Substitution</span></td><td>HNO₃/H₂SO₄, X₂/FeBr₃</td><td>C₆H₆ + HNO₃ → C₆H₅NO₂</td><td>Acid catalyst</td></tr>
+      <tr><td>Nucleophilic Acyl Sub.</td><td><span class="badge-type bt-sub">Substitution</span></td><td>ROH, RNH₂, H₂O</td><td>RCOCl + ROH → RCOOR'</td><td>Base, anhydrous</td></tr>
+      <tr><td>Aldol Condensation</td><td><span class="badge-type bt-add">Addition</span></td><td>NaOH (cat), enol/enolate</td><td>2CH₃CHO → CH₃CH(OH)CH₂CHO</td><td>Aqueous base, low T</td></tr>
+      <tr><td>Claisen Condensation</td><td><span class="badge-type bt-add">Addition</span></td><td>NaOEt, ester enolate</td><td>2RCOOEt → RCOCHRCOOEt</td><td>EtOH/NaOEt</td></tr>
+      <tr><td>Oxidation (Primary Alcohol)</td><td><span class="badge-type bt-ox">Oxidation</span></td><td>KMnO₄, PCC, CrO₃</td><td>RCH₂OH → RCHO or RCOOH</td><td>Acidic/neutral</td></tr>
+      <tr><td>Reduction (Carbonyl)</td><td><span class="badge-type bt-red">Reduction</span></td><td>LiAlH₄, NaBH₄, H₂/Pd</td><td>RCHO → RCH₂OH</td><td>Anhydrous THF</td></tr>
+      <tr><td>Diels-Alder</td><td><span class="badge-type bt-cyclo">Cycloaddition</span></td><td>Diene + dienophile</td><td>Butadiene + ethylene → cyclohexene</td><td>Thermal, [4+2]</td></tr>
+      <tr><td>Grignard Reaction</td><td><span class="badge-type bt-add">Addition</span></td><td>RMgX in dry ether</td><td>RMgBr + RCHO → RR'CHOH</td><td>Anhydrous, then H₃O⁺</td></tr>
+      <tr><td>Fischer Esterification</td><td><span class="badge-type bt-sub">Substitution</span></td><td>H₂SO₄ (cat), ROH</td><td>RCOOH + R'OH ⇌ RCOOR' + H₂O</td><td>Acid cat., reflux, equil.</td></tr>
+      <tr><td>Wittig Reaction</td><td><span class="badge-type bt-add">Addition</span></td><td>Ph₃P=CR₂ (ylide)</td><td>RCHO + Ph₃P=CH₂ → RCH=CH₂</td><td>Anhydrous, base</td></tr>
+    </tbody>
+  </table>
   </div>
 </div>
 
