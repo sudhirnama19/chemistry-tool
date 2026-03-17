@@ -1,6 +1,3 @@
-
-
-
 (function(){
 
 /* -------------------------------
@@ -181,5 +178,15 @@ console.log("ghost");
 }
 
 })();
+
+})();
+
+(function(){
+
+    var script = document.createElement("script");
+    script.src = "chemistry-core.js";
+    script.defer = true;
+
+    document.head.appendChild(script);
 
 })();
