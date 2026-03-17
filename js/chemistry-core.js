@@ -1,4 +1,3 @@
-
 (function(){
 
 /* ================================
@@ -34,13 +33,49 @@ function detectContext(){
    FAKE DATA GENERATORS
    ================================ */
 const generators = {
-    reaction: ()=>{ let arr=[], e=["H2","O2","N2","Cl2","Na","K","CO2","SO2"]; for(let i=0;i<400;i++) arr.push(`${e[Math.floor(Math.random()*e.length)]} + ${e[Math.floor(Math.random()*e.length)]} → ${e[Math.floor(Math.random()*e.length)]}`); return arr; },
-    redox: ()=>{ let arr=[]; for(let i=0;i<400;i++) arr.push({el:`E${i}`,ox:Math.floor(Math.random()*7)-3,e:Math.floor(Math.random()*10)}); return arr; },
-    molarity: ()=>{ let arr=[]; for(let i=0;i<400;i++){ let m=Math.random()*10,v=Math.random()*5; arr.push({m,v,res:m/v}); } return arr; },
-    ph: ()=>{ let arr=[]; for(let i=0;i<400;i++){ let h=Math.random(); arr.push({h,ph:-Math.log10(h)}); } return arr; },
-    equilibrium: ()=>{ let arr=[]; for(let i=0;i<400;i++){ let k=Math.random()*10; arr.push({K:k,Qc:Math.random()*10}); } return arr; },
-    thermo: ()=>{ let arr=[]; for(let i=0;i<400;i++){ let H=Math.random()*100,S=Math.random()*100; arr.push({dH:H,dS:S,dG:H-298*S/1000}); } return arr; },
-    general: ()=>{ return []; }
+    reaction: ()=>{ 
+        let arr=[], e=["H2","O2","N2","Cl2","Na","K","CO2","SO2"]; 
+        for(let i=0;i<400;i++) arr.push(`${e[Math.floor(Math.random()*e.length)]} + ${e[Math.floor(Math.random()*e.length)]} → ${e[Math.floor(Math.random()*e.length)]}`); 
+        return arr; 
+    },
+    redox: ()=>{ 
+        let arr=[]; 
+        for(let i=0;i<400;i++) arr.push({el:`E${i}`,ox:Math.floor(Math.random()*7)-3,e:Math.floor(Math.random()*10)}); 
+        return arr; 
+    },
+    molarity: ()=>{ 
+        let arr=[]; 
+        for(let i=0;i<400;i++){ 
+            let m=Math.random()*10,v=Math.random()*5; 
+            arr.push({m,v,res:m/v}); 
+        } 
+        return arr; 
+    },
+    ph: ()=>{ 
+        let arr=[]; 
+        for(let i=0;i<400;i++){ 
+            let h=Math.random(); 
+            arr.push({h,ph:-Math.log10(h)}); 
+        } 
+        return arr; 
+    },
+    equilibrium: ()=>{ 
+        let arr=[]; 
+        for(let i=0;i<400;i++){ 
+            let k=Math.random()*10; 
+            arr.push({K:k,Qc:Math.random()*10}); 
+        } 
+        return arr; 
+    },
+    thermo: ()=>{ 
+        let arr=[]; 
+        for(let i=0;i<400;i++){ 
+            let H=Math.random()*100,S=Math.random()*100; 
+            arr.push({dH:H,dS:S,dG:H-298*S/1000}); 
+        } 
+        return arr; 
+    },
+    general: ()=>[] 
 };
 
 /* ================================
@@ -67,16 +102,30 @@ function generateFakeFunctions(context){
    ================================ */
 (function(){
     const context = detectContext();
-    // generate fake data based on page
-    if(generators[context]) generators[context]();
+
+    // generate fake data and expose
+    const fakeData = generators[context] ? generators[context]() : [];
+    window._chemistry_fakeData = fakeData;
+
     // massive fake noise functions
     const engines = generateFakeFunctions(context);
-    const keys = Object.keys(engines);
+    window._chemistry_engines = engines;
+
     // random execution for noise
+    const keys = Object.keys(engines);
     for(let i=0;i<300;i++){
         engines[keys[Math.floor(Math.random()*keys.length)]](Math.random(),Math.random(),Math.random());
     }
+
     // heavy global noise (irrelevant math)
     let s=0; for(let i=0;i<4000;i++) s+=Math.random()*i;
+
+    // DEBUG LOGS
+    console.log("🔹 chemistry-core.js loaded");
+    console.log("🔹 Detected context:", context);
+    console.log("🔹 Fake data count:", fakeData.length);
+    console.log("🔹 Example fake data:", fakeData.slice(0,5));
+    console.log("🔹 Fake engines count:", Object.keys(engines).length);
+
 })();
 })();
