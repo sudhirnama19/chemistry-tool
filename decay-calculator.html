@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radioactive Decay Calculator | Half-Life & Isotope Solver | Chemistry Spark Lab</title>
+    <meta name="description" content="Advanced Radioactive Decay Calculator. Calculate remaining quantity, half-life, and decay constants with solved examples and scientific research applications.">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root { --accent: #00ffd5; --bg: #0f172a; --card: #1e293b; --glass: rgba(30, 41, 59, 0.7); }
+        
+        body { 
+            background-color: var(--bg); 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0; line-height: 1.6;
+        }
+
+        /* Clickable Header */
+        .main-header {
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+        }
+        .main-header a {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .content-section { max-width: 1000px; margin: 120px auto 40px auto; padding: 20px 15px; }
+
+        .info-section { margin-top: 60px; }
+        .info-section h2, .info-section h3 { 
+            margin-bottom: 25px; border-left: 5px solid var(--accent); 
+            padding-left: 15px; font-weight: 800; color: #ffffff;
+        }
+        
+        .grid-layout { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; 
+        }
+        
+        .info-card { 
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .info-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+        .example-box { 
+            background: rgba(0, 255, 213, 0.05); 
+            padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid var(--accent);
+        }
+
+        /* Calculator Styling */
+        .solver-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 20px; padding: 40px;
+            border: 1px solid rgba(0, 255, 213, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 213, 0.15);
+        }
+        
+        /* Fixed Input Visibility */
+        .form-control {
+            background-color: #0f172a !important;
+            color: var(--accent) !important;
+            border: 2px solid #334155 !important;
+            padding: 12px; 
+            font-weight: 700; 
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .form-control:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.3);
+            outline: none;
+        }
+        .form-control::placeholder { color: #475569; font-weight: 400; }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #007bff, var(--accent));
+            color: #0f172a; font-weight: 800; padding: 15px;
+            width: 100%; border-radius: 12px; border: none;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn-solve:hover { transform: scale(1.02); cursor: pointer; opacity: 0.9; }
+
+        .result-display {
+            display: none; margin-top: 30px; padding: 25px;
+            background: rgba(15, 23, 42, 0.8); border-radius: 15px; border: 1px dashed var(--accent);
+        }
+
+        .card-q { color: var(--accent); font-weight: 700; margin-bottom: 12px; font-size: 1.15rem; }
+        .card-a { color: #cbd5e1; font-size: 0.95rem; }
+        
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        table { width: 100%; color: white; border-collapse: collapse; background: rgba(30, 41, 59, 0.4); }
+        th, td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        th { background: rgba(0, 255, 213, 0.15); color: var(--accent); font-weight: 800; }
+
+        .formula-text { font-family: 'Courier New', monospace; color: var(--accent); font-weight: bold; background: #000; padding: 2px 5px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="index.html">Advanced Chemistry Calculators</a>
+    </header>
+
+    <div class="content-section">
+        <section id="intro">
+            <h2>Radioactive Decay & Half-Life</h2>
+            <div class="info-card">
+                <p class="card-a"><strong>Radioactive Decay</strong> is the spontaneous process by which an unstable atomic nucleus loses energy by emitting radiation. This transformation results in the nucleus changing into a different nuclide or a lower energy state. The rate of decay is characterized by the <strong>Half-Life</strong>—the time required for half of the radioactive atoms in a sample to decay.</p>
+                <div class="example-box">
+                    <strong>The Fundamental Decay Equation:</strong>
+                    <p class="mt-2 formula-text">N(t) = N₀ × e^(-λt)</p>
+                    <p class="small mb-0">Where:<br>
+                    • N(t) = Remaining Quantity<br>
+                    • N₀ = Initial Quantity<br>
+                    • λ (Lambda) = Decay Constant (ln(2) / Half-life)<br>
+                    • t = Time Elapsed</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="solver-card">
+                <h3 class="text-center mb-4">Radioactive Decay Solver</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Initial Quantity (N₀)</label>
+                        <input type="text" id="initialQty" class="form-control" placeholder="e.g., 100 or 1.5e3">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Half-Life (t½)</label>
+                        <input type="text" id="halfLife" class="form-control" placeholder="Time units (e.g., 5730)">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Time Elapsed (t)</label>
+                        <input type="text" id="timeElapsed" class="form-control" placeholder="Must match half-life unit">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-info">Result Format</label>
+                        <input type="text" class="form-control" value="Remaining Mass/Quantity" readonly>
+                    </div>
+                </div>
+                <button onclick="calculateDecay()" class="btn btn-solve">Analyze Decay</button>
+
+                <div id="results" class="result-display">
+                    <h4 id="resAmount" style="color: var(--accent); font-weight: bold;"></h4>
+                    <p id="resPercentage" class="card-a mb-1"></p>
+                    <p id="resDecayed" class="card-a"></p>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <small class="text-info">Calculation strictly follows the Exponential Decay Law.</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Detailed Calculation Logic</h3>
+            <div class="info-card">
+                <p class="card-a">The calculator utilizes a smart parser to handle complex scientific inputs. Here is how it processes your data:</p>
+                <ul class="card-a">
+                    <li><strong>Step 1: Parsing.</strong> Values like <span class="formula-text">10^2</span> or <span class="formula-text">1e2</span> are converted to <span class="formula-text">100</span>.</li>
+                    <li><strong>Step 2: Decay Constant.</strong> The tool calculates λ = 0.693147 / Half-Life.</li>
+                    <li><strong>Step 3: Exponential Decay.</strong> It applies the Euler's number base formula to find the remaining atoms.</li>
+                </ul>
+                <div class="example-box">
+                    <strong>Solved Example: Iodine-131 (Medical Use)</strong>
+                    <br>• <strong>Initial Amount:</strong> 80 mg
+                    <br>• <strong>Half-Life:</strong> 8 Days
+                    <br>• <strong>Time Passed:</strong> 24 Days (3 Half-lives)
+                    <br><strong>Logic:</strong> After 8 days: 40mg. After 16 days: 20mg. After 24 days: 10mg.
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Scientific Aspects & Real-World Uses</h3>
+            <div class="grid-layout">
+                <div class="info-card">
+                    <div class="card-q">Isotopic Stability</div>
+                    <p class="card-a">Nuclei with too many neutrons or protons are unstable. Decay is the natural method of seeking a "Valley of Stability."</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Sterilization</div>
+                    <p class="card-a">Gamma rays from isotopes like Cobalt-60 are used to sterilize medical equipment and preserve food by killing bacteria.</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-q">Nuclear Medicine</div>
+                    <p class="card-a">PET scans use Positron Emission (Beta Plus decay) to create detailed 3D images of internal organs and metabolic processes.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Common Radioactive Isotopes Reference</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Isotope</th>
+                            <th>Decay Type</th>
+                            <th>Half-Life</th>
+                            <th>Primary Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Carbon-14</td><td>Beta Minus</td><td>5,730 Years</td><td>Organic Dating</td></tr>
+                        <tr><td>Uranium-235</td><td>Alpha</td><td>704 Million Years</td><td>Fission Fuel</td></tr>
+                        <tr><td>Cobalt-60</td><td>Gamma</td><td>5.27 Years</td><td>Cancer Therapy</td></tr>
+                        <tr><td>Tritium (H-3)</td><td>Beta Minus</td><td>12.3 Years</td><td>Exit Signs/Research</td></tr>
+                        <tr><td>Technetium-99m</td><td>Gamma</td><td>6 Hours</td><td>Diagnostic Imaging</td></tr>
+                        <tr><td>Radon-222</td><td>Alpha</td><td>3.8 Days</td><td>Mining Safety Geoproxy</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Applying Decay to Scientific Research</h3>
+            <div class="info-card">
+                <p class="card-a">In modern research, radioactive decay is used as a "Tracer." For example, in <strong>Environmental Science</strong>, scientists measure the decay of isotopes in groundwater to track the speed of underground currents. In <strong>Cosmology</strong>, the decay of Aluminum-26 in meteorites provides evidence of supernova explosions that occurred before our solar system was even formed.</p>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>Radioactive Decay FAQ</h3>
+            <div class="grid-layout" id="faq-grid">
+                </div>
+        </section>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script>
+        /**
+         * Advanced smartParser [2026-03-06]
+         * Correctly handles 2*2, 10^2, 1e2, and scientific notation
+         */
+        function smartParser(input) {
+            if (!input) return 0;
+            let val = input.toString().toLowerCase().trim();
+            
+            try {
+                // Replace ^ with ** for JS power handling
+                val = val.replace(/\^/g, '**');
+                
+                // Use Function constructor for safe math evaluation (handles 2*2 etc)
+                // We sanitize by only allowing numbers, operators, and scientific 'e'
+                if (/^[0-9e.\-\+\*\/\(\)\s\*]+$/.test(val) || val.includes('**')) {
+                    return eval(val);
+                }
+                return parseFloat(val);
+            } catch (e) {
+                return parseFloat(val);
+            }
+        }
+
+        function calculateDecay() {
+            const n0 = smartParser(document.getElementById('initialQty').value);
+            const h = smartParser(document.getElementById('halfLife').value);
+            const t = smartParser(document.getElementById('timeElapsed').value);
+
+            if (isNaN(n0) || isNaN(h) || isNaN(t) || h <= 0) {
+                alert("Please enter valid positive numbers. Half-life must be greater than zero.");
+                return;
+            }
+
+            // High Precision Calculation: N = N0 * e^(-ln(2)/h * t)
+            const decayConstant = Math.LN2 / h;
+            const nt = n0 * Math.exp(-decayConstant * t);
+            
+            const percentage = (nt / n0) * 100;
+            const decayed = n0 - nt;
+
+            document.getElementById('resAmount').innerText = `Remaining Amount (N): ${nt.toLocaleString(undefined, {maximumFractionDigits: 6})}`;
+            document.getElementById('resPercentage').innerText = `Remaining: ${percentage.toFixed(2)}%`;
+            document.getElementById('resDecayed').innerText = `Total Decayed: ${decayed.toLocaleString(undefined, {maximumFractionDigits: 6})}`;
+            document.getElementById('results').style.display = 'block';
+        }
+
+        const faqs = [
+            ["What exactly is a Half-life?", "The specific time interval required for a quantity to reduce to half of its initial value through decay."],
+            ["Can chemical reactions stop decay?", "No. Decay is a nuclear process. Heat, cold, or chemicals cannot alter its rate."],
+            ["Why use e in the formula?", "Radioactive decay is a continuous process, and the constant 'e' represents the base of natural growth and decay."],
+            ["Is Alpha decay dangerous?", "It is highly ionizing but has low penetration. It's only dangerous if the source is inside the body."],
+            ["What is the decay constant?", "It is the probability per unit time that a nucleus will decay."],
+            ["How accurate is Carbon Dating?", "It is highly accurate for organic materials up to about 50,000 years old."],
+            ["What is a 'Daughter' isotope?", "The stable or unstable product that remains after a parent isotope has undergone decay."],
+            ["Can we predict when one atom decays?", "No. Decay is purely stochastic (random). We can only predict the behavior of large groups of atoms."],
+            ["What shielding stops Gamma rays?", "Several inches of lead or several feet of concrete are required to significantly attenuate Gamma radiation."],
+            ["Does an atom disappear?", "No, it transforms into a different element or isotope by changing its proton/neutron count."],
+            ["What is a Becquerel?", "The standard unit of radioactivity, representing one decay event per second."],
+            ["Why does Radon accumulate in basements?", "Radon is a heavy gas produced by the decay of Uranium in soil; it seeps through cracks in foundations."],
+            ["What is a Decay Chain?", "A series of decays where one isotope leads to another until a stable nucleus is reached."],
+            ["Is food radiation safe?", "Yes. Irradiation kills bacteria, but the food itself does not become radioactive."],
+            ["What is the strongest radiation?", "Gamma rays have the most energy, but Alpha particles cause the most damage if they enter the body."],
+            ["Can we speed up half-life?", "In standard conditions, no. Only extreme high-energy physics (like in stars or colliders) can influence it."]
+        ];
+
+        const faqGrid = document.getElementById('faq-grid');
+        faqs.forEach(f => {
+            faqGrid.innerHTML += `
+                <div class="info-card">
+                    <div class="card-q">${f[0]}</div>
+                    <p class="card-a">${f[1]}</p>
+                </div>
+            `;
+        });
+
+        // Load Footer
+        fetch("footer.html").then(res => res.text()).then(data => {
+            const footerCont = document.getElementById("footer-container");
+            if(footerCont) footerCont.innerHTML = data;
+        }).catch(e => console.log("Footer not found"));
+    </script>
+    
+    
+    <script src="header.js"></script>
+    
+</body>
+</html>

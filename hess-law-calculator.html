@@ -1,0 +1,597 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Hess's Law Solver | Auto-Balancing Engine</title>
+<script src="header.js" defer></script>
+<style>
+:root {
+    --accent: #00f2ff;
+    --glass: rgba(15, 23, 42, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --bg: #0a1120;
+    --success: #00ff88;
+    --error: #ff4d4d;
+    --info: #a855f7;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    background: var(--bg);
+    color: #e2e8f0;
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 80px 15px 20px; 
+}
+
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 35px;
+    margin-bottom: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+h1, h2, h3 { color: var(--accent); margin-top: 0; }
+p { color: #cbd5e1; line-height: 1.8; }
+
+.reaction-block {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-left: 6px solid var(--accent);
+}
+
+.input-grid { display: flex; flex-direction: column; gap: 20px; margin-bottom: 15px; }
+
+@media(min-width:768px){
+    .input-grid { flex-direction: row; align-items: flex-end; }
+    .input-field-wrap { flex: 1; }
+}
+
+.input-field-wrap label {
+    display: block; font-size: 0.8rem; color: var(--accent);
+    margin-bottom: 10px; text-transform: uppercase; font-weight: 800;
+}
+
+input[type=text] {
+    background: rgba(0,0,0,0.5)!important;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px; padding: 15px; color: #fff!important;
+    width: 100%; font-size: 16px; outline: none;
+}
+
+.toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.switch-wrap { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.switch { position: relative; width: 48px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: #334155; border-radius: 24px; transition: 0.4s;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 18px; width: 18px; left: 3px; bottom: 3px;
+    background: #fff; border-radius: 50%; transition: 0.4s;
+}
+input:checked+.slider { background: var(--accent); }
+input:checked+.slider:before { transform: translateX(24px); }
+
+.btn-container { display: flex; gap: 20px; flex-wrap: wrap; margin: 30px 0; }
+.btn {
+    padding: 18px 30px; border-radius: 14px; font-weight: 800;
+    border: none; cursor: pointer; transition: 0.3s; font-size: 0.95rem;
+    text-transform: uppercase;
+}
+.btn-primary { background: var(--accent); color: #000; }
+.btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+.analysis-box {
+    background: rgba(0,242,255,0.05);
+    border: 2px solid var(--accent);
+    border-radius: 20px; padding: 30px; display: none; margin-top: 20px;
+}
+
+.log-item {
+    font-family: 'Courier New', monospace;
+    padding: 12px; border-radius: 10px; margin-bottom: 10px;
+    border-left: 4px solid #fff; background: rgba(0,0,0,0.3);
+}
+
+.status-balanced { border-color: var(--success); color: var(--success); }
+.status-unbalanced { border-color: var(--error); color: var(--error); }
+.cancel-text { text-decoration: line-through; color: var(--error); opacity: 0.7; }
+
+/* --- Fixed Knowledge Base & FAQ Styling --- */
+.info-section {
+    margin-top: 10px; /* Reduced gap */
+    padding-top: 0;
+}
+
+.guide-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid var(--glass-border);
+    max-width: 100%;
+    overflow: hidden; /* Prevents text spill */
+}
+
+.guide-card h2, .guide-card h3 {
+    border-left: 4px solid var(--accent);
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.step-box {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    border-left: 3px solid var(--success);
+    word-break: break-all;
+}
+
+.logic-list { list-style: none; padding: 0; }
+.logic-list li {
+    margin-bottom: 15px;
+    padding-left: 30px;
+    position: relative;
+}
+.logic-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.faq-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.faq-item {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.example-math {
+    background: #000;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    color: var(--success);
+    overflow-x: auto;
+    line-height: 1.6;
+}
+
+mark {
+    background: var(--accent);
+    color: #000;
+    padding: 0 5px;
+    border-radius: 3px;
+}
+
+.grid-two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="glass-card">
+        <h1>Hess's Law Master Solver</h1>
+        <p>Advanced thermodynamic engine with professional chemical formula parser and automatic species cancellation.</p>
+    </div>
+
+    <div class="glass-card">
+        <div id="steps-container">
+            <div class="reaction-block">
+                <div class="input-grid">
+                    <div class="input-field-wrap">
+                        <label>Equation</label>
+                        <input type="text" class="rxn-text" placeholder="CH4 + 2O2 -> CO2 + 2H2O">
+                    </div>
+                    <div class="input-field-wrap" style="max-width:180px;">
+                        <label>ΔH (kJ/mol)</label>
+                        <input type="text" class="rxn-val">
+                    </div>
+                    <div class="input-field-wrap" style="max-width:100px;">
+                        <label>Multiplier</label>
+                        <input type="text" class="rxn-mult" value="1">
+                    </div>
+                </div>
+                <div class="toggle-row">
+                    <label class="switch-wrap">
+                        <div class="switch">
+                            <input type="checkbox" class="rxn-reverse">
+                            <span class="slider"></span>
+                        </div>
+                        <span style="font-weight:600;">Reverse Reaction</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="addRow()">+ Add Step</button>
+            <button class="btn btn-primary" onclick="solveHess()">Analyze & Calculate</button>
+        </div>
+
+        <div id="results-area" class="analysis-box">
+            <h3>Final Enthalpy Sum</h3>
+            <div id="final-res" style="font-size:2.5rem;font-weight:900;color:var(--accent);margin-bottom:20px;"></div>
+            <h4>Atomic Balance & Cancellation Check:</h4>
+            <div id="analysis-log"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container info-section">
+    <div class="guide-card">
+        <h2>How to Use the Solver: Detailed Logic</h2>
+        <p>This calculator uses a <strong>Stoichiometric String Engine</strong>. To ensure perfect results, follow these input patterns:</p>
+        <ul class="logic-list">
+            <li><strong>The Arrow:</strong> Use <code>-></code> to separate reactants and products.</li>
+            <li><strong>Coefficients:</strong> Place numbers directly before the molecule (e.g., <code>2H2O</code>). Fractions like <code>1/2</code> are supported.</li>
+            <li><strong>ΔH Input:</strong> Supports scientific notation (<code>-3.93e2</code>) and exponents (<code>10^2</code>).</li>
+            <li><strong>State Symbols:</strong> <code>(s), (l), (g), (aq)</code> are recognized and treated as distinct species.</li>
+        </ul>
+        <div class="step-box">
+            <strong>Example:</strong> <code>CH4 + 2O2 -> CO2 + 2H2O</code> | ΔH: <code>-890.3</code>
+        </div>
+    </div>
+
+    <div class="grid-two-col">
+        <div class="guide-card">
+            <h3>Aspects of Hess's Law</h3>
+            <p>Fundamental pillars of the law:</p>
+            <ul>
+                <li><strong>State Function:</strong> ΔH is independent of the pathway.</li>
+                <li><strong>Extensive Property:</strong> Enthalpy is proportional to the amount of substance.</li>
+                <li><strong>Conservation:</strong> Energy is neither created nor destroyed in chemical cycles.</li>
+            </ul>
+        </div>
+        <div class="guide-card">
+            <h3>Uses of Hess's Law</h3>
+            <p>Crucial for reactions that are:</p>
+            <ul>
+                <li>Too slow to measure directly (e.g., rust).</li>
+                <li>Highly explosive or unstable.</li>
+                <li>Unable to occur without producing side-products.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="guide-card">
+        <h2>Definition & Detailed Example</h2>
+        <p><strong>Definition:</strong> The total enthalpy change for a chemical reaction is the same regardless of whether the reaction occurs in one step or several steps.</p>
+        
+        <h3>Solved Example: Propane Formation</h3>
+        <p>Target: 3C(s) + 4H<sub>2</sub>(g) &rarr; C<sub>3</sub>H<sub>8</sub>(g)</p>
+        <div class="example-math">
+            1. C + O2 -> CO2 | ΔH = -394 kJ (x3)<br>
+            2. H2 + 0.5O2 -> H2O | ΔH = -286 kJ (x4)<br>
+            3. C3H8 + 5O2 -> 3CO2 + 4H2O | ΔH = -2220 kJ (REVERSE)<br>
+            -------------------------------------------------------<br>
+            Result: [3(-394)] + [4(-286)] - [-2220] = <mark>-106 kJ/mol</mark>
+        </div>
+    </div>
+
+    <div class="guide-card">
+    <h2>Detailed FAQ & Research Insights</h2>
+    <div class="faq-container">
+        <div class="faq-item">
+            <h4>1. What does the Δ (Delta) symbol signify?</h4>
+            <p>In thermodynamics, <b>Δ</b> represents a change in a state function. For Enthalpy (ΔH), it is defined as H<sub>products</sub> - H<sub>reactants</sub>. Because absolute enthalpy cannot be measured directly, we measure the heat flow during the transition.</p>
+        </div>
+        <div class="faq-item">
+            <h4>2. Can I use Entropy (ΔS) or Gibbs Free Energy (ΔG)?</h4>
+            <p>Yes. Since ΔS and ΔG are also <b>State Functions</b>, they obey the additive property of Hess's Law. Research in chemical engineering uses this summation method to predict if a reaction will happen spontaneously without needing dangerous laboratory tests.</p>
+        </div>
+        <div class="faq-item">
+            <h4>3. Why am I seeing an "Unbalanced" error?</h4>
+            <p>The <b>Law of Conservation of Mass</b> states that atoms cannot be created or destroyed. If your input has 3 Carbons on the left side but only 1 on the right, the math will be invalid. You must ensure every atom is accounted for in your coefficients.</p>
+        </div>
+        <div class="faq-item">
+            <h4>4. How do I input exponents or scientific notation?</h4>
+            <p>Our <code>smartParser</code> supports standard notation. You can enter <code>10^3</code> for 1000 or <code>-5.6e-2</code> for -0.056. This is especially useful for <b>lattice energy</b> research where energy values are extremely high.</p>
+        </div>
+        <div class="faq-item">
+            <h4>5. How does the Multiplier field work?</h4>
+            <p>If your target equation needs 3 moles of a substance but your reference reaction only provides 1, enter <b>3</b> in the multiplier. The engine multiplies both the molecules and the ΔH value, following the <b>extensive property</b> of enthalpy.</p>
+        </div>
+        <div class="faq-item">
+            <h4>6. Does "Reverse Reaction" flip the sign?</h4>
+            <p>Yes. Based on the <b>First Law of Thermodynamics</b>, if a forward reaction releases heat (exothermic), the reverse must absorb heat (endothermic). Toggling this switch automatically multiplies your ΔH value by -1.</p>
+        </div>
+        <div class="faq-item">
+            <h4>7. Why are state symbols (s, l, g, aq) critical?</h4>
+            <p>Enthalpy depends on the physical state. For example, forming H<sub>2</sub>O(l) releases -285.8 kJ, but forming H<sub>2</sub>O(g) releases only -241.8 kJ. The difference is the <b>heat of vaporization</b>. Always include these to ensure accuracy.</p>
+        </div>
+        <div class="faq-item">
+            <h4>8. Can I use fractions like 1/2 or 3/2?</h4>
+            <p>Yes. In professional thermochemistry, fractional coefficients are used to represent the formation of exactly <b>one mole</b> of a product. You can type <code>1/2</code> or <code>0.5</code> into any numeric field.</p>
+        </div>
+        <div class="faq-item">
+            <h4>9. How does the engine handle complex ions?</h4>
+            <p>The parser identifies groups like SO<sub>4</sub> or PO<sub>4</sub>. It breaks them into individual atoms (Sulfur, Oxygen, etc.) and cross-references them against our 118-element database to verify <b>atomic balance</b>.</p>
+        </div>
+        <div class="faq-item">
+            <h4>10. What is the research history of Hess's Law?</h4>
+            <p>Proposed by Germain Hess in 1840, this law was a major breakthrough before the Law of Conservation of Energy was fully understood. Today, it is the foundation for <b>Computational Chemistry</b> used in drug discovery.</p>
+        </div>
+        <div class="faq-item">
+            <h4>11. Does temperature change the result?</h4>
+            <p>Most standard data is measured at 25°C (298.15 K). If your steps occur at different temperatures, you would need <b>Kirchhoff's Law</b>. This solver assumes a constant temperature for all steps.</p>
+        </div>
+        <div class="faq-item">
+            <h4>12. What defines an "Endothermic" result?</h4>
+            <p>A positive (+) final ΔH means the system <b>absorbed</b> heat. In industrial manufacturing, these reactions require constant heating from an external source to stay active.</p>
+        </div>
+        <div class="faq-item">
+            <h4>13. Why round to two decimal places?</h4>
+            <p>This maintains <b>Significant Figures</b>. Most high-precision calorimeters are accurate to 0.01 kJ. Rounding prevents "false precision" where the numbers look more accurate than the actual lab equipment allows.</p>
+        </div>
+        <div class="faq-item">
+            <h4>14. What exactly is a "Standard State"?</h4>
+            <p>It is the most stable form of an element at 1 bar of pressure. For instance, Oxygen is a gas (O<sub>2</sub>) and Carbon is Graphite. This is why the enthalpy of formation for pure elements in these states is always <b>0</b>.</p>
+        </div>
+        <div class="faq-item">
+            <h4>15. Are complex formulas like Mg(OH)2 supported?</h4>
+            <p>Yes. The engine uses a <b>recursive stack</b>. It looks at the "2" outside the parenthesis and automatically knows there are 2 Oxygens and 2 Hydrogens, ensuring your balancing check is 100% correct.</p>
+        </div>
+        <div class="faq-item">
+            <h4>16. Is the solver mobile-responsive?</h4>
+            <p>The layout uses <b>Modern CSS Grid</b>. On a phone, the input boxes and FAQ items will automatically stack vertically to ensure you can calculate on the go without zooming in.</p>
+        </div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script>
+function smartParser(input) {
+    if(!input) return 0;
+    try {
+        return Function('"use strict"; return (' + input.toString().replace(/\^/g, '**') + ')')();
+    } catch { return NaN; }
+}
+
+function parseFormula(formula) {
+
+    // Support complex ions like K4[Fe(CN)6]
+    formula = formula.replace(/\[/g,'(').replace(/\]/g,')');
+
+    // Remove spaces
+    formula = formula.replace(/\s/g,'');
+
+    let stack = [{}];
+    let i = 0;
+
+    while (i < formula.length) {
+
+        let char = formula[i];
+
+        if (char === "(") {
+            stack.push({});
+            i++;
+        }
+
+        else if (char === ")") {
+
+            i++;
+            let num = "";
+
+            while (i < formula.length && /\d/.test(formula[i])) {
+                num += formula[i++];
+            }
+
+            num = parseInt(num || 1);
+
+            let group = stack.pop();
+            let top = stack[stack.length - 1];
+
+            for (let el in group) {
+                top[el] = (top[el] || 0) + group[el] * num;
+            }
+        }
+
+        else {
+
+            let el = char;
+            i++;
+
+            if (i < formula.length && /[a-z]/.test(formula[i])) {
+                el += formula[i++];
+            }
+
+            let num = "";
+
+            while (i < formula.length && /\d/.test(formula[i])) {
+                num += formula[i++];
+            }
+
+            num = parseInt(num || 1);
+
+            let top = stack[stack.length - 1];
+            top[el] = (top[el] || 0) + num;
+        }
+    }
+
+    return stack[0];
+}
+
+function getAtoms(formula) {
+
+    formula = formula.replace(/\./g,"·"); // support dot or middle dot
+
+    let parts = formula.split("·");
+
+    let total = {};
+
+    parts.forEach(part => {
+
+        let match = part.match(/^(\d+)?(.*)$/);
+
+        let coef = match[1] ? parseInt(match[1]) : 1;
+        let pureFormula = match[2];
+
+        let atoms = parseFormula(pureFormula);
+
+        for (let el in atoms) {
+            total[el] = (total[el] || 0) + atoms[el] * coef;
+        }
+    });
+
+    return total;
+}
+
+function addRow() {
+
+    const div = document.createElement('div');
+
+    div.className = 'reaction-block';
+
+    div.innerHTML = `
+        <div class="input-grid">
+            <div class="input-field-wrap"><label>Reaction</label><input type="text" class="rxn-text"></div>
+            <div class="input-field-wrap" style="max-width:180px;"><label>ΔH</label><input type="text" class="rxn-val"></div>
+            <div class="input-field-wrap" style="max-width:100px;"><label>Mult</label><input type="text" class="rxn-mult" value="1"></div>
+        </div>
+        <div class="toggle-row">
+            <label class="switch-wrap">
+                <div class="switch">
+                    <input type="checkbox" class="rxn-reverse">
+                    <span class="slider"></span>
+                </div>
+                <span>Reverse Reaction</span>
+            </label>
+        </div>`;
+
+    document.getElementById('steps-container').appendChild(div);
+}
+
+function solveHess() {
+
+    const rows = document.querySelectorAll('.reaction-block');
+
+    let netH = 0;
+
+    let inventory = {};
+
+    let logHtml = "";
+
+    rows.forEach((row, i) => {
+
+        let text = row.querySelector('.rxn-text').value;
+
+        const hVal = smartParser(row.querySelector('.rxn-val').value);
+
+        const multVal = smartParser(row.querySelector('.rxn-mult').value);
+
+        const isRev = row.querySelector('.rxn-reverse').checked;
+
+        if (isNaN(hVal) || !text.includes('->')) return;
+
+        const effectiveMult = isRev ? (multVal * -1) : multVal;
+
+        netH += (hVal * effectiveMult);
+
+        let [leftSide, rightSide] = text.split('->');
+
+        let leftAtoms = {}, rightAtoms = {};
+
+        function parseSide(side, target, dir) {
+
+            side.split('+').forEach(part => {
+
+                let p = part.trim();
+
+                if (!p) return;
+
+                let match = p.match(/^([\d\/\.]+)?\s*(.*)$/);
+
+                let coef = smartParser(match[1]) || 1;
+
+                let formula = match[2];
+
+                let atoms = getAtoms(formula);
+
+                for (let a in atoms) {
+                    target[a] = (target[a] || 0) + atoms[a] * coef;
+                }
+
+                inventory[formula] = (inventory[formula] || 0) + coef * dir * effectiveMult;
+            });
+        }
+
+        parseSide(leftSide, leftAtoms, -1);
+        parseSide(rightSide, rightAtoms, 1);
+
+        let balanced = true;
+
+        let keys = new Set([...Object.keys(leftAtoms), ...Object.keys(rightAtoms)]);
+
+        keys.forEach(k => {
+            if (Math.abs((leftAtoms[k] || 0) - (rightAtoms[k] || 0)) > 0.0001) {
+                balanced = false;
+            }
+        });
+
+        logHtml += `<div class="log-item ${balanced ? 'status-balanced' : 'status-unbalanced'}">
+        Step ${i+1}: ${balanced ? 'Balanced ✓' : 'Unbalanced ✗ Check Atoms!'}
+        </div>`;
+    });
+
+    for (let species in inventory) {
+
+        if (Math.abs(inventory[species]) < 0.0001) {
+
+            logHtml += `<div class="log-item">
+            Intermediate <span class="cancel-text">${species}</span> fully canceled.
+            </div>`;
+        }
+    }
+
+    document.getElementById('results-area').style.display = "block";
+
+    document.getElementById('final-res').innerHTML = `ΔH = ${netH.toFixed(2)} kJ/mol`;
+
+    document.getElementById('analysis-log').innerHTML = logHtml;
+}
+
+fetch('footer.html')
+.then(r => r.text())
+.then(d => document.getElementById('footer-placeholder').innerHTML = d);
+</script>
+
+</body>
+</html>

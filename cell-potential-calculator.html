@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell Potential Calculator | Electrochemistry Tool</title>
+<meta name="description" content="Advanced Cell Potential Calculator with Nernst equation, standard reduction potentials, step-by-step examples, FAQs and in-depth electrochemistry reference.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Syne:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --accent: #00f2ff;
+  --glass: rgba(15, 23, 42, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --bg: #0a1120;
+  --success: #00ff88;
+  --error: #ff4d4d;
+  --info: #a855f7;
+  --accent2: #00f2ff44;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --gold: #f59e0b;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ─── BACKGROUND ─── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,242,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 80%, rgba(168,85,247,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,255,136,0.03) 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ─── GLASS CARD ─── */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 35px;
+  margin-bottom: 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.glass-card:hover {
+  border-color: rgba(0,242,255,0.3);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,242,255,0.1);
+}
+.glass-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,242,255,0.4), transparent);
+}
+
+/* ─── LAYOUT ─── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+main { padding: 70px 0 60px; }
+
+/* ─── HERO / DEFINITION ─── */
+.hero-card {
+  background: linear-gradient(135deg, rgba(0,242,255,0.08) 0%, rgba(168,85,247,0.08) 100%);
+  border: 1px solid rgba(0,242,255,0.25);
+  border-radius: 28px;
+  padding: 50px 40px 40px;
+  margin-bottom: 25px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-card::after {
+  content: '⚡';
+  position: absolute; right: 40px; top: 30px;
+  font-size: 80px; opacity: 0.07;
+}
+.page-tag {
+  display: inline-block;
+  background: rgba(0,242,255,0.1);
+  border: 1px solid rgba(0,242,255,0.3);
+  color: var(--accent);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
+}
+.page-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(26px, 5vw, 44px);
+  font-weight: 800;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--info) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.page-subtitle { color: var(--text-dim); font-size: 17px; max-width: 700px; }
+
+/* ─── SECTION HEADINGS ─── */
+.sec-heading {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(17px, 3vw, 22px);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-heading::before {
+  content: '';
+  display: inline-block; width: 4px; height: 22px;
+  background: linear-gradient(180deg, var(--accent), var(--info));
+  border-radius: 3px;
+}
+.sub-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700;
+  color: #cbd5e1; margin: 18px 0 8px;
+}
+
+/* ─── FORMULA BOX ─── */
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+.formula-box {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(0,242,255,0.2);
+  border-radius: 14px; padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+}
+.formula-box .label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--accent); margin-bottom: 10px; font-family: 'Syne', sans-serif;
+}
+.formula-box .eq {
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #fff; line-height: 1.5;
+}
+.formula-box .eq span.sym { color: var(--accent); }
+.formula-box .eq span.num { color: var(--success); }
+.formula-box .eq span.note { color: var(--info); }
+.formula-desc { font-size: 12px; color: var(--text-dim); margin-top: 8px; font-family: 'Syne', sans-serif; }
+
+/* ─── CALCULATOR ─── */
+.calc-wrapper {
+  background: linear-gradient(135deg, rgba(0,242,255,0.06) 0%, rgba(168,85,247,0.06) 100%);
+  border: 1px solid rgba(0,242,255,0.3);
+  border-radius: 24px; padding: 38px;
+  margin-bottom: 25px;
+}
+.calc-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+.calc-tab {
+  padding: 9px 22px; border-radius: 30px; cursor: pointer; font-size: 13px;
+  font-family: 'Orbitron', monospace; font-weight: 600; letter-spacing: 1px;
+  border: 1px solid var(--glass-border); background: transparent; color: var(--text-dim);
+  transition: all 0.25s;
+}
+.calc-tab.active {
+  background: linear-gradient(135deg, var(--accent), var(--info));
+  color: #0a1120; border-color: transparent;
+  box-shadow: 0 4px 20px rgba(0,242,255,0.35);
+}
+.calc-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.calc-panel { display: none; }
+.calc-panel.active { display: block; }
+
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px; }
+.input-group label {
+  display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 7px; font-weight: 600;
+}
+.input-group input, .input-group select {
+  width: 100%; padding: 13px 16px;
+  background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+  border-radius: 12px; color: #fff; font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none; appearance: none;
+}
+.input-group input:focus, .input-group select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,242,255,0.15);
+}
+.input-group select option { background: #0a1120; }
+.input-hint { font-size: 11px; color: var(--text-dim); margin-top: 5px; }
+
+/* ─── EXPR INPUT PREVIEW ─── */
+.expr-syntax {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 7px 0 3px;
+}
+.expr-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 2px 9px; border-radius: 6px;
+  background: rgba(0,242,255,0.08); border: 1px solid rgba(0,242,255,0.2);
+  color: var(--accent); cursor: default;
+}
+.input-preview {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  margin-top: 6px; padding: 6px 11px; border-radius: 8px;
+  background: rgba(0,0,0,0.35); min-height: 26px;
+  transition: all 0.2s; display: none;
+}
+.input-preview.ok  { display: block; color: var(--success); border: 1px solid rgba(0,255,136,0.2); }
+.input-preview.bad { display: block; color: var(--error);   border: 1px solid rgba(255,77,77,0.2); }
+.sup-demo { font-size: 10px; vertical-align: super; }
+.sub-demo { font-size: 10px; vertical-align: sub; }
+
+.calc-btn {
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
+  color: #0a1120; font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 14px; letter-spacing: 2px; border: none; border-radius: 14px;
+  cursor: pointer; transition: all 0.3s;
+  box-shadow: 0 6px 25px rgba(0,242,255,0.3);
+}
+.calc-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(0,242,255,0.45); }
+.calc-btn:active { transform: translateY(0); }
+
+.result-box {
+  margin-top: 24px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(0,242,255,0.25);
+  border-radius: 16px; padding: 24px;
+  display: none;
+}
+.result-box.show { display: block; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.result-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 800; margin: 8px 0;
+}
+.result-value.positive { color: var(--success); }
+.result-value.negative { color: var(--error); }
+.result-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+.result-interpretation {
+  margin-top: 14px; padding: 14px;
+  background: rgba(0,242,255,0.06); border-radius: 10px;
+  font-size: 14px; color: var(--text-dim);
+  border-left: 3px solid var(--accent);
+}
+.result-steps {
+  margin-top: 16px;
+  background: rgba(0,0,0,0.3); border-radius: 10px; padding: 16px;
+}
+.result-steps h4 { font-size: 12px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.step-item { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+.step-num { color: var(--info); font-weight: 700; min-width: 20px; }
+
+.error-msg { color: var(--error); font-size: 13px; margin-top: 12px; display: none; }
+
+/* ─── HOW TO USE ─── */
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+.how-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 22px;
+  transition: border-color 0.25s;
+}
+.how-card:hover { border-color: rgba(0,242,255,0.3); }
+.how-num {
+  font-family: 'Orbitron', monospace; font-size: 28px; font-weight: 800;
+  color: var(--accent); opacity: 0.4; line-height: 1; margin-bottom: 10px;
+}
+.how-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.how-text { font-size: 13px; color: var(--text-dim); }
+
+/* ─── EXAMPLE BOX ─── */
+.example-box {
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 14px; padding: 22px;
+  margin: 14px 0;
+}
+.example-box .ex-title {
+  font-family: 'Orbitron', monospace; font-size: 12px; color: var(--success);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+}
+.example-box p { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+.example-box .eq-line {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  color: #fff; margin: 6px 0; padding: 8px 12px;
+  background: rgba(0,0,0,0.3); border-radius: 8px;
+}
+.answer { color: var(--success); font-weight: 700; }
+
+/* ─── ASPECTS / USES GRID ─── */
+.aspects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin: 16px 0; }
+.aspect-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 20px;
+  transition: all 0.25s;
+}
+.aspect-card:hover { border-color: rgba(168,85,247,0.4); transform: translateY(-3px); }
+.aspect-icon { font-size: 26px; margin-bottom: 10px; }
+.aspect-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.aspect-text { font-size: 13px; color: var(--text-dim); }
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 14px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead tr { background: rgba(0,242,255,0.1); }
+thead th {
+  padding: 14px 16px; text-align: left; font-family: 'Orbitron', monospace;
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+tbody tr:hover { background: rgba(0,242,255,0.04); }
+tbody td { padding: 13px 16px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+tbody td:first-child { color: #fff; font-family: 'Syne', sans-serif; }
+.pos { color: var(--success); } .neg { color: var(--error); }
+
+/* ─── PROCESS STEPS ─── */
+.process-steps { counter-reset: step-counter; }
+.process-step {
+  display: flex; gap: 18px; margin-bottom: 20px; align-items: flex-start;
+  padding: 20px; background: rgba(0,0,0,0.25);
+  border: 1px solid var(--glass-border); border-radius: 14px;
+  counter-increment: step-counter; transition: border-color 0.2s;
+}
+.process-step:hover { border-color: rgba(0,242,255,0.25); }
+.process-step::before {
+  content: counter(step-counter, decimal-leading-zero);
+  font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 800;
+  color: var(--accent); opacity: 0.5; min-width: 36px; line-height: 1.2;
+}
+.process-step-content .step-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.process-step-content .step-body { font-size: 13px; color: var(--text-dim); }
+
+/* ─── RULES GRID ─── */
+.rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
+.rule-card {
+  background: rgba(168,85,247,0.05);
+  border: 1px solid rgba(168,85,247,0.2);
+  border-radius: 14px; padding: 20px;
+  transition: border-color 0.25s;
+}
+.rule-card:hover { border-color: rgba(168,85,247,0.4); }
+.rule-badge {
+  display: inline-block; padding: 3px 12px;
+  background: rgba(168,85,247,0.2); border-radius: 20px;
+  font-size: 11px; color: var(--info); letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 10px; font-weight: 700;
+}
+.rule-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.rule-text { font-size: 13px; color: var(--text-dim); }
+
+/* ─── FAQ ─── */
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin: 18px 0; }
+.faq-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px; padding: 24px;
+  cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.faq-card:hover { border-color: rgba(0,242,255,0.3); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+.faq-card.open { border-color: rgba(0,242,255,0.4); background: rgba(0,242,255,0.04); }
+.faq-q {
+  font-size: 14px; font-weight: 700; color: #fff;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+}
+.faq-icon { color: var(--accent); font-size: 18px; transition: transform 0.3s; flex-shrink: 0; }
+.faq-card.open .faq-icon { transform: rotate(45deg); }
+.faq-a {
+  font-size: 13px; color: var(--text-dim); margin-top: 12px;
+  display: none; line-height: 1.7;
+}
+.faq-card.open .faq-a { display: block; }
+
+/* ─── RESEARCH APPS ─── */
+.research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+.research-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 14px 14px 0; padding: 18px;
+  transition: border-left-color 0.25s;
+}
+.research-card:hover { border-left-color: var(--accent); }
+.research-icon { font-size: 22px; margin-bottom: 8px; }
+.research-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.research-text { font-size: 13px; color: var(--text-dim); }
+
+/* ─── BADGE TAGS ─── */
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.badge-success { background: rgba(0,255,136,0.15); color: var(--success); border: 1px solid rgba(0,255,136,0.25); }
+.badge-error { background: rgba(255,77,77,0.15); color: var(--error); border: 1px solid rgba(255,77,77,0.25); }
+.badge-info { background: rgba(168,85,247,0.15); color: var(--info); border: 1px solid rgba(168,85,247,0.25); }
+.badge-accent { background: rgba(0,242,255,0.12); color: var(--accent); border: 1px solid rgba(0,242,255,0.25); }
+
+/* ─── HIGHLIGHT ─── */
+.hl { color: var(--accent); font-weight: 700; }
+.hl-g { color: var(--success); font-weight: 700; }
+.hl-p { color: var(--info); font-weight: 700; }
+
+/* ─── DIVIDER ─── */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,242,255,0.2), transparent); margin: 10px 0 24px; }
+
+/* ─── SCROLL ANIMATION ─── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 640px) {
+  .hero-card { padding: 30px 20px; }
+  .glass-card { padding: 22px 18px; }
+  .calc-wrapper { padding: 22px 18px; }
+  .input-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── COPIED TAG ─── */
+.copy-tag {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--accent); color: #0a1120;
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER PLACEHOLDER -->
+<script src="header.js"></script>
+
+<main>
+<div class="container">
+
+<!-- ══════════════════════════════════════════
+     HERO / DEFINITION
+══════════════════════════════════════════ -->
+<div class="hero-card fade-in">
+  <div class="page-tag">⚡ Electrochemistry Tools</div>
+  <h1 class="page-title">Cell Potential Calculator</h1>
+  <p class="page-subtitle">
+    Calculate standard, non-standard, and Nernst cell potentials instantly.
+    Powered by reduction potential tables, the Nernst equation, and Gibbs free energy relationships.
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DEFINITION & FORMULAS
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">What is Cell Potential?</h2>
+  <p style="color:var(--text-dim);font-size:15px;margin-bottom:16px;">
+    <strong style="color:#fff;">Cell Potential (E<sub>cell</sub>)</strong>, also called electromotive force (EMF), is the
+    driving force that pushes electrons through an external circuit in an electrochemical cell. It is measured in
+    <span class="hl">Volts (V)</span> and determines whether a redox reaction occurs
+    <span class="badge badge-success">spontaneously</span> or
+    <span class="badge badge-error">non-spontaneously</span>.
+  </p>
+  <p style="color:var(--text-dim);font-size:15px;margin-bottom:22px;">
+    It represents the difference in reduction potential between the <span class="hl">cathode (reduction)</span>
+    and the <span class="hl-p">anode (oxidation)</span>. A positive E<sub>cell</sub> indicates a spontaneous
+    reaction (ΔG < 0), while a negative value indicates non-spontaneity.
+  </p>
+
+  <div class="divider"></div>
+
+  <h3 class="sec-heading">Core Formulas</h3>
+  <div class="formula-grid">
+    <div class="formula-box">
+      <div class="label">Standard Cell Potential</div>
+      <div class="eq">
+        <span class="sym">E°<sub>cell</sub></span> = <span class="sym">E°<sub>cathode</sub></span> − <span class="sym">E°<sub>anode</sub></span>
+      </div>
+      <div class="formula-desc">Both values are standard reduction potentials (25°C, 1 M, 1 atm)</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Nernst Equation</div>
+      <div class="eq">
+        <span class="sym">E<sub>cell</sub></span> = <span class="sym">E°<sub>cell</sub></span> −
+        <span class="num">(RT / nF)</span> × <span class="sym">ln Q</span>
+      </div>
+      <div class="formula-desc">At 25°C simplifies to: E = E° − (0.0592 / n) × log Q</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Gibbs Free Energy</div>
+      <div class="eq">
+        <span class="sym">ΔG°</span> = <span class="note">−n</span> × <span class="num">F</span> × <span class="sym">E°<sub>cell</sub></span>
+      </div>
+      <div class="formula-desc">n = moles of electrons; F = 96,485 C/mol (Faraday constant)</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Equilibrium Constant</div>
+      <div class="eq">
+        <span class="sym">E°<sub>cell</sub></span> = <span class="num">(0.0592 / n)</span> × <span class="sym">log K</span>
+      </div>
+      <div class="formula-desc">Relates standard cell potential to equilibrium constant K at 25°C</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sec-heading">Symbol Reference</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px;">
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">E°<sub>cell</sub></span> — Standard cell potential (V)
+    </div>
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">n</span> — Number of electrons transferred
+    </div>
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">F</span> — Faraday's constant (96,485 C/mol)
+    </div>
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">R</span> — Gas constant (8.314 J/mol·K)
+    </div>
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">T</span> — Temperature (Kelvin)
+    </div>
+    <div style="font-size:13px;color:var(--text-dim);padding:10px;background:rgba(0,0,0,0.3);border-radius:10px;">
+      <span class="hl">Q</span> — Reaction quotient
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CALCULATOR
+══════════════════════════════════════════ -->
+<div class="calc-wrapper fade-in" id="calculator">
+  <div class="page-tag">⚙️ Interactive Tool</div>
+  <h2 class="sec-heading" style="margin-top:12px;">Cell Potential Calculator</h2>
+
+  <div class="calc-tabs">
+    <button class="calc-tab active" onclick="switchTab('standard',this)">Standard E°cell</button>
+    <button class="calc-tab" onclick="switchTab('nernst',this)">Nernst Equation</button>
+    <button class="calc-tab" onclick="switchTab('gibbs',this)">Gibbs & Equilibrium</button>
+  </div>
+
+  <!-- TAB 1: Standard -->
+  <div id="tab-standard" class="calc-panel active">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">
+      Enter the standard reduction potentials for cathode and anode to calculate E°<sub>cell</sub>.
+      You can use preset half-reactions or enter custom values.
+    </p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Cathode Half-Reaction (preset)</label>
+        <select id="catPreset" onchange="loadPreset('cat')">
+          <option value="">— Select or enter manually —</option>
+          <option value="0.00">H⁺/H₂ → 0.00 V (SHE)</option>
+          <option value="1.36">Cl₂/Cl⁻ → +1.36 V</option>
+          <option value="1.23">O₂/H₂O → +1.23 V</option>
+          <option value="0.80">Ag⁺/Ag → +0.80 V</option>
+          <option value="0.77">Fe³⁺/Fe²⁺ → +0.77 V</option>
+          <option value="0.34">Cu²⁺/Cu → +0.34 V</option>
+          <option value="0.00">H⁺/H₂ → 0.00 V</option>
+          <option value="-0.13">Pb²⁺/Pb → −0.13 V</option>
+          <option value="-0.25">Ni²⁺/Ni → −0.25 V</option>
+          <option value="-0.44">Fe²⁺/Fe → −0.44 V</option>
+          <option value="-0.76">Zn²⁺/Zn → −0.76 V</option>
+          <option value="-2.37">Mg²⁺/Mg → −2.37 V</option>
+        </select>
+        <div class="input-hint">Or type a custom value below</div>
+      </div>
+      <div class="input-group">
+        <label>Cathode E° Reduction (V)</label>
+        <input type="text" id="catV" placeholder="e.g. 0.80 or 2*10^-1" oninput="livePreview(this,'prev-catV')" autocomplete="off">
+        <div class="expr-syntax">
+          <span class="expr-tag">0.34</span>
+          <span class="expr-tag">2*10^-1</span>
+          <span class="expr-tag">-0.76</span>
+          <span class="expr-tag">3.4*10^-1</span>
+        </div>
+        <div class="input-preview" id="prev-catV"></div>
+        <div class="input-hint">Plain number or expression: <strong>a*b^c</strong>, <strong>10^-9</strong>, <strong>2*5</strong></div>
+      </div>
+      <div class="input-group">
+        <label>Anode Half-Reaction (preset)</label>
+        <select id="anoPreset" onchange="loadPreset('ano')">
+          <option value="">— Select or enter manually —</option>
+          <option value="0.00">H⁺/H₂ → 0.00 V (SHE)</option>
+          <option value="1.36">Cl₂/Cl⁻ → +1.36 V</option>
+          <option value="1.23">O₂/H₂O → +1.23 V</option>
+          <option value="0.80">Ag⁺/Ag → +0.80 V</option>
+          <option value="0.77">Fe³⁺/Fe²⁺ → +0.77 V</option>
+          <option value="0.34">Cu²⁺/Cu → +0.34 V</option>
+          <option value="0.00">H⁺/H₂ → 0.00 V</option>
+          <option value="-0.13">Pb²⁺/Pb → −0.13 V</option>
+          <option value="-0.25">Ni²⁺/Ni → −0.25 V</option>
+          <option value="-0.44">Fe²⁺/Fe → −0.44 V</option>
+          <option value="-0.76">Zn²⁺/Zn → −0.76 V</option>
+          <option value="-2.37">Mg²⁺/Mg → −2.37 V</option>
+        </select>
+        <div class="input-hint">Or type a custom value below</div>
+      </div>
+      <div class="input-group">
+        <label>Anode E° Reduction (V)</label>
+        <input type="text" id="anoV" placeholder="e.g. -0.76 or -7.6*10^-1" oninput="livePreview(this,'prev-anoV')" autocomplete="off">
+        <div class="expr-syntax">
+          <span class="expr-tag">-0.76</span>
+          <span class="expr-tag">-7.6*10^-1</span>
+          <span class="expr-tag">-2.37</span>
+          <span class="expr-tag">-2.37*10^0</span>
+        </div>
+        <div class="input-preview" id="prev-anoV"></div>
+        <div class="input-hint">Plain number or expression: <strong>a*10^n</strong>, negative values allowed</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcStandard()">⚡ CALCULATE E°CELL</button>
+    <div class="error-msg" id="err-std"></div>
+    <div class="result-box" id="res-std">
+      <div class="result-label">Standard Cell Potential</div>
+      <div class="result-value" id="res-std-val"></div>
+      <div class="result-interpretation" id="res-std-interp"></div>
+      <div class="result-steps" id="res-std-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Nernst -->
+  <div id="tab-nernst" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">
+      Calculate the actual cell potential at non-standard conditions using the Nernst equation.
+    </p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>E°cell (V)</label>
+        <input type="text" id="n-ecell" placeholder="e.g. 1.10 or 11*10^-1" oninput="livePreview(this,'prev-necell')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.10</span><span class="expr-tag">11*10^-1</span></div>
+        <div class="input-preview" id="prev-necell"></div>
+        <div class="input-hint">Standard cell potential</div>
+      </div>
+      <div class="input-group">
+        <label>n (electrons transferred)</label>
+        <input type="text" id="n-n" placeholder="e.g. 2" oninput="livePreview(this,'prev-nn')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">2</span><span class="expr-tag">4</span></div>
+        <div class="input-preview" id="prev-nn"></div>
+        <div class="input-hint">Integer number of electrons</div>
+      </div>
+      <div class="input-group">
+        <label>Temperature (K)</label>
+        <input type="text" id="n-T" placeholder="298.15 or 2.9815*10^2" oninput="livePreview(this,'prev-nT')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">298.15</span><span class="expr-tag">2.9815*10^2</span></div>
+        <div class="input-preview" id="prev-nT"></div>
+        <div class="input-hint">Default: 298.15 K (25°C)</div>
+      </div>
+      <div class="input-group">
+        <label>Reaction Quotient Q</label>
+        <input type="text" id="n-Q" placeholder="e.g. 20*10^-9 or 0.001" oninput="livePreview(this,'prev-nQ')" autocomplete="off">
+        <div class="expr-syntax">
+          <span class="expr-tag">20*10^-9</span>
+          <span class="expr-tag">1.5*10^-3</span>
+          <span class="expr-tag">0.001</span>
+          <span class="expr-tag">10^-6</span>
+          <span class="expr-tag">20*5</span>
+        </div>
+        <div class="input-preview" id="prev-nQ"></div>
+        <div class="input-hint">Supports: plain · <strong>a*b</strong> · <strong>10^n</strong> · <strong>a*10^-n</strong></div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcNernst()">⚡ CALCULATE NERNST E</button>
+    <div class="error-msg" id="err-nernst"></div>
+    <div class="result-box" id="res-nernst">
+      <div class="result-label">Non-Standard Cell Potential</div>
+      <div class="result-value" id="res-nernst-val"></div>
+      <div class="result-interpretation" id="res-nernst-interp"></div>
+      <div class="result-steps" id="res-nernst-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Gibbs -->
+  <div id="tab-gibbs" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">
+      Calculate Gibbs free energy (ΔG°) and equilibrium constant (K) from standard cell potential.
+    </p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>E°cell (V)</label>
+        <input type="text" id="g-ecell" placeholder="e.g. 1.10 or 1.1*10^0" oninput="livePreview(this,'prev-gecell')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.10</span><span class="expr-tag">-1.36</span><span class="expr-tag">1.1*10^0</span></div>
+        <div class="input-preview" id="prev-gecell"></div>
+        <div class="input-hint">Standard cell potential</div>
+      </div>
+      <div class="input-group">
+        <label>n (electrons transferred)</label>
+        <input type="text" id="g-n" placeholder="e.g. 2" oninput="livePreview(this,'prev-gn')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">2</span><span class="expr-tag">4</span><span class="expr-tag">6</span></div>
+        <div class="input-preview" id="prev-gn"></div>
+        <div class="input-hint">Integer number of electrons</div>
+      </div>
+      <div class="input-group">
+        <label>Temperature (K) <span style="color:var(--text-dim)">(for K calc)</span></label>
+        <input type="text" id="g-T" placeholder="298.15 or 2.9815*10^2" oninput="livePreview(this,'prev-gT')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">298.15</span><span class="expr-tag">373</span></div>
+        <div class="input-preview" id="prev-gT"></div>
+        <div class="input-hint">Used only for equilibrium constant</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcGibbs()">⚡ CALCULATE ΔG° & K</button>
+    <div class="error-msg" id="err-gibbs"></div>
+    <div class="result-box" id="res-gibbs">
+      <div class="result-steps" id="res-gibbs-steps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HOW TO USE THE CALCULATOR
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How to Use This Calculator</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px;">
+    Follow these steps to get accurate results. Each mode uses different inputs — here's a complete guide with real examples.
+  </p>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Choose Your Calculator Mode</div>
+      <div class="how-text">Select <em>Standard E°cell</em> for textbook-style problems, <em>Nernst</em> for real-world non-standard conditions, or <em>Gibbs & K</em> for thermodynamic analysis.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Identify Cathode & Anode</div>
+      <div class="how-text">The <span class="hl">cathode</span> is where reduction occurs (higher E°). The <span class="hl-p">anode</span> is where oxidation occurs (lower E°). Use the preset dropdown or type values manually.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Enter Correct Signs</div>
+      <div class="how-text">All standard reduction potentials have a defined sign. Enter them exactly as given in reference tables — do NOT reverse the sign of the anode. The formula handles this.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <div class="how-title">For Nernst — Find Q</div>
+      <div class="how-text">Q = [products]/[reactants]. If anode is 0.1 M Zn²⁺ and cathode is 1.0 M Cu²⁺, then Q = [Zn²⁺]/[Cu²⁺] = 0.1/1.0 = 0.1 (for the Daniell cell).</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">05</div>
+      <div class="how-title">Read the Result</div>
+      <div class="how-text">The calculator shows the result with spontaneity interpretation. <span class="hl-g">Positive = spontaneous</span>, <span style="color:var(--error)">negative = non-spontaneous</span>. Step-by-step working is included below the result.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">06</div>
+      <div class="how-title">Worked Example</div>
+      <div class="how-text">Daniell cell: Cu²⁺/Cu (+0.34 V) as cathode, Zn²⁺/Zn (−0.76 V) as anode. E°cell = 0.34 − (−0.76) = <span class="hl">+1.10 V</span> → spontaneous galvanic cell.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sub-heading">Detailed Worked Example — Nernst Mode</h3>
+  <div class="example-box">
+    <div class="ex-title">📘 Example: Daniell Cell at Non-Standard Conditions</div>
+    <p><strong>Given:</strong> Cu²⁺/Cu cathode (+0.34 V), Zn²⁺/Zn anode (−0.76 V). [Cu²⁺] = 0.5 M, [Zn²⁺] = 0.1 M, T = 298 K, n = 2</p>
+    <div class="eq-line">E°cell = 0.34 − (−0.76) = +1.10 V</div>
+    <div class="eq-line">Q = [Zn²⁺] / [Cu²⁺] = 0.1 / 0.5 = 0.20</div>
+    <div class="eq-line">E = 1.10 − (0.0592/2) × log(0.20)</div>
+    <div class="eq-line">E = 1.10 − (0.0296) × (−0.699)</div>
+    <div class="eq-line">E = 1.10 + 0.0207 = <span class="answer">+1.121 V</span></div>
+    <p style="margin-top:10px;"><strong>Interpretation:</strong> The non-standard potential (+1.121 V) is slightly higher than E°cell because reactant concentration (Cu²⁺) is lower than standard, favouring the forward reaction.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ASPECTS OF CELL POTENTIAL
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Key Aspects of Cell Potential</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:18px;">
+    Understanding these aspects enables deeper analysis of electrochemical systems across all scales.
+  </p>
+  <div class="aspects-grid">
+    <div class="aspect-card">
+      <div class="aspect-icon">🔋</div>
+      <div class="aspect-title">Spontaneity Indicator</div>
+      <div class="aspect-text">A positive E<sub>cell</sub> directly predicts that the redox reaction is spontaneous under given conditions — the cell will generate electricity without external input.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🌡️</div>
+      <div class="aspect-title">Temperature Dependence</div>
+      <div class="aspect-text">Via the Nernst equation, E<sub>cell</sub> changes with temperature. As T increases, the (RT/nF) term grows, amplifying concentration effects on potential.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">⚖️</div>
+      <div class="aspect-title">Concentration Effect</div>
+      <div class="aspect-text">Le Chatelier's principle applies: increasing product concentration decreases E<sub>cell</sub>; increasing reactant concentration increases it, as captured by the Nernst equation.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🔌</div>
+      <div class="aspect-title">Electrode Independence</div>
+      <div class="aspect-text">E°<sub>cell</sub> is an intensive property — it does not depend on how many moles are reacting, only on the identity of the half-reactions (unlike ΔG° which is extensive).</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">📉</div>
+      <div class="aspect-title">Equilibrium Connection</div>
+      <div class="aspect-text">At equilibrium, E<sub>cell</sub> = 0 V and Q = K. The cell can no longer do electrical work. This is the dead-battery condition.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🔁</div>
+      <div class="aspect-title">Reversibility</div>
+      <div class="aspect-text">Cells with high E°<sub>cell</sub> store substantial chemical energy. Rechargeable systems (like Li-ion) operate by reversing the cell reaction using an external voltage source.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     USES OF CELL POTENTIAL
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Applications & Uses of Cell Potential</h2>
+  <div class="aspects-grid">
+    <div class="aspect-card">
+      <div class="aspect-icon">🚗</div>
+      <div class="aspect-title">Battery Technology</div>
+      <div class="aspect-text">Cell potential determines battery voltage. Li-ion cells produce ~3.7 V by pairing high-reduction-potential cathodes (LiCoO₂) with low-potential anodes (graphite).</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">⚗️</div>
+      <div class="aspect-title">Electroplating</div>
+      <div class="aspect-text">Applied voltage must exceed the cell potential to deposit metal ions onto surfaces. Understanding E<sub>cell</sub> prevents over- or under-plating in industrial processes.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🛡️</div>
+      <div class="aspect-title">Corrosion Prevention</div>
+      <div class="aspect-text">Metals with more negative reduction potentials corrode preferentially. Galvanic protection uses sacrificial anodes (e.g., Zn on steel ships) calculated using E°values.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🧪</div>
+      <div class="aspect-title">Analytical Chemistry</div>
+      <div class="aspect-text">Potentiometry measures E<sub>cell</sub> to determine ion concentration. pH meters, ion-selective electrodes, and biosensors all exploit the Nernst equation.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🌱</div>
+      <div class="aspect-title">Fuel Cells</div>
+      <div class="aspect-text">Hydrogen fuel cells (E°= 1.23 V) convert chemical energy directly to electricity. Cell potential efficiency guides catalyst design and material selection.</div>
+    </div>
+    <div class="aspect-card">
+      <div class="aspect-icon">🧬</div>
+      <div class="aspect-title">Biological Systems</div>
+      <div class="aspect-text">Mitochondrial electron transport chain uses redox potentials (NADH/NAD⁺ at −0.32 V to O₂/H₂O at +0.82 V) to generate ATP — a total cell potential of ~1.14 V.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PROCESS STEP BY STEP
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Cell Potential Calculation — Step-by-Step</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:22px;">
+    Follow this systematic approach to solve any cell potential problem confidently.
+  </p>
+
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Write the Half-Reactions</div>
+        <div class="step-body">Separate the overall redox reaction into its oxidation (anode) and reduction (cathode) half-reactions. Balance all atoms and charges. <br><em>Example: Cu²⁺ + 2e⁻ → Cu (reduction) | Zn → Zn²⁺ + 2e⁻ (oxidation)</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Look Up Standard Reduction Potentials</div>
+        <div class="step-body">Find E° values from a standard reduction potential table for both half-reactions. Always recorded as reduction potentials (electrons on the left). <br><em>E°(Cu²⁺/Cu) = +0.34 V | E°(Zn²⁺/Zn) = −0.76 V</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Identify Cathode and Anode</div>
+        <div class="step-body">The half-reaction with the higher (more positive) E° is the cathode (reduction). The one with lower E° is the anode (oxidation). <br><em>Cathode: Cu²⁺/Cu (+0.34 V) — higher | Anode: Zn/Zn²⁺ (−0.76 V) — lower</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Apply the Formula</div>
+        <div class="step-body">E°cell = E°cathode − E°anode. Use the standard reduction potentials as-is — do not reverse the sign of the anode. <br><em>E°cell = (+0.34) − (−0.76) = +1.10 V</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Check for Non-Standard Conditions (Nernst)</div>
+        <div class="step-body">If concentrations ≠ 1 M or T ≠ 25°C, apply Nernst equation. Determine Q from ion concentrations. <br><em>If [Cu²⁺] = 0.5 M and [Zn²⁺] = 0.1 M: Q = 0.1/0.5 = 0.2</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Calculate ΔG° (Optional)</div>
+        <div class="step-body">Use ΔG° = −nFE°cell to find the Gibbs free energy. Confirms spontaneity thermodynamically (negative ΔG = spontaneous). <br><em>ΔG° = −2 × 96485 × 1.10 = −212,267 J = −212.3 kJ/mol</em></div>
+      </div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-content">
+        <div class="step-title">Interpret the Result</div>
+        <div class="step-body">E > 0: spontaneous galvanic cell. E = 0: equilibrium (dead battery). E &lt; 0: non-spontaneous (requires electrolysis). State units and conditions clearly in your answer.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SOLVED EXAMPLES
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Solved Examples</h2>
+
+  <div class="example-box">
+    <div class="ex-title">📗 Example 1 — Daniell Cell (Standard Conditions)</div>
+    <p><strong>Cell:</strong> Zn | Zn²⁺(1M) || Cu²⁺(1M) | Cu</p>
+    <p><strong>Given:</strong> E°(Cu²⁺/Cu) = +0.34 V, E°(Zn²⁺/Zn) = −0.76 V, n = 2</p>
+    <div class="eq-line">E°cell = E°cathode − E°anode = 0.34 − (−0.76)</div>
+    <div class="eq-line">E°cell = <span class="answer">+1.10 V ✓ Spontaneous</span></div>
+    <div class="eq-line">ΔG° = −2 × 96485 × 1.10 = −212,267 J = −212.3 kJ/mol</div>
+    <p><strong>Conclusion:</strong> This galvanic cell spontaneously converts chemical energy to electrical energy.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📘 Example 2 — Silver-Zinc Cell</div>
+    <p><strong>Given:</strong> E°(Ag⁺/Ag) = +0.80 V, E°(Zn²⁺/Zn) = −0.76 V, n = 2</p>
+    <div class="eq-line">E°cell = 0.80 − (−0.76) = <span class="answer">+1.56 V ✓ Spontaneous</span></div>
+    <div class="eq-line">K = 10^(n × E° / 0.0592) = 10^(2 × 1.56 / 0.0592) = 10^(52.7) ≈ 5×10⁵²</div>
+    <p><strong>Conclusion:</strong> Extremely large K confirms this reaction goes essentially to completion.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📙 Example 3 — Non-Spontaneous Cell (Electrolysis)</div>
+    <p><strong>Given:</strong> Electrolysis of NaCl(aq). E°(Cl₂/Cl⁻) = +1.36 V (cathode?), E°(O₂/H₂O) = +1.23 V</p>
+    <p>For the desired reaction (Cl₂ at anode, H₂ at cathode): E°cell = 0.00 − 1.36 = −1.36 V</p>
+    <div class="eq-line">E°cell = <span style="color:var(--error)">−1.36 V → Non-spontaneous</span></div>
+    <p><strong>Conclusion:</strong> Minimum 1.36 V external voltage required. In practice, overpotential makes it ~2 V in industrial chlor-alkali plants.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📕 Example 4 — pH Measurement via Nernst</div>
+    <p><strong>Given:</strong> Glass electrode, E°cell = 0.40 V, n = 1, T = 298 K, Q = [H⁺] = 10⁻³ M (pH 3)</p>
+    <div class="eq-line">E = 0.40 − (0.0592/1) × log(10⁻³)</div>
+    <div class="eq-line">E = 0.40 − 0.0592 × (−3) = 0.40 + 0.178 = <span class="answer">+0.578 V</span></div>
+    <p><strong>Conclusion:</strong> Each pH unit change alters E by 59.2 mV at 25°C — the basis of all pH meters.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     RULES & APPLICATIONS
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Rules & Principles</h2>
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-badge">Rule 01</div>
+      <div class="rule-title">Sign Convention</div>
+      <div class="rule-text">Always look up <em>reduction</em> potentials. Never reverse the sign of either electrode when applying E°cell = E°cathode − E°anode. The subtraction handles the oxidation reversal automatically.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 02</div>
+      <div class="rule-title">Spontaneity Rule</div>
+      <div class="rule-text">If E°cell > 0 → ΔG° < 0 → reaction is spontaneous (galvanic cell). If E°cell < 0 → ΔG° > 0 → non-spontaneous (requires electrolysis).</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 03</div>
+      <div class="rule-title">Stoichiometry Independence</div>
+      <div class="rule-text">E°cell does NOT change when you multiply half-reactions to balance electron transfer. However, ΔG° and K do change — they depend on n.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 04</div>
+      <div class="rule-title">Activity of Solids/Liquids</div>
+      <div class="rule-text">Pure solids (Zn, Cu) and pure liquids (H₂O) have activity = 1 and are excluded from Q in the Nernst equation. Only aqueous ions and dissolved gases are included.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 05</div>
+      <div class="rule-title">Standard Hydrogen Electrode</div>
+      <div class="rule-text">The SHE (H⁺/H₂, 1 atm, 1 M) is the universal reference with E° = 0.000 V exactly. All other potentials are measured relative to it.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 06</div>
+      <div class="rule-title">Nernst at Equilibrium</div>
+      <div class="rule-text">When the cell reaches equilibrium: E<sub>cell</sub> = 0, Q = K. Setting E = 0 in the Nernst equation gives: 0 = E° − (0.0592/n) log K → log K = nE°/0.0592.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     REFERENCE TABLE
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Standard Reduction Potentials — Reference Table</h2>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">Selected values at 25°C, 1 M concentration, 1 atm for gases. Ordered from most oxidizing (top) to most reducing (bottom).</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Half-Reaction</th>
+          <th>E° (V)</th>
+          <th>Category</th>
+          <th>Common Use</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>F₂ + 2e⁻ → 2F⁻</td><td class="pos">+2.87</td><td><span class="badge badge-error">Strong Oxidizer</span></td><td>Fluorine chemistry</td></tr>
+        <tr><td>MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O</td><td class="pos">+1.51</td><td><span class="badge badge-error">Oxidizer</span></td><td>Titrations</td></tr>
+        <tr><td>Cl₂ + 2e⁻ → 2Cl⁻</td><td class="pos">+1.36</td><td><span class="badge badge-error">Oxidizer</span></td><td>Chlor-alkali industry</td></tr>
+        <tr><td>O₂ + 4H⁺ + 4e⁻ → 2H₂O</td><td class="pos">+1.23</td><td><span class="badge badge-error">Oxidizer</span></td><td>Fuel cells, corrosion</td></tr>
+        <tr><td>Ag⁺ + e⁻ → Ag</td><td class="pos">+0.80</td><td><span class="badge badge-accent">Metal</span></td><td>Silver plating</td></tr>
+        <tr><td>Fe³⁺ + e⁻ → Fe²⁺</td><td class="pos">+0.77</td><td><span class="badge badge-accent">Redox</span></td><td>Iron chemistry</td></tr>
+        <tr><td>Cu²⁺ + 2e⁻ → Cu</td><td class="pos">+0.34</td><td><span class="badge badge-accent">Metal</span></td><td>Copper plating, Daniell cell</td></tr>
+        <tr><td>2H⁺ + 2e⁻ → H₂</td><td>0.00</td><td><span class="badge badge-info">SHE Reference</span></td><td>Universal reference</td></tr>
+        <tr><td>Pb²⁺ + 2e⁻ → Pb</td><td class="neg">−0.13</td><td><span class="badge badge-accent">Metal</span></td><td>Lead-acid batteries</td></tr>
+        <tr><td>Ni²⁺ + 2e⁻ → Ni</td><td class="neg">−0.25</td><td><span class="badge badge-accent">Metal</span></td><td>Nickel cells</td></tr>
+        <tr><td>Fe²⁺ + 2e⁻ → Fe</td><td class="neg">−0.44</td><td><span class="badge badge-accent">Metal</span></td><td>Iron redox</td></tr>
+        <tr><td>Zn²⁺ + 2e⁻ → Zn</td><td class="neg">−0.76</td><td><span class="badge badge-success">Reducer</span></td><td>Daniell cell, galvanizing</td></tr>
+        <tr><td>Al³⁺ + 3e⁻ → Al</td><td class="neg">−1.66</td><td><span class="badge badge-success">Strong Reducer</span></td><td>Aluminum smelting</td></tr>
+        <tr><td>Mg²⁺ + 2e⁻ → Mg</td><td class="neg">−2.37</td><td><span class="badge badge-success">Strong Reducer</span></td><td>Sacrificial anodes</td></tr>
+        <tr><td>Na⁺ + e⁻ → Na</td><td class="neg">−2.71</td><td><span class="badge badge-success">Strong Reducer</span></td><td>Sodium batteries</td></tr>
+        <tr><td>Li⁺ + e⁻ → Li</td><td class="neg">−3.04</td><td><span class="badge badge-success">Strongest Reducer</span></td><td>Li-ion batteries</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How Cell Potential Works — Mechanism</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:16px;">
+    At the atomic level, cell potential arises from the difference in electron affinity between two metals.
+    Here's the complete mechanism with a concrete Daniell cell example:
+  </p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;">
+    <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:18px;">
+      <div style="font-size:12px;color:var(--success);font-weight:700;letter-spacing:2px;margin-bottom:8px;">ANODE (−)</div>
+      <p style="font-size:13px;color:var(--text-dim);">Zinc atoms <strong style="color:#fff;">lose electrons</strong> (oxidation) and dissolve into solution as Zn²⁺ ions. The electrode becomes negatively charged as electrons accumulate.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;margin-top:10px;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px;">Zn → Zn²⁺ + 2e⁻</div>
+    </div>
+    <div style="background:rgba(0,242,255,0.05);border:1px solid rgba(0,242,255,0.2);border-radius:12px;padding:18px;">
+      <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:2px;margin-bottom:8px;">CATHODE (+)</div>
+      <p style="font-size:13px;color:var(--text-dim);">Cu²⁺ ions from solution <strong style="color:#fff;">gain electrons</strong> (reduction) and deposit as solid copper. This electrode becomes positive.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;margin-top:10px;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px;">Cu²⁺ + 2e⁻ → Cu</div>
+    </div>
+    <div style="background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:18px;">
+      <div style="font-size:12px;color:var(--info);font-weight:700;letter-spacing:2px;margin-bottom:8px;">SALT BRIDGE</div>
+      <p style="font-size:13px;color:var(--text-dim);">Ions migrate through the salt bridge to maintain electrical neutrality: anions flow to the anode, cations flow to the cathode compartment.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;margin-top:10px;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px;">K⁺ → CuSO₄ half | SO₄²⁻ → ZnSO₄ half</div>
+    </div>
+    <div style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:18px;">
+      <div style="font-size:12px;color:var(--gold);font-weight:700;letter-spacing:2px;margin-bottom:8px;">ELECTRON FLOW</div>
+      <p style="font-size:13px;color:var(--text-dim);">Electrons flow through the <strong style="color:#fff;">external circuit</strong> from anode (−) to cathode (+), driven by the potential difference E°cell = 1.10 V.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;margin-top:10px;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px;">Zn → [wire] → Cu → load</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sub-heading">Energy Conversion Chain</h3>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px;background:rgba(0,0,0,0.3);border-radius:12px;">
+    <div style="text-align:center;padding:12px;background:rgba(0,242,255,0.1);border-radius:10px;font-size:13px;">⚗️<br><span style="color:var(--accent)">Chemical<br>Energy</span></div>
+    <div style="color:var(--text-dim);font-size:20px;">→</div>
+    <div style="text-align:center;padding:12px;background:rgba(0,255,136,0.1);border-radius:10px;font-size:13px;">⚡<br><span style="color:var(--success)">Electrical<br>Potential</span></div>
+    <div style="color:var(--text-dim);font-size:20px;">→</div>
+    <div style="text-align:center;padding:12px;background:rgba(168,85,247,0.1);border-radius:10px;font-size:13px;">💡<br><span style="color:var(--info)">Useful<br>Work</span></div>
+    <div style="color:var(--text-dim);font-size:14px;margin-left:10px;">Governed by: ΔG° = −nFE°cell</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCIENTIFIC RESEARCH APPLICATIONS
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Cell Potential in Scientific Research</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:18px;">
+    Researchers across disciplines rely on electrochemical potential measurements for cutting-edge applications.
+  </p>
+  <div class="research-grid">
+    <div class="research-card">
+      <div class="research-icon">🔋</div>
+      <div class="research-title">Next-Gen Battery Design</div>
+      <div class="research-text">Scientists use DFT-calculated reduction potentials to screen thousands of electrode materials computationally before synthesis. Li-S cells (theoretical E° ~2.1 V) and Na-ion batteries are designed this way.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-icon">💉</div>
+      <div class="research-title">Biosensors & Medical Diagnostics</div>
+      <div class="research-text">Glucose oxidase enzyme electrodes exploit the Nernst equation for real-time blood glucose monitoring. Continuous glucose monitors (CGMs) track potential shifts as small as 1 mV corresponding to 0.1 mM glucose change.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-icon">🌊</div>
+      <div class="research-title">Seawater Electrolysis</div>
+      <div class="research-text">Green hydrogen production requires overcoming E°cell = −1.23 V for water splitting. Researchers measure cell potential vs. current (Tafel plots) to evaluate catalyst overpotentials and efficiencies.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-icon">🧫</div>
+      <div class="research-title">Microbial Fuel Cells</div>
+      <div class="research-text">Bioelectrochemistry research measures the E°cell of microbial metabolic reactions. Geobacter sulfurreducens produces ~0.3 V from organic waste oxidation — studied for wastewater treatment energy recovery.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-icon">🪨</div>
+      <div class="research-title">Mineral Extraction (Hydrometallurgy)</div>
+      <div class="research-text">Cell potential data guides selective leaching. Cu²⁺ (E° +0.34 V) can be selectively reduced from Fe²⁺ (E° −0.44 V) mixtures — the 0.78 V difference drives cementation in copper mining operations.</div>
+    </div>
+    <div class="research-card">
+      <div class="research-icon">🛸</div>
+      <div class="research-title">Space & Aerospace Applications</div>
+      <div class="research-text">NASA uses Nernst equation analysis for fuel cell health monitoring in spacecraft. Deviation of measured E from theoretical Nernst E signals membrane degradation or gas crossover in PEM fuel cells.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Frequently Asked Questions</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:22px;">
+    Comprehensive answers to the most common questions about cell potential and electrochemistry.
+  </p>
+  <div class="faq-grid" id="faqGrid">
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between EMF and cell potential?<span class="faq-icon">+</span></div>
+      <div class="faq-a">EMF (electromotive force) and cell potential are often used interchangeably, but technically EMF refers to the maximum potential difference measured when no current is flowing (open circuit). Cell potential under load is slightly lower due to internal resistance. In standard calculations, E°cell = EMF at standard conditions with no current drain.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why doesn't E°cell change when you multiply a half-reaction?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Cell potential is an intensive property — like temperature or density, it doesn't depend on quantity. Multiplying a half-reaction changes ΔG° (because ΔG° = −nFE° and n increases proportionally), but E° itself remains constant. Think of it as voltage: a 9V battery is 9V whether it's small or large.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What happens to cell potential at equilibrium?<span class="faq-icon">+</span></div>
+      <div class="faq-a">At equilibrium, the cell potential equals exactly zero volts. The driving force for electron transfer disappears because the reaction quotient Q equals the equilibrium constant K. This is the "dead battery" condition. Setting E = 0 in the Nernst equation: 0 = E° − (0.0592/n)log K, which gives log K = nE°/0.0592.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Can cell potential be negative? What does it mean?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Yes. A negative E°cell means the forward reaction is non-spontaneous under standard conditions — you must supply energy (electrolysis) to drive it. For example, electroplating copper (depositing it forcibly), charging a battery, or producing aluminum via the Hall-Héroult process all require negative-E reactions driven by external voltage.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How does temperature affect cell potential?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Temperature enters through the Nernst equation via the RT/nF factor. At higher temperatures, the concentration-dependent correction term (RT/nF × ln Q) becomes larger. For most galvanic cells, E°cell itself has a temperature coefficient (dE°/dT) related to the reaction's entropy change: dE°/dT = ΔS°/nF. Lead-acid batteries, for instance, lose about 4 mV/°C at lower temperatures.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the reaction quotient Q in the Nernst equation?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Q is the reaction quotient — calculated like the equilibrium constant K but using actual (non-equilibrium) concentrations. For a reaction aA + bB → cC + dD, Q = [C]ᶜ[D]ᵈ / [A]ᵃ[B]ᵇ. Pure solids and liquids are excluded (activity = 1). Gases use partial pressure in atm. For the Daniell cell: Zn + Cu²⁺ → Zn²⁺ + Cu, Q = [Zn²⁺]/[Cu²⁺].</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How is cell potential related to Gibbs free energy?<span class="faq-icon">+</span></div>
+      <div class="faq-a">They are directly related by ΔG° = −nFE°cell. Since n and F are always positive, the sign of ΔG° is always opposite to E°cell. A positive E° gives negative ΔG° (spontaneous). This relationship bridges electrochemistry and thermodynamics — it means measuring voltage in a voltmeter is equivalent to measuring free energy change of the reaction.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the Standard Hydrogen Electrode (SHE)?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The SHE is the universal reference electrode for reduction potentials: a platinum electrode immersed in 1 M H⁺ solution with H₂ gas at 1 atm bubbled over it. Its potential is defined as exactly 0.000 V at all temperatures. Every E° value in reduction potential tables is measured relative to the SHE. In practice, the more stable Ag/AgCl or calomel (SCE) reference electrodes are used, with correction factors applied.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you calculate the number of electrons transferred (n)?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Write and balance both half-reactions. The number of electrons in each half-reaction must be equal (multiply if needed). The n in the Nernst equation and ΔG° formula is this total number. For the Daniell cell: Zn → Zn²⁺ + 2e⁻ and Cu²⁺ + 2e⁻ → Cu, so n = 2. For MnO₄⁻/Mn²⁺ reactions, n = 5 per MnO₄⁻.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is overpotential and how does it affect real cells?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Overpotential is the extra voltage needed beyond E°cell to overcome kinetic barriers (activation energy). Even if E°cell = −1.23 V for water splitting, actual electrolyzers require ~1.8–2.0 V due to overpotentials at both electrodes. Catalysts (like platinum for H₂ evolution or IrO₂ for O₂ evolution) reduce overpotential, improving energy efficiency.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the significance of Faraday's constant (F)?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Faraday's constant F = 96,485 C/mol represents the charge of one mole of electrons. It connects the macroscopic (moles) and electrical (coulombs) worlds. In ΔG° = −nFE°, F converts the n moles of electrons times voltage into energy (joules). It's also used in Faraday's laws of electrolysis to calculate mass deposited: m = (M × I × t) / (n × F).</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How does concentration polarization affect battery performance?<span class="faq-icon">+</span></div>
+      <div class="faq-a">As a battery discharges, reactant concentrations decrease and product concentrations increase near electrodes. The Nernst equation shows this shifts Q, reducing E<sub>cell</sub>. This is concentration polarization — the cell voltage drops before the theoretical equilibrium. Fast discharge rates amplify this effect, explaining why battery voltage sags under heavy load but recovers when resting.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Can you combine multiple cell potentials to get a new one?<span class="faq-icon">+</span></div>
+      <div class="faq-a">You must use Hess's law via ΔG°, not by simply adding E° values directly. Since ΔG° = −nFE°, add the ΔG° values (each computed with their respective n), then calculate the new E° = −ΔG°total / (n_total × F). Direct addition of E° values only works when n is the same for both steps.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between galvanic and electrolytic cells?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Galvanic (voltaic) cells have E°cell > 0 and spontaneously convert chemical energy to electrical energy (batteries, fuel cells). Electrolytic cells have E°cell < 0 and require an external voltage source to drive a non-spontaneous reaction (electroplating, water electrolysis, chlor-alkali process, aluminum smelting). Both use the same E°cell formula — only the sign and energy direction differ.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How accurate is the Nernst equation at very high or low concentrations?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The Nernst equation assumes ideal behavior (activity = concentration). At high ionic strengths (>0.1 M), ion-ion interactions cause activity coefficients to deviate from 1. The Debye-Hückel equation corrects for this. At concentrations above ~0.5 M, measured E values can differ from Nernst predictions by 10–50 mV, which is significant in precision analytical chemistry.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How is cell potential used to determine unknown concentrations?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Potentiometry directly exploits the Nernst equation: measure E<sub>cell</sub> against a known reference, then solve for the unknown [ion]. For a Cu²⁺ ion-selective electrode: E = E° − (0.0296) × log[Cu²⁺]. Measuring E and knowing E°, you can find [Cu²⁺] to nanomolar precision. pH meters, fluoride sensors, and nitrate electrodes all use this exact principle.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+</main>
+
+<!-- FOOTER PLACEHOLDER -->
+<div id="footer-container"></div>
+<script>
+fetch('footer.html').then(r=>r.text()).then(h=>{document.getElementById('footer-container').innerHTML=h;}).catch(()=>{});
+</script>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════
+// EXPRESSION PARSER  — supports:
+//   plain numbers:   0.34   -0.76   +1.10
+//   multiply:        20*5   3.4*2
+//   power:           10^5   10^-9
+//   combined:        20*10^-9   1.5*10^-3   6.02*10^23
+//   negative base:   -2*10^3
+// ══════════════════════════════════════════
+function parseExpr(raw) {
+  if (!raw || raw.toString().trim() === '') return NaN;
+  let s = raw.toString().trim();
+
+  // Allow leading + or - without space issues
+  // Pattern: optional sign, number, optional *number, optional ^signedInt
+  // e.g.  -20*10^-9  |  1.5*10^3  |  10^-6  |  20*5  |  -0.76  |  1.10
+
+  // First try direct float parse (covers plain numbers)
+  const direct = parseFloat(s);
+  if (!isNaN(direct) && String(s).match(/^[+-]?\d+\.?\d*([eE][+-]?\d+)?$/)) {
+    return direct;
+  }
+
+  // Regex: (sign+number) * (number) ^ (sign+number)
+  // Groups: 1=coefficient  2=base  3=exponent
+  const re = /^([+-]?\s*\d+\.?\d*(?:[eE][+-]?\d+)?)\s*(?:\*\s*([+-]?\d+\.?\d*(?:[eE][+-]?\d+)?))?\s*(?:\^\s*([+-]?\d+))?$/;
+  const m = s.match(re);
+  if (m) {
+    let coeff    = parseFloat(m[1]);           // e.g. 20
+    let base     = m[2] ? parseFloat(m[2]) : 1; // e.g. 10
+    let exponent = m[3] ? parseInt(m[3])   : 0; // e.g. -9
+    if (isNaN(coeff)) return NaN;
+    if (m[2] && !m[3]) return coeff * base;               // a*b only  → 10*10 = 100
+    if (!m[2] && m[3]) return Math.pow(coeff, exponent);  // a^c only  → 10^5 = 100000
+    return coeff * Math.pow(base, exponent);               // a*b^c     → 20*10^-9
+  }
+
+  // Fallback: plain float
+  return parseFloat(s);
+}
+
+// ─── Pretty-print a number in scientific notation if very large/small ───
+function prettyNum(v) {
+  if (isNaN(v)) return '—';
+  const a = Math.abs(v);
+  if (a !== 0 && (a < 0.001 || a >= 1e6)) {
+    // Format as a × 10ⁿ
+    const exp = Math.floor(Math.log10(a));
+    const man = v / Math.pow(10, exp);
+    const manStr = parseFloat(man.toPrecision(6));
+    const supMap = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+    const supExp = String(exp).split('').map(c => supMap[c] || c).join('');
+    return `${manStr} × 10${supExp}  (= ${v.toPrecision(6)})`;
+  }
+  return String(parseFloat(v.toPrecision(10)));
+}
+
+// ─── Live preview under each input ───
+function livePreview(input, previewId) {
+  const el = document.getElementById(previewId);
+  if (!el) return;
+  const raw = input.value.trim();
+  if (!raw) { el.className = 'input-preview'; el.textContent = ''; return; }
+  const val = parseExpr(raw);
+  if (isNaN(val)) {
+    el.className = 'input-preview bad';
+    el.textContent = '✗ Invalid expression';
+  } else {
+    el.className = 'input-preview ok';
+    el.textContent = '= ' + prettyNum(val);
+  }
+}
+
+// ─── Tab Switching ───
+function switchTab(name, btn) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.calc-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  // Clear results
+  ['res-std','res-nernst','res-gibbs'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('show');
+  });
+  ['err-std','err-nernst','err-gibbs'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+}
+
+// ─── Preset Loader ───
+function loadPreset(type) {
+  const sel = document.getElementById(type + 'Preset');
+  const inp = document.getElementById(type + 'V');
+  if(sel.value !== '') inp.value = sel.value;
+}
+
+// ─── Format Number ───
+function fmt(n, d=4) { return parseFloat(n.toFixed(d)); }
+
+// ─── Standard Calculator ───
+function calcStandard() {
+  const cat = parseExpr(document.getElementById('catV').value);
+  const ano = parseExpr(document.getElementById('anoV').value);
+  const errEl = document.getElementById('err-std');
+  const resEl = document.getElementById('res-std');
+
+  errEl.style.display = 'none'; resEl.classList.remove('show');
+
+  if(isNaN(cat) || isNaN(ano)) {
+    errEl.textContent = '⚠ Please enter valid numerical values for both cathode and anode potentials.';
+    errEl.style.display = 'block'; return;
+  }
+
+  const ecell = fmt(cat - ano);
+  const spontaneous = ecell > 0;
+  const resultValEl = document.getElementById('res-std-val');
+  const resultInterpEl = document.getElementById('res-std-interp');
+  const resultStepsEl = document.getElementById('res-std-steps');
+
+  resultValEl.textContent = (ecell >= 0 ? '+' : '') + ecell + ' V';
+  resultValEl.className = 'result-value ' + (spontaneous ? 'positive' : 'negative');
+
+  resultInterpEl.innerHTML = spontaneous
+    ? `✅ <strong>Spontaneous Galvanic Cell</strong> — This reaction proceeds spontaneously. The cell produces electrical energy. E°cell > 0 confirms ΔG° < 0.`
+    : ecell === 0
+    ? `⚖️ <strong>At Equilibrium</strong> — No net reaction. E°cell = 0 means ΔG° = 0 and Q = K.`
+    : `⚠️ <strong>Non-Spontaneous</strong> — This reaction requires an external voltage source (electrolysis). E°cell < 0 means ΔG° > 0.`;
+
+  resultStepsEl.innerHTML = `
+    <h4>Step-by-Step Solution</h4>
+    <div class="step-item"><span class="step-num">1.</span> Formula: E°cell = E°cathode − E°anode</div>
+    <div class="step-item"><span class="step-num">2.</span> E°cathode = ${cat >= 0 ? '+' : ''}${cat} V</div>
+    <div class="step-item"><span class="step-num">3.</span> E°anode = ${ano >= 0 ? '+' : ''}${ano} V</div>
+    <div class="step-item"><span class="step-num">4.</span> E°cell = ${cat} − (${ano}) = ${ecell} V</div>
+    <div class="step-item"><span class="step-num">5.</span> Spontaneous? ${spontaneous ? '✅ Yes (E > 0)' : ecell===0 ? '⚖️ Equilibrium (E = 0)' : '❌ No (E < 0)'}</div>
+  `;
+
+  resEl.classList.add('show');
+}
+
+// ─── Nernst Calculator ───
+function calcNernst() {
+  const Ecell = parseExpr(document.getElementById('n-ecell').value);
+  const n     = parseExpr(document.getElementById('n-n').value);
+  const T     = parseExpr(document.getElementById('n-T').value) || 298.15;
+  const Q     = parseExpr(document.getElementById('n-Q').value);
+  const errEl = document.getElementById('err-nernst');
+  const resEl = document.getElementById('res-nernst');
+
+  errEl.style.display = 'none'; resEl.classList.remove('show');
+
+  if(isNaN(Ecell) || isNaN(n) || isNaN(Q)) {
+    errEl.textContent = '⚠ Please fill in E°cell, n, and Q values.';
+    errEl.style.display = 'block'; return;
+  }
+  if(n <= 0 || !Number.isInteger(n)) {
+    errEl.textContent = '⚠ n must be a positive integer (1, 2, 3...).';
+    errEl.style.display = 'block'; return;
+  }
+  if(Q <= 0) {
+    errEl.textContent = '⚠ Q must be a positive number (concentrations are always positive).';
+    errEl.style.display = 'block'; return;
+  }
+
+  const R = 8.314, F = 96485;
+  const correction = fmt((R * T) / (n * F) * Math.log(Q), 6);
+  const E = fmt(Ecell - correction, 4);
+  const factor = fmt((0.05916 * Math.log10(Q)) / n, 6);
+  const E_25 = fmt(Ecell - factor, 4);
+
+  const resultValEl = document.getElementById('res-nernst-val');
+  const resultInterpEl = document.getElementById('res-nernst-interp');
+  const resultStepsEl = document.getElementById('res-nernst-steps');
+
+  resultValEl.textContent = (E >= 0 ? '+' : '') + E + ' V';
+  resultValEl.className = 'result-value ' + (E > 0 ? 'positive' : 'negative');
+
+  const diff = fmt(E - Ecell, 4);
+  resultInterpEl.innerHTML = `
+    The non-standard potential is <strong>${(E >= 0 ? '+' : '') + E} V</strong> (E°cell was ${(Ecell >= 0 ? '+' : '') + Ecell} V). 
+    Correction: <strong>${diff >= 0 ? '+' : ''}${diff} V</strong> due to Q = ${Q}.
+    ${E > 0 ? '✅ Still spontaneous.' : E === 0 ? '⚖️ At equilibrium.' : '❌ Non-spontaneous under these conditions.'}
+  `;
+
+  resultStepsEl.innerHTML = `
+    <h4>Step-by-Step Solution (Nernst Equation)</h4>
+    <div class="step-item"><span class="step-num">1.</span> Nernst eq: E = E° − (RT/nF) × ln Q</div>
+    <div class="step-item"><span class="step-num">2.</span> E°cell = ${Ecell} V, n = ${n}, T = ${T} K</div>
+    <div class="step-item"><span class="step-num">3.</span> R = 8.314 J/mol·K, F = 96485 C/mol</div>
+    <div class="step-item"><span class="step-num">4.</span> RT/nF = (8.314 × ${T}) / (${n} × 96485) = ${fmt((8.314*T)/(n*96485),6)} V</div>
+    <div class="step-item"><span class="step-num">5.</span> ln(Q) = ln(${Q}) = ${fmt(Math.log(Q),6)}</div>
+    <div class="step-item"><span class="step-num">6.</span> Correction = ${fmt((8.314*T)/(n*96485),6)} × ${fmt(Math.log(Q),4)} = ${correction} V</div>
+    <div class="step-item"><span class="step-num">7.</span> E = ${Ecell} − (${correction}) = <strong>${E} V</strong></div>
+    <div class="step-item"><span class="step-num">8.</span> At 25°C shortcut: E = E° − (0.0592/n) × log Q = ${E_25} V</div>
+  `;
+
+  resEl.classList.add('show');
+}
+
+// ─── Gibbs / K Calculator ───
+function calcGibbs() {
+  const Ecell = parseExpr(document.getElementById('g-ecell').value);
+  const n     = parseExpr(document.getElementById('g-n').value);
+  const T     = parseExpr(document.getElementById('g-T').value) || 298.15;
+  const errEl = document.getElementById('err-gibbs');
+  const resEl = document.getElementById('res-gibbs');
+
+  errEl.style.display = 'none'; resEl.classList.remove('show');
+
+  if(isNaN(Ecell) || isNaN(n)) {
+    errEl.textContent = '⚠ Please enter E°cell and n values.';
+    errEl.style.display = 'block'; return;
+  }
+  if(n <= 0) {
+    errEl.textContent = '⚠ n must be a positive integer.';
+    errEl.style.display = 'block'; return;
+  }
+
+  const F = 96485, R = 8.314;
+  const dG_J = fmt(-n * F * Ecell, 2);
+  const dG_kJ = fmt(dG_J / 1000, 4);
+  const logK = fmt((n * Ecell) / (0.05916), 4);
+  const K = Math.pow(10, logK);
+  const KDisplay = K > 1e99 ? '> 10⁹⁹' : K < 1e-99 ? '< 10⁻⁹⁹' : fmt(K, 4).toExponential(3);
+
+  const stepsEl = document.getElementById('res-gibbs-steps');
+  stepsEl.innerHTML = `
+    <h4>Gibbs Free Energy & Equilibrium Constant</h4>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="text-align:center;padding:16px;background:rgba(0,242,255,0.08);border:1px solid rgba(0,242,255,0.2);border-radius:12px;">
+        <div style="font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">ΔG°</div>
+        <div style="font-family:'Orbitron',monospace;font-size:24px;font-weight:800;color:${dG_kJ < 0 ? 'var(--success)' : 'var(--error)'}">${dG_kJ > 0 ? '+' : ''}${dG_kJ} kJ/mol</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">${dG_kJ < 0 ? '✅ Spontaneous' : '❌ Non-spontaneous'}</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:12px;">
+        <div style="font-size:11px;color:var(--info);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">K (equilibrium)</div>
+        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:800;color:var(--info)">${KDisplay}</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">log K = ${logK}</div>
+      </div>
+    </div>
+    <div class="step-item"><span class="step-num">1.</span> ΔG° = −nFE° = −${n} × 96485 × ${Ecell} = ${dG_J} J/mol</div>
+    <div class="step-item"><span class="step-num">2.</span> ΔG° = ${dG_kJ} kJ/mol ${dG_kJ < 0 ? '(spontaneous ✅)' : '(non-spontaneous ❌)'}</div>
+    <div class="step-item"><span class="step-num">3.</span> log K = nE°/0.05916 = ${n} × ${Ecell} / 0.05916 = ${logK}</div>
+    <div class="step-item"><span class="step-num">4.</span> K = 10^(${logK}) = ${KDisplay}</div>
+    <div class="step-item"><span class="step-num">5.</span> Also: ΔG° = −RT ln K → ln K = −ΔG°/RT = ${fmt(-dG_J/(R*T),4)}</div>
+  `;
+
+  resEl.classList.add('show');
+}
+
+// ─── FAQ Toggle ───
+function toggleFaq(card) {
+  card.classList.toggle('open');
+}
+
+// ─── Scroll Fade-in ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
