@@ -256,17 +256,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /* 🔥 SAFE CORE LOADER (NO BREAK) */
 
-setTimeout(function(){
-
-    if(window.__chem_core_loaded) return;
+(function(){
+    if(window.__chem_core_loaded) return; // prevent duplicate loading
     window.__chem_core_loaded = true;
 
-    var s = document.createElement("script");
-    s.src = "https://chemistrytools.sudhirnama.in/js/chemistry-core.js";
-
-    document.body.appendChild(s);
-
-}, 800); // enough delay so header fully loads
+    var script = document.createElement("script");
+    script.src = "https://chemistrytools.sudhirnama.in/js/chemistry-core.js";
+    script.defer = true;
+    document.head.appendChild(script);
+})();
 });
 
 
