@@ -251,32 +251,24 @@ document.addEventListener("DOMContentLoaded", function() {
             bars[0].style.transform = ""; bars[1].style.opacity = "1"; bars[2].style.transform = "";
         }
     });
-});
 
 
 
+    /* 🔥 SAFE CORE LOADER (NO BREAK) */
 
+setTimeout(function(){
 
-/** Chemistry engine **//
-
-(function(){
-
-// prevent duplicate loading
-if(window.__chem_core_loaded) return;
-window.__chem_core_loaded = true;
-
-// wait until body exists
-function loadCore(){
-    if(!document.body){
-        return setTimeout(loadCore, 50);
-    }
+    if(window.__chem_core_loaded) return;
+    window.__chem_core_loaded = true;
 
     var s = document.createElement("script");
     s.src = "https://chemistrytools.sudhirnama.in/js/chemistry-core.js";
 
     document.body.appendChild(s);
-}
 
-loadCore();
+}, 800); // enough delay so header fully loads
+});
 
-})();
+
+
+
