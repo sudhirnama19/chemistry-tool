@@ -1,10 +1,17 @@
 (function(){
 
-var DEBUG = true; // turn OFF later
+/* AUTO DEBUG FLAG (only when ?debug=true) */
+var DEBUG = window.location.href.includes("debug=true");
 
+/* SAFE DEBUG BOX (won’t break if body not ready) */
 function showDebug(msg){
 
 if(!DEBUG) return;
+
+/* wait until body exists */
+if(!document.body){
+return setTimeout(function(){ showDebug(msg); }, 50);
+}
 
 var box = document.getElementById("chem-debug-box");
 
@@ -27,8 +34,8 @@ document.body.appendChild(box);
 box.innerHTML += msg + "<br>";
 }
 
-/* -------- CONTEXT FUNCTION -------- */
-function detectContext(){
+/* SIMPLE CONTEXT CHECK (independent, no conflict) */
+function __checkNoiseContext(){
 
 let text = document.title.toLowerCase();
 
@@ -40,15 +47,15 @@ if(text.includes("ph")) return "ph";
 return "general";
 }
 
-/* -------- MAIN -------- */
+/* RUN SAFELY */
 (function(){
 
-let context = detectContext();
+var context = __checkNoiseContext();
 
-showDebug("Noise ON");
+showDebug("Noise Engine Loaded");
 showDebug("Context: " + context);
 
-/* fake execution test */
+/* simulate fake activity */
 for(let i=0;i<5;i++){
 showDebug("Fake Exec " + i);
 }
