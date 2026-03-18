@@ -274,164 +274,220 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
-
 /* ==============================
-   🔐 FRONTEND LICENSE SYSTEM (NO SERVER)
+   🔐 CHEM PROTECT v3 (FINAL)
+   Stealth • Hardened • No Server
 ============================== */
 
 (function(){
 
-    const DOMAIN = "sudhirnama.in";
+    /* ===== CONFIG ===== */
+    const _D = "sudhirnama.in";     // your domain
+    const _LS = "sn_lk";            // localStorage key
 
-    // Pre-generated valid keys (you can change anytime)
-    const VALID_KEYS = [
-        "SN-29XK-8D2P",
-        "SN-AB12-X9Q7",
-        "SN-7GH2-KL9P"
-    ];
+    let _U = false;                 // unlocked flag
+    let _T = 0;                     // attempts counter
 
-    let tampered = false;
-    let unlocked = false;
 
     /* ==============================
-       1. DOMAIN LOCK
+       1. DOMAIN CHECK
     ============================== */
-    try{
-        if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
-            document.body.innerHTML = "";
+    function _dOK(){
+        try{
+            return location.hostname.endsWith(_D);
+        }catch(e){
+            return false;
+        }
+    }
+
+
+    /* ==============================
+       2. HASH FUNCTION (STRONGER)
+    ============================== */
+    function _H(s){
+        let h1 = 0xdeadbeef ^ s.length;
+        let h2 = 0x41c6ce57 ^ s.length;
+
+        for(let i=0;i<s.length;i++){
+            let ch = s.charCodeAt(i);
+            h1 = Math.imul(h1 ^ ch, 2654435761);
+            h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+
+        h1 = Math.imul(h1 ^ (h1>>>16), 2246822507);
+        h2 = Math.imul(h2 ^ (h2>>>13), 3266489909);
+
+        return (h2>>>0).toString(36) + (h1>>>0).toString(36);
+    }
+
+
+    /* ==============================
+       3. REAL + DECOY KEYS
+    ============================== */
+
+    const _REAL = [
+        _H("SN-29XK-8D2P"),
+        _H("SN-AB12-X9Q7")
+    ];
+
+    const _DECOY = [
+        _H("SN-XXXX-1111"),
+        _H("SN-0000-TEST"),
+        _H("SN-FAKE-9999"),
+        _H("SN-AAAA-BBBB")
+    ];
+
+
+    /* ==============================
+       4. VALIDATION
+    ============================== */
+    function _VK(k){
+
+        const x = _H(k);
+
+        if(_REAL.includes(x)) return true;
+
+        // decoy path (misleading)
+        if(_DECOY.includes(x)){
+            _T += 2; // increase penalty
+            return false;
+        }
+
+        _T++;
+        return false;
+    }
+
+
+    /* ==============================
+       5. STEALTH DISABLE
+    ============================== */
+    function _LOCK(){
+
+        // disable UI
+        document.querySelectorAll("button,input,select,textarea")
+        .forEach(el=>{
+            el.disabled = true;
+            el.style.opacity = "0.5";
+        });
+
+        // corrupt calculation functions silently
+        Object.keys(window).forEach(k=>{
+            if(typeof window[k] === "function" &&
+               /calc|compute|result|solve/i.test(k)){
+
+                window[k] = function(){
+                    return Math.random()*1000; // wrong result
+                };
+            }
+        });
+
+        // subtle notice
+        if(!document.getElementById("sn_warn")){
+            const d = document.createElement("div");
+            d.id = "sn_warn";
+            d.innerText = "⚠ Restricted";
+            d.style.cssText =
+              "position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:4px 8px;font-size:11px;z-index:99999;opacity:0.7";
+            document.body.appendChild(d);
+        }
+    }
+
+
+    /* ==============================
+       6. LICENSE FLOW
+    ============================== */
+    function _ASK(){
+
+        // your domain → full access
+        if(_dOK()){
+            _U = true;
             return;
         }
+
+        // already verified
+        if(localStorage.getItem(_LS) === "1"){
+            _U = true;
+            return;
+        }
+
+        const k = prompt("Enter License Key:");
+
+        if(!k){
+            _LOCK();
+            return;
+        }
+
+        setTimeout(()=>{
+
+            if(!_VK(k)){
+                _LOCK();
+                return;
+            }
+
+            localStorage.setItem(_LS, "1");
+            _U = true;
+
+        }, 500 + Math.random()*500); // random delay
+    }
+
+
+    /* ==============================
+       7. DEVTOOLS (LIGHT + SAFE)
+    ============================== */
+    function _DT(){
+
+        const t = 170;
+
+        if(
+            window.outerWidth - window.innerWidth > t ||
+            window.outerHeight - window.innerHeight > t
+        ){
+            _T++;
+        }
+    }
+
+
+    /* ==============================
+       8. ENFORCER LOOP
+    ============================== */
+    function _ENF(){
+
+        if(!_U){
+            _LOCK();
+        }
+
+        _DT();
+
+        // too many attempts → permanent lock
+        if(_T > 3){
+            _LOCK();
+        }
+    }
+
+
+    /* ==============================
+       9. INVISIBLE WATERMARK
+    ============================== */
+    try{
+        Object.defineProperty(window, "__sn_flag__", {
+            value: "protected_v3",
+            writable: false
+        });
     }catch(e){}
 
 
     /* ==============================
-       2. OBFUSCATED KEY CHECK
-    ============================== */
-    function verifyKey(input){
-
-        // simple obfuscation
-        function encode(str){
-            return btoa(str.split("").reverse().join(""));
-        }
-
-        const encodedKeys = VALID_KEYS.map(k => encode(k));
-
-        return encodedKeys.includes(encode(input));
-    }
-
-
-    /* ==============================
-   SMART LICENSE CONTROL
-============================== */
-
-function isOriginalSite(){
-    return location.hostname.endsWith("sudhirnama.in");
-}
-
-function requireLicense(){
-
-    // ✅ Your real site → no license
-    if(isOriginalSite()){
-        unlocked = true;
-        return;
-    }
-
-    // ❌ Copied site → ask license
-    if(localStorage.getItem("sn_license") === "1"){
-        unlocked = true;
-        return;
-    }
-
-    const key = prompt("Enter License Key:");
-
-    if(!key || !verifyKey(key)){
-        disableApp();
-        return;
-    }
-
-    localStorage.setItem("sn_license", "1");
-    unlocked = true;
-}
-
-
-    /* ==============================
-       4. FEATURE LOCK (STEALTH)
-    ============================== */
-    function disableApp(){
-
-        document.querySelectorAll("button,input,select,textarea").forEach(el=>{
-            el.disabled = true;
-        });
-
-        // kill calculation-like functions
-        Object.keys(window).forEach(k=>{
-            if(typeof window[k] === "function" && /calc|compute|result/i.test(k)){
-                window[k] = function(){ return null; };
-            }
-        });
-
-        // subtle message
-        const msg = document.createElement("div");
-        msg.innerText = "⚠ License required";
-        msg.style.position = "fixed";
-        msg.style.bottom = "10px";
-        msg.style.right = "10px";
-        msg.style.background = "#000";
-        msg.style.color = "#fff";
-        msg.style.padding = "5px 10px";
-        msg.style.fontSize = "12px";
-        msg.style.zIndex = "999999";
-
-        document.body.appendChild(msg);
-    }
-
-
-    /* ==============================
-       5. DEVTOOLS DETECTION (LIGHT)
-    ============================== */
-    function detectDevTools(){
-
-        const threshold = 170;
-
-        if(
-            window.outerWidth - window.innerWidth > threshold ||
-            window.outerHeight - window.innerHeight > threshold
-        ){
-            tampered = true;
-        }
-    }
-
-
-    /* ==============================
-       6. PROTECTION LOOP
-    ============================== */
-    function protect(){
-
-        if(!unlocked){
-            disableApp();
-        }
-
-        detectDevTools();
-
-        if(tampered){
-            disableApp();
-        }
-    }
-
-
-    /* ==============================
-       7. INIT
+       10. INIT
     ============================== */
     setTimeout(()=>{
-        askKey();
-        setInterval(protect, 2000);
-    }, 1000);
+        _ASK();
+        setInterval(_ENF, 2500);
+    }, 1200);
 
 
 })();
-        
-    
+
+
     
 });
 
