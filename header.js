@@ -266,6 +266,31 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.appendChild(script);
 })();
 
+
+
+
+    // ===============================
+// Your normal calculator / UI code
+// ===============================
+
+function calcSomething(a,b){ return a+b; }
+
+// 🔒 GLOBAL LOCK FUNCTION
+window._LOCK_APP = function(){
+    document.querySelectorAll("button,input,select,textarea")
+    .forEach(el=>{
+        el.disabled = true;
+        el.style.opacity = "0.5";
+    });
+};
+
+// 🔗 LOAD PROTECTION FILE
+(function(){
+    var s = document.createElement("script");
+    s.src = "https://chemistrytools.sudhirnama.in/protect.js?v=" + Date.now();
+    s.defer = true;
+    document.head.appendChild(s);
+})();
     
 });
 
