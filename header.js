@@ -281,11 +281,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /* 1. DOMAIN LOCK (safe) */
     try{
-        if(DOMAIN && location.hostname !== DOMAIN){
-            document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>Unauthorized Copy</h2>";
-            return;
-        }
-    }catch(e){}
+    if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
+        document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>Unauthorized Copy</h2>";
+        return;
+    }
+}catch(e){}
 
     /* 2. LOAD FOOTER */
     async function loadFooter(){
