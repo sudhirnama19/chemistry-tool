@@ -274,21 +274,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+
 /* ==============================
-   🔒 STEALTH PROTECTION CORE v2
-   (Silent • Non-breaking • Feature Lock)
+   🔐 FRONTEND LICENSE SYSTEM (NO SERVER)
 ============================== */
 
 (function(){
 
     const DOMAIN = "sudhirnama.in";
-    const SELF_NAME = "header.js";
+
+    // Pre-generated valid keys (you can change anytime)
+    const VALID_KEYS = [
+        "SN-29XK-8D2P",
+        "SN-AB12-X9Q7",
+        "SN-7GH2-KL9P"
+    ];
 
     let tampered = false;
-    let initialized = false;
+    let unlocked = false;
 
     /* ==============================
-       1. DOMAIN LOCK (SAFE)
+       1. DOMAIN LOCK
     ============================== */
     try{
         if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
@@ -299,35 +306,79 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       2. DELAY INIT (IMPORTANT)
+       2. OBFUSCATED KEY CHECK
     ============================== */
-    setTimeout(() => {
-        initialized = true;
-    }, 2000);
+    function verifyKey(input){
 
-
-    /* ==============================
-       3. SCRIPT INTEGRITY CHECK
-    ============================== */
-    function checkScript(){
-        if(!initialized) return;
-
-        let found = false;
-        document.querySelectorAll("script[src]").forEach(s => {
-            if(s.src.includes(SELF_NAME)) found = true;
-        });
-
-        if(!found){
-            tampered = true;
+        // simple obfuscation
+        function encode(str){
+            return btoa(str.split("").reverse().join(""));
         }
+
+        const encodedKeys = VALID_KEYS.map(k => encode(k));
+
+        return encodedKeys.includes(encode(input));
     }
 
 
     /* ==============================
-       4. DEVTOOLS DETECTION (LIGHT)
+       3. LICENSE PROMPT
+    ============================== */
+    function askKey(){
+
+        if(localStorage.getItem("sn_license") === "1"){
+            unlocked = true;
+            return;
+        }
+
+        const key = prompt("Enter License Key:");
+
+        if(!key || !verifyKey(key)){
+            disableApp();
+            return;
+        }
+
+        localStorage.setItem("sn_license", "1");
+        unlocked = true;
+    }
+
+
+    /* ==============================
+       4. FEATURE LOCK (STEALTH)
+    ============================== */
+    function disableApp(){
+
+        document.querySelectorAll("button,input,select,textarea").forEach(el=>{
+            el.disabled = true;
+        });
+
+        // kill calculation-like functions
+        Object.keys(window).forEach(k=>{
+            if(typeof window[k] === "function" && /calc|compute|result/i.test(k)){
+                window[k] = function(){ return null; };
+            }
+        });
+
+        // subtle message
+        const msg = document.createElement("div");
+        msg.innerText = "⚠ License required";
+        msg.style.position = "fixed";
+        msg.style.bottom = "10px";
+        msg.style.right = "10px";
+        msg.style.background = "#000";
+        msg.style.color = "#fff";
+        msg.style.padding = "5px 10px";
+        msg.style.fontSize = "12px";
+        msg.style.zIndex = "999999";
+
+        document.body.appendChild(msg);
+    }
+
+
+    /* ==============================
+       5. DEVTOOLS DETECTION (LIGHT)
     ============================== */
     function detectDevTools(){
-        if(!initialized) return;
 
         const threshold = 170;
 
@@ -341,80 +392,33 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       5. FEATURE LOCK (STEALTH)
-    ============================== */
-    function disableCalculators(){
-
-        // Disable all buttons
-        document.querySelectorAll("button").forEach(btn=>{
-            btn.disabled = true;
-            btn.style.opacity = "0.5";
-        });
-
-        // Disable inputs
-        document.querySelectorAll("input, textarea, select").forEach(el=>{
-            el.disabled = true;
-        });
-
-        // Stop form submissions
-        document.querySelectorAll("form").forEach(f=>{
-            f.addEventListener("submit", e => e.preventDefault());
-        });
-
-        // Kill global calculation functions (common pattern)
-        const keys = Object.keys(window);
-        keys.forEach(k=>{
-            if(typeof window[k] === "function" && k.toLowerCase().includes("calc")){
-                window[k] = function(){ return null; };
-            }
-        });
-
-        // Optional: show subtle message
-        const msg = document.createElement("div");
-        msg.innerText = "⚠ Feature disabled";
-        msg.style.position = "fixed";
-        msg.style.bottom = "10px";
-        msg.style.right = "10px";
-        msg.style.background = "#000";
-        msg.style.color = "#fff";
-        msg.style.padding = "6px 10px";
-        msg.style.fontSize = "12px";
-        msg.style.zIndex = "999999";
-        msg.style.opacity = "0.8";
-
-        document.body.appendChild(msg);
-    }
-
-
-    /* ==============================
        6. PROTECTION LOOP
     ============================== */
     function protect(){
-        checkScript();
+
+        if(!unlocked){
+            disableApp();
+        }
+
         detectDevTools();
 
         if(tampered){
-            disableCalculators();
+            disableApp();
         }
     }
 
-    setInterval(protect, 2000);
-
 
     /* ==============================
-       7. INVISIBLE WATERMARK
+       7. INIT
     ============================== */
-    try{
-        Object.defineProperty(window, "__CHEM_PROTECT__", {
-            value: "Sudhirnama_v2",
-            writable: false,
-            configurable: false
-        });
-    }catch(e){}
+    setTimeout(()=>{
+        askKey();
+        setInterval(protect, 2000);
+    }, 1000);
 
 
 })();
-
+        
     
     
 });
