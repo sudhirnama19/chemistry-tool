@@ -280,38 +280,46 @@ document.addEventListener("DOMContentLoaded", function() {
     const DOMAIN = "sudhirnama.in"; // optional
 
     /* 1. DOMAIN LOCK (safe) */
-    try{
-    if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
+try{
+    const allowed = ["sudhirnama.in"];
+
+    if(!allowed.some(d => location.hostname.endsWith(d))){
         document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>Unauthorized Copy</h2>";
         return;
     }
 }catch(e){}
+    /* 2. LOAD FOOTER (FIXED VERSION) */
+async function loadFooter(){
+    try{
+        if(document.getElementById(FOOTER_ID)) return;
 
-    /* 2. LOAD FOOTER */
-    async function loadFooter(){
-        try{
-            let existing = document.getElementById(FOOTER_ID);
+        const res = await fetch(FOOTER_URL + "?v=" + Date.now());
+        const html = await res.text();
 
-            if(!existing){
-                const res = await fetch(FOOTER_URL + "?v=" + Date.now());
-                const html = await res.text();
+        // Temporary container
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
 
-                const container = document.createElement("div");
-                container.id = FOOTER_ID;
-                container.innerHTML = html;
+        // Extract actual footer
+        const footer = temp.querySelector("footer");
 
-                container.style.position = "fixed";
-                container.style.bottom = "0";
-                container.style.left = "0";
-                container.style.width = "100%";
-                container.style.zIndex = "999999";
+        if(footer){
+            footer.id = FOOTER_ID;
 
-                document.body.appendChild(container);
-            }
-        }catch(e){
-            console.warn("Footer load failed");
+            // Apply styling directly to footer
+            footer.style.position = "fixed";
+            footer.style.bottom = "0";
+            footer.style.left = "0";
+            footer.style.width = "100%";
+            footer.style.zIndex = "999999";
+
+            document.body.appendChild(footer);
         }
+
+    }catch(e){
+        console.warn("Footer load failed");
     }
+}
 
     /* 3. AUTO-RESTORE */
     function ensureFooter(){
