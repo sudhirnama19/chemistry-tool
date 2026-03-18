@@ -322,25 +322,37 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       3. LICENSE PROMPT
-    ============================== */
-    function askKey(){
+   SMART LICENSE CONTROL
+============================== */
 
-        if(localStorage.getItem("sn_license") === "1"){
-            unlocked = true;
-            return;
-        }
+function isOriginalSite(){
+    return location.hostname.endsWith("sudhirnama.in");
+}
 
-        const key = prompt("Enter License Key:");
+function requireLicense(){
 
-        if(!key || !verifyKey(key)){
-            disableApp();
-            return;
-        }
-
-        localStorage.setItem("sn_license", "1");
+    // ✅ Your real site → no license
+    if(isOriginalSite()){
         unlocked = true;
+        return;
     }
+
+    // ❌ Copied site → ask license
+    if(localStorage.getItem("sn_license") === "1"){
+        unlocked = true;
+        return;
+    }
+
+    const key = prompt("Enter License Key:");
+
+    if(!key || !verifyKey(key)){
+        disableApp();
+        return;
+    }
+
+    localStorage.setItem("sn_license", "1");
+    unlocked = true;
+}
 
 
     /* ==============================
