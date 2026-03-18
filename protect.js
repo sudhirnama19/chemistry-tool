@@ -1,17 +1,17 @@
 
 /* ==============================
-   🔐 CHEM PROTECT v3 (FINAL)
+   🔐 CHEM PROTECT v3 (UPDATED)
    Stealth • Hardened • No Server
 ============================== */
 
 (function(){
 
     /* ===== CONFIG ===== */
-    const _D = "sudhirnama.in";     // your domain
-    const _LS = "sn_lk";            // localStorage key
+    const _D = "sudhirnama.in";
+    const _LS = "sn_lk";
 
-    let _U = false;                 // unlocked flag
-    let _T = 0;                     // attempts counter
+    let _U = false;
+    let _T = 0;
 
 
     /* ==============================
@@ -27,7 +27,7 @@
 
 
     /* ==============================
-       2. HASH FUNCTION (STRONGER)
+       2. HASH FUNCTION
     ============================== */
     function _H(s){
         let h1 = 0xdeadbeef ^ s.length;
@@ -47,9 +47,8 @@
 
 
     /* ==============================
-       3. REAL + DECOY KEYS
+       3. KEYS
     ============================== */
-
     const _REAL = [
         _H("SN-29XK-8D2P"),
         _H("SN-AB12-X9Q7")
@@ -72,9 +71,8 @@
 
         if(_REAL.includes(x)) return true;
 
-        // decoy path (misleading)
         if(_DECOY.includes(x)){
-            _T += 2; // increase penalty
+            _T += 2;
             return false;
         }
 
@@ -84,29 +82,26 @@
 
 
     /* ==============================
-       5. STEALTH DISABLE
+       🔐 GLOBAL LOCK FUNCTION
     ============================== */
-    function _LOCK(){
+    window._LOCK_APP = function(){
 
-        // disable UI
         document.querySelectorAll("button,input,select,textarea")
         .forEach(el=>{
             el.disabled = true;
             el.style.opacity = "0.5";
         });
 
-        // corrupt calculation functions silently
         Object.keys(window).forEach(k=>{
             if(typeof window[k] === "function" &&
                /calc|compute|result|solve/i.test(k)){
 
                 window[k] = function(){
-                    return Math.random()*1000; // wrong result
+                    return Math.random()*1000;
                 };
             }
         });
 
-        // subtle notice
         if(!document.getElementById("sn_warn")){
             const d = document.createElement("div");
             d.id = "sn_warn";
@@ -115,7 +110,7 @@
               "position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:4px 8px;font-size:11px;z-index:99999;opacity:0.7";
             document.body.appendChild(d);
         }
-    }
+    };
 
 
     /* ==============================
@@ -123,13 +118,11 @@
     ============================== */
     function _ASK(){
 
-        // your domain → full access
         if(_dOK()){
             _U = true;
             return;
         }
 
-        // already verified
         if(localStorage.getItem(_LS) === "1"){
             _U = true;
             return;
@@ -138,26 +131,26 @@
         const k = prompt("Enter License Key:");
 
         if(!k){
-            _LOCK();
+            window._LOCK_APP();
             return;
         }
 
         setTimeout(()=>{
 
             if(!_VK(k)){
-                _LOCK();
+                window._LOCK_APP();
                 return;
             }
 
             localStorage.setItem(_LS, "1");
             _U = true;
 
-        }, 500 + Math.random()*500); // random delay
+        }, 500 + Math.random()*500);
     }
 
 
     /* ==============================
-       7. DEVTOOLS (LIGHT + SAFE)
+       7. DEVTOOLS CHECK
     ============================== */
     function _DT(){
 
@@ -173,25 +166,24 @@
 
 
     /* ==============================
-       8. ENFORCER LOOP
+       8. ENFORCER
     ============================== */
     function _ENF(){
 
         if(!_U){
-            _LOCK();
+            window._LOCK_APP();
         }
 
         _DT();
 
-        // too many attempts → permanent lock
         if(_T > 3){
-            _LOCK();
+            window._LOCK_APP();
         }
     }
 
 
     /* ==============================
-       9. INVISIBLE WATERMARK
+       9. WATERMARK
     ============================== */
     try{
         Object.defineProperty(window, "__sn_flag__", {
