@@ -271,8 +271,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+
+
 /* ==============================
-   🔒 STABLE PROTECTION CORE (SAFE)
+   🔒 STEALTH PROTECTION CORE v2
+   (Silent • Non-breaking • Feature Lock)
 ============================== */
 
 (function(){
@@ -288,8 +292,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ============================== */
     try{
         if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
-            document.documentElement.innerHTML =
-              "<h2 style='text-align:center;margin-top:50px;'>Unauthorized Copy</h2>";
+            document.body.innerHTML = "";
             return;
         }
     }catch(e){}
@@ -304,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       3. SCRIPT CHECK (SAFE)
+       3. SCRIPT INTEGRITY CHECK
     ============================== */
     function checkScript(){
         if(!initialized) return;
@@ -321,12 +324,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       4. DEVTOOLS DETECTION (SAFE)
+       4. DEVTOOLS DETECTION (LIGHT)
     ============================== */
     function detectDevTools(){
         if(!initialized) return;
 
-        const threshold = 160;
+        const threshold = 170;
 
         if(
             window.outerWidth - window.innerWidth > threshold ||
@@ -338,35 +341,79 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       5. FEATURE LOCK (ONLY WHEN REAL)
+       5. FEATURE LOCK (STEALTH)
     ============================== */
-    function lockApp(){
-        document.body.innerHTML = `
-            <div style="text-align:center;margin-top:60px;font-family:sans-serif;">
-                <h2>Security Violation Detected</h2>
-                <p>Application disabled</p>
-            </div>
-        `;
+    function disableCalculators(){
+
+        // Disable all buttons
+        document.querySelectorAll("button").forEach(btn=>{
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+        });
+
+        // Disable inputs
+        document.querySelectorAll("input, textarea, select").forEach(el=>{
+            el.disabled = true;
+        });
+
+        // Stop form submissions
+        document.querySelectorAll("form").forEach(f=>{
+            f.addEventListener("submit", e => e.preventDefault());
+        });
+
+        // Kill global calculation functions (common pattern)
+        const keys = Object.keys(window);
+        keys.forEach(k=>{
+            if(typeof window[k] === "function" && k.toLowerCase().includes("calc")){
+                window[k] = function(){ return null; };
+            }
+        });
+
+        // Optional: show subtle message
+        const msg = document.createElement("div");
+        msg.innerText = "⚠ Feature disabled";
+        msg.style.position = "fixed";
+        msg.style.bottom = "10px";
+        msg.style.right = "10px";
+        msg.style.background = "#000";
+        msg.style.color = "#fff";
+        msg.style.padding = "6px 10px";
+        msg.style.fontSize = "12px";
+        msg.style.zIndex = "999999";
+        msg.style.opacity = "0.8";
+
+        document.body.appendChild(msg);
     }
 
 
     /* ==============================
-       6. PROTECTION LOOP (CONTROLLED)
+       6. PROTECTION LOOP
     ============================== */
     function protect(){
         checkScript();
         detectDevTools();
 
         if(tampered){
-            lockApp();
+            disableCalculators();
         }
     }
 
     setInterval(protect, 2000);
 
 
-})();
+    /* ==============================
+       7. INVISIBLE WATERMARK
+    ============================== */
+    try{
+        Object.defineProperty(window, "__CHEM_PROTECT__", {
+            value: "Sudhirnama_v2",
+            writable: false,
+            configurable: false
+        });
+    }catch(e){}
 
+
+})();
 
     
     
