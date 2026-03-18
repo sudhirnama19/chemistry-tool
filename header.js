@@ -268,21 +268,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
+
+
+
 /* ==============================
-   🔒 CHEMISTRY SPARK PROTECTION CORE v1.0
-   (No Footer • Self-Healing • Feature Lock • DevTools Detection)
+   🔒 STABLE PROTECTION CORE (SAFE)
 ============================== */
 
 (function(){
 
     const DOMAIN = "sudhirnama.in";
-    const WATERMARK = "Sudhirnama_Protected_v1";
     const SELF_NAME = "header.js";
 
-    let __TAMPERED__ = false;
+    let tampered = false;
+    let initialized = false;
 
     /* ==============================
-       1. DOMAIN LOCK (Subdomain Safe)
+       1. DOMAIN LOCK (SAFE)
     ============================== */
     try{
         if(DOMAIN && !location.hostname.endsWith(DOMAIN)){
@@ -294,74 +296,49 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       2. INVISIBLE WATERMARK
+       2. DELAY INIT (IMPORTANT)
     ============================== */
-    (function(){
-        try{
-            Object.defineProperty(window, "__CHEM_SPARK__", {
-                value: WATERMARK,
-                writable: false,
-                configurable: false
-            });
-        }catch(e){}
-    })();
+    setTimeout(() => {
+        initialized = true;
+    }, 2000);
 
 
     /* ==============================
-       3. SCRIPT INTEGRITY CHECK
+       3. SCRIPT CHECK (SAFE)
     ============================== */
     function checkScript(){
-        let found = false;
+        if(!initialized) return;
 
+        let found = false;
         document.querySelectorAll("script[src]").forEach(s => {
             if(s.src.includes(SELF_NAME)) found = true;
         });
 
         if(!found){
-            __TAMPERED__ = true;
+            tampered = true;
         }
     }
 
 
     /* ==============================
-       4. DEVTOOLS DETECTION
+       4. DEVTOOLS DETECTION (SAFE)
     ============================== */
     function detectDevTools(){
+        if(!initialized) return;
+
         const threshold = 160;
 
         if(
             window.outerWidth - window.innerWidth > threshold ||
             window.outerHeight - window.innerHeight > threshold
         ){
-            __TAMPERED__ = true;
-        }
-
-        // debugger trap
-        const start = performance.now();
-        debugger;
-        const end = performance.now();
-
-        if(end - start > 100){
-            __TAMPERED__ = true;
+            tampered = true;
         }
     }
 
 
     /* ==============================
-       5. DOM TAMPER DETECTION
-    ============================== */
-    const observer = new MutationObserver(() => {
-        __TAMPERED__ = true;
-    });
-
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
-
-
-    /* ==============================
-       6. FEATURE LOCK (CRITICAL)
+       5. FEATURE LOCK (ONLY WHEN REAL)
     ============================== */
     function lockApp(){
         document.body.innerHTML = `
@@ -374,33 +351,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     /* ==============================
-       7. SELF-HEALING LOOP
+       6. PROTECTION LOOP (CONTROLLED)
     ============================== */
-    function protectLoop(){
-
+    function protect(){
         checkScript();
         detectDevTools();
 
-        if(__TAMPERED__){
+        if(tampered){
             lockApp();
         }
     }
 
-    setInterval(protectLoop, 1000);
-
-
-    /* ==============================
-       8. LIGHT OBFUSCATION (BASIC)
-    ============================== */
-    (function(){
-        const _0x = ["log","warn","clear"];
-        _0x.forEach(fn => {
-            try{ console[fn] = function(){}; }catch(e){}
-        });
-    })();
+    setInterval(protect, 2000);
 
 
 })();
+
+
+    
     
 });
 
