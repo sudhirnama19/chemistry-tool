@@ -2098,6 +2098,996 @@ const BOND_RULES = [
     ],
     smiles:()=> "R-CH₂-R' (methylene, fully deoxygenated)",
     confidence:88 },
+
+
+
+  /*
+ ══════════════════════════════════════════════════════════════════════
+  NEW REACTION LOGIC — paste this entire block into EXTRA_RULES array
+  LOCATION: organic-reaction-predictor.html, line ~2100
+  Paste BEFORE the closing ]; of EXTRA_RULES (before line: "];")
+  i.e. replace the lone  ];  with this block followed by  ];
+ ══════════════════════════════════════════════════════════════════════
+*/
+
+  // ── LINDLAR PARTIAL HYDROGENATION (Alkyne → (Z)-Alkene) ─────────────
+  { id:"lindlar_reduction",
+    match:(r,rg,c)=>
+      /alkyne|c≡c|c#c|\byn\b|yne\b/i.test(r) &&
+      /lindlar|pd.*caco3|pd.*baso4|quinoline.*pd|h2.*lindlar/i.test(rg+c),
+    product:()=> "(Z)-Alkene (cis-alkene) — syn addition of H₂ across C≡C; Lindlar catalyst stops reaction at alkene stage",
+    type:"Partial Hydrogenation of Alkyne — Lindlar Catalyst → (Z)-Alkene",
+    mechanism:[
+      "Lindlar catalyst: Pd deposited on CaCO₃, poisoned with lead acetate + quinoline — reduces reactivity to stop at alkene",
+      "H₂ adsorbs to catalyst surface; alkyne π system co-adsorbs to same metal face",
+      "Both H atoms delivered syn (same face) to the alkyne → cis (Z) alkene only",
+      "Catalyst poisoning prevents further hydrogenation to alkane (unlike Pd/C)",
+      "Stereochemical outcome: exclusively (Z)/(cis) double bond — critical for natural product synthesis"
+    ],
+    smiles:()=> "R-CH=CH-R' [(Z)-cis configuration]",
+    confidence:97 },
+
+  // ── BIRCH / DISSOLVING METAL REDUCTION (Alkyne → (E)-Alkene or Arene → Diene) ──
+  { id:"birch_reduction",
+    match:(r,rg,c)=>
+      /alkyne|c≡c|c#c|yn|benzene|aromatic|phenyl|toluene|anisole|benzoic/i.test(r) &&
+      /na.*nh3|li.*nh3|birch|liq.*nh3|nh3.*liq|dissolving.*metal/i.test(rg+c),
+    product:(r,rg,c)=>
+      /alkyne|c≡c|c#c|yn/i.test(r)
+        ? "(E)-Alkene (trans-alkene) — dissolving metal gives exclusively trans product via vinyl radical/anion intermediate"
+        : /methoxy|anisole|edg|oh|ome/i.test(r)
+          ? "1,4-Cyclohexadiene (non-conjugated) — EDG substituent: double bonds remain at positions 2,5 (adjacent to substituent); substituent on sp³ carbon"
+          : "1,4-Cyclohexadiene (non-conjugated diene) — Birch reduction reduces unsubstituted positions; EWG substituent: double bonds at 2,5 (away from substituent)",
+    type:"Birch / Dissolving Metal Reduction (Na or Li in liq. NH₃)",
+    mechanism:[
+      "Na or Li dissolves in liquid NH₃ (−33°C) → solvated electrons (e⁻_aq) — very strong reductants (E° ≈ −2.7 V)",
+      "For alkynes: solvated e⁻ adds to C≡C → vinyl radical anion; NH₃ protonates → vinyl radical; second e⁻ → vinyl anion; NH₃ protonates → (E)-alkene (trans, anti addition)",
+      "For arenes: two e⁻ added stepwise to ring → cyclohexadienyl anion protonated by t-BuOH or NH₃",
+      "EDG groups (OCH₃, OH): reduction occurs at unsubstituted ring positions → double bonds remain at 2,5 (adjacent to EDG)",
+      "EWG groups (COOH, CO): reduction at substituted positions → double bonds at 2,5 (away from EWG); Birch rule"
+    ],
+    smiles:(r)=>
+      /alkyne|yn/i.test(r)
+        ? "R-CH=CH-R' [(E)-trans double bond]"
+        : "cyclohexa-2,5-dien-1-yl system (1,4-diene, non-conjugated)",
+    confidence:95 },
+
+  // ── KUCHEROV / Hg²⁺-CATALYSED HYDRATION OF ALKYNE ──────────────────
+  { id:"kucherov_hydration",
+    match:(r,rg,c)=>
+      /alkyne|c≡c|c#c|\byn\b|yne\b/i.test(r) &&
+      /hgso4|hg2\+|hg\(ii\)|hgso|mercury|kucherov/i.test(rg+c),
+    product:(r,rg)=>{
+      if(/1-|prop-1-yn|but-1-yn|pent-1-yn|hex-1-yn|hept-1-yn|oct-1-yn|terminal/i.test(r))
+        return "Methyl ketone (RCOCH₃) — Markovnikov hydration; terminal alkyne → methyl ketone via enol tautomerism";
+      return "Ketone — internal alkyne gives ketone mixture via enol intermediate; symmetrical alkynes give single ketone";
+    },
+    type:"Kucherov Hydration of Alkyne (Hg²⁺-Catalysed) → Ketone",
+    mechanism:[
+      "Hg²⁺ coordinates to alkyne π electrons — activates triple bond toward nucleophilic water attack (electrophilic activation)",
+      "Water attacks the more substituted carbon (Markovnikov) → vinyl–mercury intermediate",
+      "Protodemetalation of C–Hg bond gives vinyl alcohol (enol)",
+      "Enol tautomerises spontaneously to the more stable carbonyl compound (keto form)",
+      "Terminal alkynes → methyl ketones (CH₃CO–R); internal alkynes → ketone mixture unless symmetric"
+    ],
+    smiles:(r)=>
+      /1-|terminal/i.test(r) ? "R-CO-CH₃ (methyl ketone, Markovnikov)" : "R-CO-R' (ketone via enol tautomer)",
+    confidence:94 },
+
+  // ── TERMINAL ACETYLIDE FORMATION (NaNH₂ / NaH / n-BuLi) ────────────
+  { id:"acetylide_formation",
+    match:(r,rg,c)=>
+      /terminal.*alkyne|alkyn.*\b1-|1-.*alkyne|c≡ch|\byn\b.*h/i.test(r) &&
+      /nanh2|nah|n-buli|nbuli|lda|n-bulli|butyllithium/i.test(rg),
+    product:()=> "Metal acetylide (RC≡C⁻ Na⁺ or Li⁺) — stabilised carbanion; strong nucleophile for alkylation and addition reactions",
+    type:"Deprotonation of Terminal Alkyne → Acetylide Anion",
+    mechanism:[
+      "Terminal alkyne C–H is acidic (pKa ≈ 25) — sp hybridisation gives high s-character → increased acidity vs alkene (pKa 44) or alkane (pKa 50)",
+      "NaNH₂ (conjugate acid pKa 38), NaH, or n-BuLi (pKa 50) easily deprotonates terminal C–H",
+      "Acetylide carbanion RC≡C⁻ formed — linear sp carbon, excellent nucleophile and strong base",
+      "Reacts with: primary alkyl halides (SN2 alkylation → longer alkyne), carbonyl compounds (addition → propargylic alcohols), CO₂ (→ carboxylic acids)",
+      "KEY LIMITATION: only primary (1°) alkyl halides work in SN2 alkylation; 2°/3° halides → E2 elimination"
+    ],
+    smiles:()=> "R-C≡C⁻ Na⁺ (sodium acetylide — carbanion nucleophile)",
+    confidence:96 },
+
+  // ── ACETYLIDE ALKYLATION → HIGHER ALKYNE ────────────────────────────
+  { id:"acetylide_alkylation",
+    match:(r,rg,c)=>
+      /acetylide|sodium.*yn|lithium.*yn|rc≡c.*na|na.*c≡c|c≡c.*na|c≡c.*li/i.test(r) &&
+      /alkyl.*halide|ch3i|ethyl.*iodide|ethyl.*bromide|bromoethane|iodoethane|bromopropane|iodobutane|r-x\b/i.test(rg),
+    product:()=> "Internal alkyne (R-C≡C-R') — chain extended by alkyl group via SN2 alkylation; carbon skeleton homologated",
+    type:"Acetylide SN2 Alkylation → Internal Alkyne",
+    mechanism:[
+      "Acetylide carbanion (RC≡C⁻) is a powerful nucleophile — sp-hybridised carbon attacks 1° alkyl halide backside (SN2)",
+      "Backside attack on C–X bond: new C–C bond forms, halide leaves as X⁻",
+      "Only primary (1°) alkyl halides react cleanly by SN2; secondary/tertiary give E2 elimination instead",
+      "Product: internal alkyne R-C≡C-R' with carbon chain extended",
+      "Critical use: builds longer chain alkynes from terminal alkynes — key C–C bond forming reaction in synthesis"
+    ],
+    smiles:()=> "R-C≡C-R' (internal alkyne, carbon chain lengthened by SN2)",
+    confidence:92 },
+
+  // ── MARKOVNIKOV HYDRATION OF ALKENE (H₂SO₄/H₂O or H₃O⁺) ────────────
+  { id:"markovnikov_hydration",
+    match:(r,rg,c)=>
+      /alkene|c=c|ch=|=ch|\bene\b/i.test(r) &&
+      /h2so4.*h2o|h3o\+|h2o.*h2so4|h2so4.*water|acid.*hydration|markovnikov.*hydration|h3po4.*h2o/i.test(rg+c),
+    product:(r,rg)=>
+      /2-methyl|2-butene|methyl.*cyclo|1-methyl|tert/i.test(r)
+        ? "Tertiary Markovnikov alcohol — OH on the most substituted carbon; via tertiary carbocation"
+        : "Markovnikov alcohol — OH added to the more substituted (more H-bearing) carbon via stable carbocation intermediate",
+    type:"Acid-Catalysed Markovnikov Hydration of Alkene → Alcohol",
+    mechanism:[
+      "H⁺ (from H₂SO₄ or H₃O⁺) protonates the C=C at the less-substituted carbon → most stable carbocation (Markovnikov's rule)",
+      "Carbocation stability order: 3° > 2° > 1° — protonation always gives the more stable cation",
+      "Water nucleophile attacks carbocation → protonated alcohol (oxonium ion)",
+      "Deprotonation to solvent gives Markovnikov alcohol",
+      "Rearrangements (1,2-hydride or 1,2-alkyl shifts) possible if adjacent carbocation is more stable — can give rearranged product"
+    ],
+    smiles:()=> "R-C(OH)-R' (Markovnikov alcohol — OH on more-substituted carbon)",
+    confidence:93 },
+
+  // ── CONJUGATED DIENE 1,2- vs 1,4-ADDITION ───────────────────────────
+  { id:"diene_12_14_addition",
+    match:(r,rg,c)=>
+      /1,3-diene|buta-1,3|butadiene|conjugated.*diene|diene/i.test(r) &&
+      /br2|cl2|hbr|hcl/i.test(rg) &&
+      !/dien.*phile|diels/i.test(rg+c),
+    product:(r,rg,c)=>{
+      if(/-80|cold|kinetic|low.?temp/i.test(c+rg))
+        return "1,2-Addition product (kinetic control, low T) — electrophile at C1, nucleophile at C2; double bond shifts to C3–C4";
+      if(/40|warm|heat|thermodynamic|high.?temp/i.test(c+rg))
+        return "1,4-Addition product (thermodynamic control, higher T) — electrophile at C1, nucleophile at C4; more stable conjugated alkene product";
+      return "Mixture of 1,2- and 1,4-addition products; low T → 1,2-kinetic product; high T → 1,4-thermodynamic product; ratio depends on conditions";
+    },
+    type:"Electrophilic Addition to Conjugated Diene — 1,2- vs 1,4-Addition",
+    mechanism:[
+      "Electrophile (H⁺ or Br⁺) adds to C1 of conjugated diene → allylic carbocation delocalised over C2 and C4",
+      "Allylic cation has two resonance structures: nucleophile can attack C2 (1,2-product) or C4 (1,4-product)",
+      "Low temperature (kinetic): faster nucleophilic attack at closer C2 → 1,2-addition product (kinetic)",
+      "High temperature (thermodynamic): equilibration → more stable 1,4-product (conjugated alkene, lower energy)",
+      "Curtin-Hammett: product ratio determined by relative TS energies; 1,4-product has lower-energy TS at high T"
+    ],
+    smiles:(r,rg,c)=>
+      /kinetic|cold|-80/i.test(c)
+        ? "X-CH₂-CH=CH-CH₂ → 1,2-adduct (X at C2)"
+        : "X-CH₂-CH=CH-CH₂X → 1,4-adduct (X at C1 and C4)",
+    confidence:90 },
+
+  // ── ZIEGLER-NATTA / COORDINATION POLYMERIZATION ─────────────────────
+  { id:"coordination_polymerization",
+    match:(r,rg,c)=>
+      /ethene|propene|ethylene|propylene|isoprene|butadiene|vinyl|alkene/i.test(r) &&
+      /ziegler|natta|ticl4|alr3|al.*et3|metallocene|coordination.*polym|ziegler-natta/i.test(rg+c),
+    product:(r,rg)=>{
+      if(/ethene|ethylene/i.test(r)) return "Polyethylene (HDPE/LLDPE) — stereoregular; Ziegler-Natta gives linear high-density PE; properties tunable by catalyst";
+      if(/propene|propylene/i.test(r)) return "Isotactic polypropylene (iPP) — stereoregular; all methyl groups on same side of chain backbone";
+      if(/isoprene/i.test(r)) return "cis-1,4-Polyisoprene — Ziegler-Natta gives stereospecific cis addition (synthetic natural rubber)";
+      if(/butadiene/i.test(r)) return "1,4-Polybutadiene — stereospecific cis or trans depending on catalyst system";
+      return "Stereoregular addition polymer — coordination polymerisation controls tacticity (isotactic/syndiotactic)";
+    },
+    type:"Coordination (Ziegler-Natta) Polymerisation → Stereoregular Polymer",
+    mechanism:[
+      "TiCl₄ + AlR₃ (e.g. AlEt₃) → active Ti(III) species at catalyst surface with vacant coordination site",
+      "Alkene monomer coordinates to Ti centre → π-complex at vacant site (insertion-ready)",
+      "Migratory insertion: alkene inserts into Ti–C bond → new Ti–C bond, chain grows by one monomer unit (Cossee-Arlman)",
+      "Stereocontrol: catalyst geometry forces alkene to insert with specific face → all same configuration → isotactic polymer",
+      "Chain transfer: β-hydride elimination (gives vinyl end-group) or H₂ addition controls molecular weight"
+    ],
+    smiles:(r)=>
+      /ethene/i.test(r) ? "(-CH₂-CH₂-)n (polyethylene)"
+      : /propene/i.test(r) ? "(-CH₂-CH(CH₃)-)n (isotactic polypropylene)"
+      : "(-CH₂-CHR-)n (stereoregular addition polymer)",
+    confidence:93 },
+
+  // ── FREE RADICAL CHAIN-GROWTH POLYMERIZATION ────────────────────────
+  { id:"radical_polymerization",
+    match:(r,rg,c)=>
+      /vinyl|acrylate|acrylonitrile|styrene|methacrylate|chloroethene|tetrafluoro|chloroprene|acrylic|mma|methyl.*methacrylate/i.test(r) &&
+      /roor|aibn|peroxide|radical.*init|benzoyl.*peroxide|free.*radical.*polym/i.test(rg+c),
+    product:(r,rg)=>{
+      if(/vinyl.?chloride|chloroethene/i.test(r)) return "Poly(vinyl chloride) PVC — [-CH₂-CHCl-]n; rigid thermoplastic; plasticised with dioctyl phthalate for flexible PVC";
+      if(/tetrafluoro/i.test(r)) return "PTFE (Teflon) — [-CF₂-CF₂-]n; extremely chemically resistant; non-stick; very high melting point";
+      if(/acrylonitrile/i.test(r)) return "Polyacrylonitrile (PAN) — [-CH₂-CHCN-]n; precursor to carbon fibre; used in fibres and membranes";
+      if(/methyl.*methacrylate|mma/i.test(r)) return "PMMA (Perspex / Plexiglass) — [-CH₂-C(CH₃)(CO₂CH₃)-]n; transparent thermoplastic";
+      if(/chloroprene/i.test(r)) return "Neoprene [-CH₂-CCl=CH-CH₂-]n — oil-resistant synthetic rubber";
+      return "Addition polymer [-CH₂-CHX-]n — head-to-tail addition via radical chain mechanism";
+    },
+    type:"Free Radical Chain-Growth Polymerisation → Addition Polymer",
+    mechanism:[
+      "Initiation: ROOR (peroxide) cleaved thermally or by UV → 2 RO•; radical adds to monomer C=C → chain-end radical",
+      "Propagation: chain-end radical adds to monomer in head-to-tail fashion (more stable secondary/tertiary radical at chain end)",
+      "Chain-end radical attacks CH₂= of monomer → new radical at substituted C → repeat (kp >> ki, very fast chain growth)",
+      "Termination: coupling (two radicals combine R•+•R→R-R) or disproportionation (H-transfer → alkene + alkane chain ends)",
+      "Head-to-tail selectivity: addition gives most stable radical; random (head-to-head) defects occur rarely"
+    ],
+    smiles:(r)=>
+      /vinyl.?chloride/i.test(r) ? "(-CH₂-CHCl-)n PVC"
+      : /tetrafluoro/i.test(r) ? "(-CF₂-CF₂-)n PTFE"
+      : "(-CH₂-CHX-)n (radical addition polymer)",
+    confidence:93 },
+
+  // ── NUCLEOPHILIC AROMATIC SUBSTITUTION (SNAr) ───────────────────────
+  { id:"snar",
+    match:(r,rg,c)=>
+      /chlorobenzene|fluorobenzene|nitrochloro|dinitrochloro|halobenzene|aryl.?halide|chloro.*nitro|fluoro.*nitro/i.test(r) &&
+      /naoh|koh|naome|naor|nh3|rnh2|nucleophil/i.test(rg) &&
+      (/nitro|ewg|2,4-dinitro|dinitro|fluoro|300|high.?temp/i.test(r+c+rg)),
+    product:(r,rg)=>{
+      if(/naoh|koh|h2o/i.test(rg)) return "Phenol (ArOH) — hydroxide replaces halide on electron-poor aromatic ring";
+      if(/naome|naor|methox/i.test(rg)) return "Aryl ether (ArOR) — alkoxide replaces halide on activated ring";
+      if(/nh3|amine|nh2/i.test(rg)) return "Aniline / Arylamine (ArNH₂) — amine nucleophile displaces halide";
+      return "SNAr substitution product — nucleophile replaces leaving group on electron-deficient ring";
+    },
+    type:"Nucleophilic Aromatic Substitution (SNAr) — Addition-Elimination",
+    mechanism:[
+      "Requires ring activation: EWG groups (NO₂, CN, COR) ortho/para to leaving group are essential — stabilise the anionic intermediate",
+      "Step 1 (rate-determining): nucleophile adds to ipso carbon → Meisenheimer complex (anionic σ-complex, sp³ carbon)",
+      "Meisenheimer complex: negative charge delocalised by resonance into EWG substituents — more EWGs = more stable = faster",
+      "Step 2: halide expelled from Meisenheimer complex → aromaticity restored",
+      "Fluorine is best LG in SNAr (most electron-withdrawing — best stabilises Meisenheimer) despite being worst LG in SN2"
+    ],
+    smiles:()=> "Ar-Nu (nucleophile replaces halide on electron-poor ring)",
+    confidence:88 },
+
+  // ── SANDMEYER REACTION (Diazonium → Aryl Halide/Nitrile) ────────────
+  { id:"sandmeyer",
+    match:(r,rg,c)=>
+      /diazonium|n2\+|benzenediazonium|aryldiazonium/i.test(r) &&
+      /cucl|cubr|cucn|cui|cuco|sandmeyer|cu.*halide/i.test(rg),
+    product:(r,rg)=>{
+      if(/cucl|hcl/i.test(rg)) return "Chloroarene (Ar-Cl) — CuCl/HCl converts diazonium to aryl chloride (Sandmeyer)";
+      if(/cubr|hbr/i.test(rg)) return "Bromoarene (Ar-Br) — CuBr/HBr converts diazonium to aryl bromide (Sandmeyer)";
+      if(/cucn|kcn/i.test(rg)) return "Benzonitrile (Ar-CN) — CuCN/KCN converts diazonium to nitrile — chain extended (Sandmeyer)";
+      return "Aryl halide or nitrile via Cu(I)-catalysed radical substitution of N₂⁺ by X⁻ (Sandmeyer)";
+    },
+    type:"Sandmeyer Reaction — Diazonium → Aryl Halide / Nitrile",
+    mechanism:[
+      "Cu(I) halide reduces Ar-N₂⁺ by single-electron transfer → aryl radical Ar• + Cu(II) + N₂",
+      "Aryl radical captures halide (Cl•, Br•, CN•) from Cu(II) species → aryl halide/nitrile product",
+      "Net: replaces N₂⁺ with halide/CN without disturbing rest of ring",
+      "Diazonium salt formed first: ArNH₂ + NaNO₂ + HCl at 0–5°C → Ar-N₂⁺ Cl⁻",
+      "Variants: KI (no Cu needed for iodo); HBF₄ → ArF (Balz-Schiemann); H₃PO₂ → ArH (dediazotisation)"
+    ],
+    smiles:(r,rg)=>
+      /cucl/i.test(rg) ? "Ar-Cl (chloroarene)"
+      : /cubr/i.test(rg) ? "Ar-Br (bromoarene)"
+      : "Ar-CN (benzonitrile/aryl nitrile)",
+    confidence:94 },
+
+  // ── DIAZOTIZATION + DIAZONIUM HYDROLYSIS ────────────────────────────
+  { id:"diazotization",
+    match:(r,rg,c)=>
+      /aniline|arylamine|aminobenzene|c6h5nh2|phnh2|aminophenol|methylaniline/i.test(r) &&
+      /nano2|nanO2|sodium.*nitrite|nitrous.*acid/i.test(rg) &&
+      /hcl|hbr|h2so4|acid/i.test(rg+c),
+    product:(r,rg,c)=>{
+      if(/h2o|heat|warm/i.test(c)) return "Phenol (ArOH) + N₂ — diazonium hydrolysis at room temp or warm; N₂ expelled";
+      return "Aryldiazonium salt (Ar-N₂⁺ X⁻) — stable at 0–5°C; reactive electrophile; used for Sandmeyer, azo coupling, and substitution reactions";
+    },
+    type:"Diazotization — Aromatic Primary Amine → Diazonium Salt",
+    mechanism:[
+      "NaNO₂ + HCl → HONO (nitrous acid) in situ",
+      "ArNH₂ attacks HONO → N-nitrosammonium intermediate",
+      "Deprotonation and loss of H₂O → diazonium ion Ar-N₂⁺",
+      "MUST be kept at 0–5°C: higher temperature → rapid diazonium decomposition (N₂ expulsion → phenol or radical)",
+      "Diazonium ion is a versatile electrophile: Sandmeyer reactions, azo coupling with activated arenes, Balz-Schiemann, Gomberg-Bachmann"
+    ],
+    smiles:()=> "Ar-N≡N⁺ X⁻ (aryldiazonium salt, reactive intermediate at 0-5°C)",
+    confidence:95 },
+
+  // ── AZO COUPLING (Diazonium + Activated Arene → Azo Dye) ────────────
+  { id:"azo_coupling",
+    match:(r,rg,c)=>
+      /diazonium|n2\+|aryldiazonium/i.test(r+rg) &&
+      /phenol|naphthol|aniline|activated|azo.?coupl/i.test(r+rg+c),
+    product:()=> "Azo compound (Ar-N=N-Ar') — intensely coloured; para position preferred; used as azo dyes and pH indicators",
+    type:"Azo Coupling — Electrophilic Aromatic Substitution by Diazonium",
+    mechanism:[
+      "Diazonium ion (Ar-N₂⁺) is a weak electrophile — only reacts with very electron-rich rings (phenols, naphthols, arylamines)",
+      "EAS: diazonium attacks para (preferred) or ortho position of activated arene → arenium ion (σ-complex)",
+      "Loss of H⁺ restores aromaticity → azo product (Ar-N=N-Ar')",
+      "Best at pH 5–9: phenol must be as ArO⁻ (more reactive); diazonium must be stable (not decomposed at high pH)",
+      "Products are intensely coloured (extended conjugation) — basis of many commercial dyes, pH indicators (litmus, methyl orange)"
+    ],
+    smiles:()=> "Ar-N=N-Ar' (azo compound — chromophore with extended conjugation)",
+    confidence:91 },
+
+  // ── BIRCH REDUCTION OF BENZENE RING (already in birch_reduction above, this covers specific arene) ──
+  // Covered by birch_reduction id above — no duplicate needed
+
+  // ── BECKMANN REARRANGEMENT (Oxime → Amide/Lactam) ───────────────────
+  { id:"beckmann_rearrangement",
+    match:(r,rg,c)=>
+      /oxime|c=noh|cyclohexanone.*oxime|ketone.*oxime|aldehyde.*oxime/i.test(r) &&
+      /h2so4|pcl5|bf3|polyphosphoric|acid|beckmann/i.test(rg+c),
+    product:(r,rg)=>
+      /cyclohexanone/i.test(r)
+        ? "Caprolactam (azepan-2-one) — Beckmann rearrangement of cyclohexanone oxime; industrial route to Nylon-6"
+        : "Amide (RCONHR') — anti-periplanar alkyl/aryl migrates to nitrogen; ring-enlarged lactam from cyclic ketone oximes",
+    type:"Beckmann Rearrangement — Oxime → Amide (or Lactam)",
+    mechanism:[
+      "Acid (H₂SO₄, PCl₅, or BF₃) protonates oxime OH → excellent leaving group (H₂O)",
+      "Anti-periplanar alkyl/aryl group migrates to electrophilic nitrogen — 1,2-shift (anti migration — Beckmann rule)",
+      "Nitrilium ion intermediate (R-C≡N⁺-R') forms after migration + loss of H₂O",
+      "Water attacks nitrilium → protonated amide → deprotonation gives amide product",
+      "For cyclic ketone oximes: ring expansion → lactam (e.g. cyclohexanone oxime → ε-caprolactam → Nylon-6 monomer)"
+    ],
+    smiles:(r)=>
+      /cyclohexanone/i.test(r) ? "Azepan-2-one (ε-caprolactam) — 7-membered lactam"
+      : "R-CO-NH-R' (amide from Beckmann rearrangement)",
+    confidence:90 },
+
+  // ── MANNICH REACTION ─────────────────────────────────────────────────
+  { id:"mannich_reaction",
+    match:(r,rg,c)=>
+      /ketone|aldehyde|enolisable|active.*methylene|malonate|acetone|cyclohexanone/i.test(r) &&
+      /mannich|ch2o.*amine|hcho.*amine|formaldehyde.*amine|ch2o.*nr2/i.test(rg+c),
+    product:()=> "β-Amino carbonyl compound (Mannich base) — aminomethyl group added to α-carbon of carbonyl; can eliminate to α,β-unsaturated carbonyl",
+    type:"Mannich Reaction — Aminomethylation of Active Methylene",
+    mechanism:[
+      "Iminium ion formation: secondary amine condenses with formaldehyde (HCHO) → iminium (R₂N=CH₂) — electrophilic",
+      "Enolisation of carbonyl compound (by acid or base) → nucleophilic enol/enolate at α-carbon",
+      "Enol attacks iminium ion → new C–C and C–N bond formed (Mannich base, β-amino carbonyl)",
+      "Product: β-aminocarbonyl compound (Mannich base) — can undergo elimination to α,β-unsaturated carbonyl",
+      "Useful in: pharmaceutical synthesis, Robinson annulation precursors, steroidal natural products"
+    ],
+    smiles:()=> "R-CO-CH₂-CH₂-NR'₂ (Mannich base — β-amino carbonyl)",
+    confidence:88 },
+
+  // ── ROBINSON ANNULATION (Michael + Aldol cyclisation) ───────────────
+  { id:"robinson_annulation",
+    match:(r,rg,c)=>
+      /ketone|aldehyde|cyclohexanone|enolate/i.test(r) &&
+      /mvk|methyl.*vinyl.*ketone|robinson|michael.*aldol|butenone|enone/i.test(rg+c),
+    product:()=> "Cyclohex-2-en-2-one ring system (6-membered enone) — Robinson annulation: Michael addition followed by intramolecular aldol + dehydration builds a new six-membered ring",
+    type:"Robinson Annulation — Michael Addition + Aldol Cyclisation → Cyclohexenone",
+    mechanism:[
+      "Step 1 (Michael addition): base generates enolate from ketone; enolate adds 1,4 to methyl vinyl ketone (MVK) → 1,5-diketone",
+      "Step 2 (intramolecular aldol): base generates enolate of one ketone; intramolecular addition to other ketone → β-hydroxy ketone (cyclic)",
+      "Step 3 (dehydration): β-hydroxy ketone loses H₂O → α,β-unsaturated cyclohexenone (six-membered ring enone)",
+      "Net: forms a new six-membered carbocyclic ring with conjugated enone functionality from simple starting materials",
+      "Classical use: synthesis of steroids, terpenes, and cyclohexenone natural products"
+    ],
+    smiles:()=> "Cyclohex-2-en-2-one ring (six-membered α,β-unsaturated ketone from annulation)",
+    confidence:86 },
+
+  // ── CYANOHYDRIN FORMATION ────────────────────────────────────────────
+  { id:"cyanohydrin_formation",
+    match:(r,rg,c)=>
+      /aldehyde|ketone|cho|c=o/i.test(r) &&
+      /hcn|kcn|nacn|cyanohydrin/i.test(rg),
+    product:(r,rg)=>
+      /aldehyde|cho/i.test(r)
+        ? "α-Hydroxy nitrile (cyanohydrin) — HCN adds to aldehyde C=O; product is primary/secondary α-hydroxy nitrile"
+        : "Tertiary α-hydroxy nitrile (cyanohydrin) from ketone; hydrolysis gives α-hydroxy acid",
+    type:"Cyanohydrin Formation — HCN Addition to Carbonyl",
+    mechanism:[
+      "HCN is in equilibrium with H⁺ and CN⁻; CN⁻ (nucleophile) attacks electrophilic carbonyl carbon",
+      "Tetrahedral alkoxide intermediate forms",
+      "Protonation (by HCN or H⁺) gives α-hydroxy nitrile (cyanohydrin)",
+      "Aldehydes react faster/more completely than ketones (less steric hindrance + more electrophilic carbonyl)",
+      "Cyanohydrin hydrolysis (H₃O⁺/heat) → α-hydroxy carboxylic acid; industrial use: acetone cyanohydrin → methyl methacrylate (MMA)"
+    ],
+    smiles:(r)=>
+      /aldehyde|cho/i.test(r) ? "R-CH(OH)-CN (α-hydroxy nitrile from aldehyde)"
+      : "R-C(OH)(CN)-R' (tertiary cyanohydrin from ketone)",
+    confidence:92 },
+
+  // ── BISULFITE ADDITION to ALDEHYDES ─────────────────────────────────
+  { id:"bisulfite_addition",
+    match:(r,rg,c)=>
+      /aldehyde|cho|methyl.*ketone|acetone/i.test(r) &&
+      /nahso3|nabiso3|bisulphite|bisulfite/i.test(rg),
+    product:()=> "Bisulfite addition compound (α-hydroxysulfonate salt) — crystalline adduct; used to purify/identify aldehydes; reversed by NaOH or Na₂CO₃",
+    type:"Bisulfite Addition to Aldehyde → α-Hydroxysulfonate",
+    mechanism:[
+      "Nucleophilic sulfur of NaHSO₃ (HSO₃⁻) attacks carbonyl carbon of aldehyde",
+      "Tetrahedral C–S bond forms → alkoxide intermediate",
+      "Proton transfer from S-OH to oxygen → solid α-hydroxysulfonate salt (bisulfite adduct)",
+      "Reversal: NaOH or Na₂CO₃ breaks C–S bond → regenerates free aldehyde (useful for purification)",
+      "Selectivity: aldehydes > methyl ketones; sterically hindered ketones do NOT react — diagnostic test"
+    ],
+    smiles:()=> "R-CH(OH)-SO₃⁻ Na⁺ (crystalline bisulfite adduct)",
+    confidence:89 },
+
+  // ── KETAL / ACETAL FORMATION AND PROTECTION ──────────────────────────
+  { id:"ketal_protection",
+    match:(r,rg,c)=>
+      /ketone|aldehyde|cyclohexanone|propan-2-one|acetone|c=o/i.test(r) &&
+      /ethylene.*glycol|hoch2ch2oh|meo.*h\+|meoh.*h\+|dimethox.*prop|acetal|ketal|dmp.*h\+/i.test(rg+c),
+    product:(r,rg)=>
+      /ethylene.*glycol|hoch2ch2oh/i.test(rg)
+        ? "Cyclic ketal (1,3-dioxolane) — ketone protected as cyclic ketal with ethylene glycol; stable to base, nucleophiles; deprotected with H₃O⁺"
+        : "Dimethyl ketal (R-C(OMe)₂-R') — ketone protected with MeOH; deprotected with aqueous acid",
+    type:"Ketal / Acetal Formation — Carbonyl Protection",
+    mechanism:[
+      "Acid catalyst protonates C=O → oxocarbenium ion (electrophilic carbonyl C)",
+      "First ROH attacks oxocarbenium → hemiketal (R-C(OH)(OR')-R'')",
+      "Protonation of OH → good leaving group (H₂O) expelled → oxocarbenium ion",
+      "Second ROH (or 2nd OH of diol) attacks → protonated ketal",
+      "Deprotonation → ketal product; Equilibrium: shifted by Dean-Stark trap (remove H₂O) or molecular sieves"
+    ],
+    smiles:()=> "cyclic: R-C(OCH₂CH₂O)-R' (1,3-dioxolane ketal) | acyclic: R-C(OMe)₂-R'",
+    confidence:91 },
+
+  // ── BAEYER-VILLIGER OXIDATION (Ketone/Cyclic Ketone → Ester/Lactone) ─
+  { id:"baeyer_villiger",
+    match:(r,rg,c)=>
+      /ketone|cyclopentanone|cyclohexanone|acetophenone|cyclohepta|c=o/i.test(r) &&
+      /mcpba|peracid|h2o2.*bf3|baeyer.*villiger|m-cpba|peroxy/i.test(rg+c),
+    product:(r,rg)=>{
+      if(/cyclohexanone|cyclohexa/i.test(r)) return "ε-Caprolactone (7-membered ring lactone, oxepan-2-one) — cyclic ketone → ring-expanded lactone; Baeyer-Villiger";
+      if(/cyclopentanone|cyclopen/i.test(r)) return "δ-Valerolactone (6-membered ring lactone) — cyclopentan-1-one → ring-expanded lactone";
+      if(/acetophenone|phcoch3/i.test(r)) return "Phenyl acetate (PhO-CO-CH₃) — aryl migrates preferentially over methyl (aryl > alkyl migratory aptitude)";
+      return "Ester (acyclic ketone → ester) or lactone (cyclic ketone → ring-expanded lactone) via Criegee intermediate";
+    },
+    type:"Baeyer-Villiger Oxidation — Ketone → Ester / Lactone",
+    mechanism:[
+      "Peracid (mCPBA, H₂O₂/BF₃) attacks C=O of ketone → Criegee intermediate (tetrahedral, contains O–O peroxy bond)",
+      "Migration of alkyl/aryl group from C to adjacent O (anti-periplanar to O–O bond) — 1,2-migration",
+      "Migratory aptitude: aryl ≈ tert > sec > phenyl > primary > CH₃ > H",
+      "O–O bond cleaves as migration occurs → carboxylic acid leaves; ester/lactone forms",
+      "Cyclic ketones: ring expansion → lactone (e.g. cyclohexanone → 7-membered ε-caprolactone)"
+    ],
+    smiles:(r)=>
+      /cyclohexanone/i.test(r) ? "Oxepan-2-one (ε-caprolactone, 7-membered lactone)"
+      : /acetophenone/i.test(r) ? "PhO-CO-CH₃ (phenyl acetate)"
+      : "R-COO-R' (ester) or cyclic lactone",
+    confidence:91 },
+
+  // ── CLEMMENSEN REDUCTION (C=O → CH₂) ─────────────────────────────────
+  { id:"clemmensen_reduction",
+    match:(r,rg,c)=>
+      /ketone|aldehyde|c=o|cho|aryl.*ketone/i.test(r) &&
+      /zn.*hg|zn\(hg\)|amalgam|clemmensen/i.test(rg+c),
+    product:()=> "Alkane / methylene compound (C=O → CH₂) — Clemmensen reduction removes oxygen from carbonyl; acid-compatible alternative to Wolff-Kishner",
+    type:"Clemmensen Reduction — C=O → CH₂ (Acidic Conditions)",
+    mechanism:[
+      "Zn(Hg) amalgam in conc. HCl: zinc surface acts as electron source; acid provides protons",
+      "Carbonyl coordinates to Zn surface → successive 2-electron reduction via surface-bound radical intermediates",
+      "Protonation at each step → ultimately replaces C=O with CH₂ (deoxygenation)",
+      "Complementary to Wolff-Kishner: Clemmensen works in acidic conditions; Wolff-Kishner in basic/high-T conditions",
+      "Common use: Friedel-Crafts acylation then Clemmensen → alkylbenzene (avoids rearrangement in direct F-C alkylation)"
+    ],
+    smiles:()=> "R-CH₂-R' (methylene — carbonyl fully deoxygenated)",
+    confidence:90 },
+
+  // ── DIECKMANN CYCLIZATION (Intramolecular Claisen → β-Keto Ester) ────
+  { id:"dieckmann_cyclization",
+    match:(r,rg,c)=>
+      /diethyl.*dicarboxylate|dimethyl.*dicarboxylate|diester|diethyl.*hex|diethyl.*pent/i.test(r) &&
+      /naoe?t|naome|naoh|base|dieckmann/i.test(rg+c),
+    product:(r,rg)=>
+      /hex/i.test(r)
+        ? "Ethyl 2-oxocyclopentane-1-carboxylate — 5-membered ring β-keto ester from diethyl hexanedioate"
+        : "β-Keto ester ring — cyclic β-keto ester from intramolecular Claisen (Dieckmann) condensation",
+    type:"Dieckmann Cyclisation — Intramolecular Claisen → Cyclic β-Keto Ester",
+    mechanism:[
+      "Base (NaOEt) deprotonates α-H of one ester → enolate",
+      "Enolate attacks the C=O of the other ester in the same molecule (intramolecular nucleophilic acyl substitution)",
+      "Tetrahedral intermediate collapses: alkoxide expelled as ethanol",
+      "Cyclic β-keto ester product formed — ring size determined by chain length (5-membered ring from 7-carbon diester; 6-membered from 8-carbon)",
+      "Product deprotonated by base (acidic α-H between two C=O groups) → enolate; acid workup gives neutral β-keto ester"
+    ],
+    smiles:()=> "cyclic β-keto ester: ethyl 2-oxocycloalkane-1-carboxylate",
+    confidence:88 },
+
+  // ── REFORMATSKY REACTION (Zn + α-Bromo Ester + Carbonyl → β-Hydroxy Ester) ──
+  { id:"reformatsky_reaction",
+    match:(r,rg,c)=>
+      /bromo.*ester|ethyl.*bromoacetate|alpha-bromo|2-bromo.*ester/i.test(r+rg) &&
+      /zn|reformatsky/i.test(rg+c),
+    product:()=> "β-Hydroxy ester — Reformatsky reaction: zinc inserts into α-C-Br bond to form organozinc enolate; adds to aldehyde/ketone → β-hydroxy ester after workup",
+    type:"Reformatsky Reaction — α-Bromo Ester + Zn + Carbonyl → β-Hydroxy Ester",
+    mechanism:[
+      "Zinc metal inserts into C–Br bond of ethyl α-bromoacetate → Reformatsky reagent (zinc enolate, BrZn–CH₂–CO₂Et)",
+      "Zinc enolate is a mild nucleophile (unlike Grignard, it tolerates ester groups on same molecule)",
+      "Nucleophilic addition to carbonyl (aldehyde or ketone) → zinc alkoxide intermediate",
+      "Aqueous workup: zinc alkoxide protonated → β-hydroxy ester product",
+      "Milder than Grignard; compatible with ester functionality; useful for building β-hydroxy acid motifs"
+    ],
+    smiles:()=> "R-CH(OH)-CH₂-CO₂Et (β-hydroxy ester after aqueous workup)",
+    confidence:88 },
+
+  // ── WACKER OXIDATION (Alkene + PdCl₂ → Aldehyde/Ketone) ─────────────
+  { id:"wacker_oxidation",
+    match:(r,rg,c)=>
+      /alkene|ethene|ethylene|propene|c=c/i.test(r) &&
+      /pdcl2|wacker|pd.*o2|pd.*cucl2/i.test(rg+c),
+    product:(r,rg)=>
+      /ethene|ethylene/i.test(r)
+        ? "Acetaldehyde (ethanal, CH₃CHO) — Wacker oxidation of ethylene; industrial process"
+        : "Ketone (Markovnikov) — terminal alkenes give methyl ketones (anti-Markovnikov would give aldehyde, but Wacker gives ketone from terminal alkene)",
+    type:"Wacker Oxidation — Alkene + PdCl₂/O₂ → Carbonyl Compound",
+    mechanism:[
+      "PdCl₂ coordinates alkene → π-complex; water attacks coordinated alkene (Markovnikov) → hydroxy-palladium intermediate",
+      "β-Hydride elimination from Pd-alkyl → vinyl alcohol (enol) + H-Pd-Cl",
+      "Enol tautomerises → carbonyl compound (aldehyde from ethylene; ketone from higher alkenes)",
+      "Pd(0) reoxidised by CuCl₂ (stoichiometric or catalytic); Cu(I) reoxidised by O₂ — catalytic cycle",
+      "Net: alkene + O₂ → carbonyl compound (oxidation); industrial process for acetaldehyde from ethylene"
+    ],
+    smiles:(r)=>
+      /ethene|ethylene/i.test(r) ? "CH₃CHO (acetaldehyde)"
+      : "R-CO-CH₃ (methyl ketone from terminal alkene)",
+    confidence:92 },
+
+  // ── HECK REACTION (Pd-Catalysed C-C Cross-Coupling) ─────────────────
+  { id:"heck_reaction",
+    match:(r,rg,c)=>
+      /aryl.*halide|aryl.*iodide|aryl.*bromide|iodobenzene|bromobenzene/i.test(r) &&
+      /alkene|acrylate|styrene|c=c|ethylene|vinyl/i.test(rg) &&
+      /pd|palladium|heck/i.test(rg+c),
+    product:()=> "Aryl-substituted alkene (Ar-CH=CH-R) — trans (E) geometry preferred; C=C double bond retained in product; Heck coupling",
+    type:"Heck Reaction — Pd-Catalysed Vinylation of Aryl Halide",
+    mechanism:[
+      "Oxidative addition: Pd(0) inserts into Ar-X bond → Ar-Pd(II)-X complex",
+      "Coordination/migratory insertion: alkene coordinates to Pd → carbopalladation (syn addition of Ar and Pd to alkene)",
+      "β-Hydride elimination: Pd abstracts β-H syn to Pd → alkene product + H-Pd-X",
+      "Base (Et₃N or K₂CO₃) neutralises HX; Pd(0) regenerated → continues catalytic cycle",
+      "Regioselectivity: Ar group adds to less hindered (terminal) carbon of alkene; E-alkene strongly preferred"
+    ],
+    smiles:()=> "Ar-CH=CH-R (E-aryl alkene, trans geometry)",
+    confidence:92 },
+
+  // ── SUZUKI COUPLING (Pd-Catalysed Biaryl Synthesis) ──────────────────
+  { id:"suzuki_coupling",
+    match:(r,rg,c)=>
+      /aryl.*halide|aryl.*iodide|aryl.*bromide|iodobenzene|bromobenzene/i.test(r) &&
+      /boronic.*acid|b\(oh\)2|bpin|suzuki|arylboron/i.test(rg),
+    product:()=> "Biaryl (Ar-Ar') or aryl-alkyl product — Suzuki-Miyaura cross-coupling; mild conditions, air-tolerant, wide functional group tolerance",
+    type:"Suzuki-Miyaura Coupling — Pd-Catalysed C–C Bond Formation",
+    mechanism:[
+      "Oxidative addition: Pd(0) inserts into Ar-X (X=I, Br, OTf) → Ar-Pd(II)-X",
+      "Transmetalation: base activates boronic acid (ArB(OH)₂ + OH⁻ → ate complex); Ar' transfers from B to Pd → Ar-Pd(II)-Ar'",
+      "Reductive elimination: C–C bond forms between two Ar groups on Pd → biaryl Ar-Ar' released; Pd(0) regenerated",
+      "Base (K₂CO₃, Cs₂CO₃) essential for transmetalation step — activates boron",
+      "Advantages: boronic acids are air-stable, non-toxic, commercially available; excellent functional group tolerance"
+    ],
+    smiles:()=> "Ar-Ar' (biaryl from Pd-catalysed cross-coupling)",
+    confidence:94 },
+
+  // ── SONOGASHIRA COUPLING (Pd/Cu Alkyne–Aryl) ─────────────────────────
+  { id:"sonogashira_coupling",
+    match:(r,rg,c)=>
+      /aryl.*halide|iodobenzene|bromobenzene|aryl.*iodide|aryl.*bromide/i.test(r) &&
+      /terminal.*alkyne|alkyne|c≡ch|c#ch|phenylacetylene/i.test(rg) &&
+      /pd|cu|sonogashira/i.test(rg+c),
+    product:()=> "Aryl alkyne (Ar-C≡C-R) — internal alkyne; Sonogashira couples aryl/vinyl halide with terminal alkyne under Pd/CuI catalysis",
+    type:"Sonogashira Coupling — Pd/Cu-Catalysed Aryl-Alkyne Bond Formation",
+    mechanism:[
+      "Pd(0) undergoes oxidative addition to Ar-X → Ar-Pd(II)-X",
+      "Cu(I) activates terminal alkyne: Cu acetylide (RC≡C-CuI) forms (Cu deprotonates terminal C-H with amine base)",
+      "Transmetalation: Cu acetylide transfers alkynyl group to Pd → Ar-Pd(II)-C≡CR",
+      "Reductive elimination: C–C bond formed → Ar-C≡C-R internal alkyne; Pd(0) regenerated",
+      "Amine base (Et₃N, iPr₂NH) acts as both proton acceptor and Cu-activating ligand"
+    ],
+    smiles:()=> "Ar-C≡C-R (aryl internal alkyne from Sonogashira coupling)",
+    confidence:93 },
+
+  // ── SIMMONS-SMITH CYCLOPROPANATION ───────────────────────────────────
+  { id:"simmons_smith",
+    match:(r,rg,c)=>
+      /alkene|c=c|cyclohexene|cyclopentene|=ch/i.test(r) &&
+      /ch2i2|iet2zn|et2zn|simmons.*smith|zinc.*methylene/i.test(rg+c),
+    product:()=> "Cyclopropane ring — syn addition of CH₂ across C=C double bond; Simmons-Smith gives no carbene side products, stereospecific syn addition",
+    type:"Simmons-Smith Cyclopropanation — Carbenoid Addition to Alkene",
+    mechanism:[
+      "Et₂Zn (or Zn/Cu) reacts with CH₂I₂ → iodomethylzinc iodide (ICH₂ZnI) — carbenoid reagent (not free carbene)",
+      "Carbenoid coordinates to alkene π system via zinc-oxygen interaction (if OH present, directs delivery to same face)",
+      "Concerted syn delivery of CH₂ to both alkene carbons → cyclopropane",
+      "Both new C–C bonds form simultaneously → syn stereochemistry retained from alkene geometry",
+      "Allylic alcohol OH directs carbenoid to same face → predictable facial selectivity"
+    ],
+    smiles:()=> "cyclopropyl ring fused to substrate — C3 ring, syn addition",
+    confidence:90 },
+
+  // ── COPE REARRANGEMENT (Thermal [3,3]-Sigmatropic) ───────────────────
+  { id:"cope_rearrangement",
+    match:(r,rg,c)=>
+      /1,5-diene|hexa-1,5-diene|cope/i.test(r+c) &&
+      /heat|thermal|300|Δ/i.test(rg+c),
+    product:()=> "Isomeric 1,5-diene — [3,3]-sigmatropic rearrangement; bonds reorganise but no net change in connectivity type; oxy-Cope variant if OH present",
+    type:"Cope Rearrangement — Thermal [3,3]-Sigmatropic Rearrangement",
+    mechanism:[
+      "1,5-Hexadiene adopts chair-like transition state (6-membered cyclic TS)",
+      "[3,3]-sigmatropic: σ bond breaks at C1-C6 position; new σ bond forms between C3 and C4",
+      "Concerted: all bond changes occur simultaneously through 6-electron Hückel aromatic TS (thermally allowed)",
+      "Oxy-Cope: if OH at C3 position → enol product which tautomerises to carbonyl → strong thermodynamic driving force",
+      "Temperature: usually >200°C for thermal; oxy-Cope can be facilitated by base (anionic oxy-Cope at room temp)"
+    ],
+    smiles:()=> "isomeric 1,5-hexadiene (bond connectivity reorganised)",
+    confidence:85 },
+
+  // ── CLAISEN REARRANGEMENT (Allyl Vinyl Ether → γ,δ-Unsaturated Carbonyl) ──
+  { id:"claisen_rearrangement",
+    match:(r,rg,c)=>
+      /allyl.*vinyl.*ether|allyl.*ether.*vinyl|vinyl.*ether|aromatic.*allyl.*ether|phenyl.*allyl|allyloxy/i.test(r) &&
+      /heat|thermal|200|claisen/i.test(rg+c),
+    product:(r)=>
+      /aromatic|phenyl|benzene|phenoxy/i.test(r)
+        ? "Allylated phenol (ortho-allylphenol) — aromatic Claisen; allyl migrates to ortho position; [3,3]-sigmatropic then re-aromatises"
+        : "γ,δ-Unsaturated carbonyl compound (pent-4-enal from allyl vinyl ether) — aliphatic Claisen rearrangement",
+    type:"Claisen Rearrangement — Thermal [3,3]-Sigmatropic Rearrangement of Allyl Vinyl Ether",
+    mechanism:[
+      "Allyl vinyl ether adopts chair-like 6-membered transition state (Claisen TS)",
+      "[3,3]-sigmatropic: O–C(allyl) σ bond breaks; new C–C bond forms between γ-carbon of allyl and α-carbon of vinyl ether",
+      "Concerted pericyclic: thermally allowed (6 electrons, Hückel aromatic TS)",
+      "Aliphatic: allyl vinyl ether → pent-4-enal (O migrates from O to C — carbon skeleton rearranges)",
+      "Aromatic (Carroll/Claisen of aryl allyl ether): allyl migrates to ortho → cyclohexadienone → enolises → 2-allylphenol"
+    ],
+    smiles:()=> "R-CO-CH₂-CH=CH₂ (γ,δ-unsaturated carbonyl from aliphatic Claisen)",
+    confidence:87 },
+
+  // ── ELECTROCYCLIC REACTIONS (Ring closure / opening) ─────────────────
+  { id:"electrocyclic",
+    match:(r,rg,c)=>
+      /triene|hexatriene|1,3,5-triene|cyclobutene|cyclohexadiene|cyclobutene/i.test(r) &&
+      /heat|hv|uv|light|thermal|photochem/i.test(rg+c),
+    product:(r,rg,c)=>{
+      if(/cyclobutene/i.test(r) && /heat/i.test(c+rg)) return "Buta-1,3-diene — thermal electrocyclic ring opening (4π, disrotatory thermal = conrotatory photochemical)";
+      if(/hexatriene|1,3,5-triene/i.test(r) && /heat/i.test(c+rg)) return "Cyclohexadiene — thermal electrocyclic ring closure of (Z)-hexatriene (6π, disrotatory; conrotatory under hν)";
+      if(/cyclohexadiene/i.test(r) && /hv|uv|light/i.test(c+rg)) return "Hexatriene — photochemical electrocyclic ring opening (6π photochemical = conrotatory)";
+      return "Electrocyclic product — thermal: 4nπ conrotatory, (4n+2)π disrotatory; photochemical: reverse stereochemistry (Woodward-Hoffmann)";
+    },
+    type:"Electrocyclic Reaction — Woodward-Hoffmann Pericyclic",
+    mechanism:[
+      "Thermal 4π (cyclobutene ↔ butadiene): conrotatory ring opening (both ends rotate same direction)",
+      "Thermal 6π (hexatriene ↔ cyclohexadiene): disrotatory ring closure (both ends rotate opposite directions)",
+      "Photochemical: reverse of thermal — 4π disrotatory; 6π conrotatory (Woodward-Hoffmann rules)",
+      "Driving force: aromaticity gain (ring closure to benzene) or ring-strain release (cyclobutene opening)",
+      "Stereospecific: orbital symmetry enforces specific geometry of product double bonds / substituents"
+    ],
+    smiles:()=> "Ring-closed or ring-opened product — stereochemistry per Woodward-Hoffmann rules",
+    confidence:84 },
+
+  // ── FRIES REARRANGEMENT (Aryl Ester → Hydroxy Ketone) ────────────────
+  { id:"fries_rearrangement",
+    match:(r,rg,c)=>
+      /aryl.*ester|phenyl.*ester|phenyl.*acetate|cresyl.*acetate|naphthyl.*ester/i.test(r) &&
+      /alcl3|bf3|fries|lewis.*acid/i.test(rg+c),
+    product:(r,rg,c)=>
+      /low.?temp|cold/i.test(c)
+        ? "para-Hydroxy ketone — Fries rearrangement at low temperature gives para product (thermodynamic)"
+        : "ortho-Hydroxy ketone — Fries rearrangement at high temperature gives ortho product (kinetic/chelation)",
+    type:"Fries Rearrangement — Aryl Ester → Hydroxy Ketone (Lewis Acid)",
+    mechanism:[
+      "AlCl₃ (Lewis acid) coordinates to ester C=O → acylium ion (RCO⁺) forms; phenoxide released",
+      "Acylium electrophile attacks activated phenol ring via EAS",
+      "Low temperature: para product kinetically accessible, less steric hindrance",
+      "High temperature: ortho product (chelation-controlled; ortho OH chelates to AlCl₃)",
+      "Net: ester O-acyl → C-acyl (O→C acyl migration via EAS on ring)"
+    ],
+    smiles:()=> "HO-Ar-CO-R (hydroxy aryl ketone from Fries rearrangement)",
+    confidence:86 },
+
+  // ── KOLBE-SCHMITT REACTION (Phenol + CO₂ → Salicylate) ───────────────
+  { id:"kolbe_schmitt",
+    match:(r,rg,c)=>
+      /phenol|phenolate|c6h5oh|c6h5o-/i.test(r) &&
+      /co2|kolbe|schmitt/i.test(rg+c),
+    product:()=> "Sodium salicylate (2-hydroxybenzoate) — electrophilic carboxylation at ortho position; basis of aspirin synthesis",
+    type:"Kolbe-Schmitt Reaction — Carboxylation of Sodium Phenolate",
+    mechanism:[
+      "Sodium phenolate (PhO⁻ Na⁺) formed first from phenol + NaOH",
+      "CO₂ coordinates to oxygen of phenolate → sodium phenyl carbonate-type intermediate",
+      "Intramolecular electrophilic carboxylation: CO₂ delivers CO₂⁻ to ortho position of ring (Kolbe mechanism)",
+      "Reaction at 125°C/5 atm CO₂ favours ortho (sodium salt); higher T with K salt gives para",
+      "Product: sodium 2-hydroxybenzoate (salicylate); acidification → salicylic acid → aspirin (via acetylation with Ac₂O)"
+    ],
+    smiles:()=> "2-HO-C₆H₄-COO⁻ Na⁺ (sodium salicylate)",
+    confidence:88 },
+
+  // ── VILSMEIER-HAACK FORMYLATION (Pyrrole/Indole/Activated Arene → Aldehyde) ──
+  { id:"vilsmeier_haack",
+    match:(r,rg,c)=>
+      /pyrrole|indole|furan|thiophene|activated.*arene|dimethylaniline|n,n-dimethyl/i.test(r) &&
+      /dmf.*pocl3|pocl3.*dmf|vilsmeier|dmf.*p2o5/i.test(rg+c),
+    product:()=> "Aryl or heteroaryl aldehyde — Vilsmeier-Haack formylation introduces –CHO at the most electron-rich position (alpha for pyrrole/furan/indole; para for activated benzenes)",
+    type:"Vilsmeier-Haack Formylation — Electrophilic Formylation of Electron-Rich Arene",
+    mechanism:[
+      "POCl₃ activates DMF (N,N-dimethylformamide): forms chloroiminium ion [(CH₃)₂N=CH-Cl]⁺ — Vilsmeier electrophile",
+      "Chloroiminium ion attacks most electron-rich position (C-2 of pyrrole/furan; C-3 of indole; para of dimethylaniline) — EAS",
+      "Iminium intermediate (σ-complex) forms → loss of H⁺ restores aromaticity → chloroiminium product",
+      "Aqueous workup: hydrolysis of C=N-Cl → aldehyde C=O",
+      "Regioselective: alpha positions of N-heterocycles react preferentially (highest electron density)"
+    ],
+    smiles:()=> "Ar-CHO or heteroaryl-CHO (aldehyde via Vilsmeier formylation)",
+    confidence:90 },
+
+  // ── PAAL-KNORR SYNTHESIS (1,4-Diketone → Pyrrole/Furan/Thiophene) ────
+  { id:"paal_knorr",
+    match:(r,rg,c)=>
+      /1,4-diketone|hexane-2,5-dione|diketone|1,4-dion/i.test(r) &&
+      /nh3|amine|nh4|pyrrole.*synth|furan.*synth|thioph.*synth|p2s5|h\+|acid/i.test(rg+c),
+    product:(r,rg)=>{
+      if(/nh3|amine|nh2|nh4/i.test(rg)) return "Pyrrole (or N-substituted pyrrole) — Paal-Knorr: 1,4-diketone + primary amine → pyrrole by double condensation and cyclodehydration";
+      if(/p2s5/i.test(rg)) return "Thiophene — Paal-Knorr: 1,4-diketone + P₂S₅ → thiophene by double thionation and ring closure";
+      return "Furan — Paal-Knorr: 1,4-diketone + acid catalyst → furan by double dehydration and ring closure";
+    },
+    type:"Paal-Knorr Synthesis — 1,4-Diketone → 5-Membered Aromatic Heterocycle",
+    mechanism:[
+      "1,4-Diketone (e.g. hexane-2,5-dione) has two carbonyl groups 4 carbons apart — ideal for 5-membered ring closure",
+      "For pyrrole: amine condenses at one C=O → hemiaminal → then at second C=O → bis-hemiaminal → double dehydration → pyrrole",
+      "For furan: acid catalyst → double dehydration of both C=O groups → furan (oxygen already present in enol form)",
+      "For thiophene: P₂S₅ replaces both oxygens with sulfur → dithioacetal → dehydration → thiophene",
+      "Very efficient one-pot synthesis of 5-membered heteroaromatics from simple open-chain 1,4-dicarbonyl precursors"
+    ],
+    smiles:(r,rg)=>
+      /nh3|amine/i.test(rg) ? "pyrrole ring C₄H₅N (or N-substituted)"
+      : /p2s5/i.test(rg) ? "thiophene ring C₄H₄S"
+      : "furan ring C₄H₄O",
+    confidence:90 },
+
+  // ── DECARBOXYLATION OF β-KETO ACID ───────────────────────────────────
+  { id:"beta_keto_decarboxylation",
+    match:(r,rg,c)=>
+      /beta.*keto.*acid|3-oxo.*acid|malonic.*acid|propanedioic.*acid|keto.*carboxylic/i.test(r) &&
+      /heat|Δ|decarb/i.test(rg+c),
+    product:()=> "Ketone or carboxylic acid + CO₂ — decarboxylation of β-keto acid or malonic acid; 6-membered cyclic TS; proceeds readily on heating above 150°C",
+    type:"Decarboxylation of β-Keto Acid / Malonic Acid",
+    mechanism:[
+      "β-Keto acid (3-oxoacid): enol tautomer forms 6-membered cyclic transition state with carboxyl C=O",
+      "Concerted: CO₂ expelled, proton transfers from O to α-C simultaneously via 6-membered TS",
+      "Malonic acid (propanedioic acid): similar 6-membered TS; loses one CO₂ → acetic acid",
+      "Driving force: formation of stable CO₂ gas (entropy) + conversion to enol → keto tautomer",
+      "Used in: malonic ester synthesis (make alkyl-substituted acetic acids); acetoacetic ester synthesis (ketone synthesis)"
+    ],
+    smiles:()=> "R-CO-CH₃ (methyl ketone) + CO₂↑ OR R-CH₂-COOH + CO₂↑",
+    confidence:91 },
+
+  // ── SODA-LIME DECARBOXYLATION (Carboxylate Salt → Alkane) ─────────────
+  { id:"soda_lime_decarboxylation",
+    match:(r,rg,c)=>
+      /sodium.*carboxylate|carboxylate.*salt|sodium.*acetate|rcoo.*na|rcoo.*k/i.test(r) &&
+      /cao|naoh.*cao|soda.*lime|naoh.*heat/i.test(rg+c),
+    product:(r,rg)=>
+      /acetate|ethanoate|ch3coo/i.test(r)
+        ? "Methane (CH₄) — soda-lime decarboxylation of sodium acetate"
+        : "Alkane (one carbon shorter) — R-COO⁻ Na⁺ → R-H + Na₂CO₃",
+    type:"Soda-Lime Decarboxylation — Carboxylate Salt → Alkane (–1 Carbon)",
+    mechanism:[
+      "NaOH + CaO mixture (soda-lime) heated strongly with dry sodium carboxylate",
+      "Ca(OH)₂/NaOH provides OH⁻ and strongly basic conditions at high temperature",
+      "RCOO⁻ → R⁻ + CO₂ (decarboxylation); R⁻ + H₂O → R-H + OH⁻",
+      "Net: R-COO⁻ Na⁺ → R-H (alkane); removes one carbon from chain",
+      "Limited synthetic use (harsh conditions, low selectivity); mainly historical importance for structure proof"
+    ],
+    smiles:()=> "R-H (alkane, one carbon fewer than starting carboxylate)",
+    confidence:85 },
+
+  // ── COPE ELIMINATION (Amine N-Oxide → Alkene) ────────────────────────
+  { id:"cope_elimination",
+    match:(r,rg,c)=>
+      /amine.*n-oxide|n-oxide|r3n.*o|cope.*elim/i.test(r) &&
+      /heat|Δ|cope.*elim/i.test(rg+c),
+    product:()=> "Alkene + hydroxylamine — Cope elimination: cyclic syn elimination via 5-membered TS; gives less-substituted (Hofmann) alkene",
+    type:"Cope Elimination — Amine N-Oxide → Alkene (Syn E2-type)",
+    mechanism:[
+      "Amine N-oxide (R₃N→O) prepared by oxidation of tertiary amine with H₂O₂ or mCPBA",
+      "On heating: 5-membered cyclic transition state (N–O acts as internal base, abstracts β-H)",
+      "Syn (cis) elimination: N–O and β-H on same face; concerted pericyclic-like process",
+      "Gives less-substituted alkene (Hofmann product) — contrast with E2 (Zaitsev)",
+      "Byproduct: dialkylhydroxylamine (R₂NOH); mild conditions (no strong base needed)"
+    ],
+    smiles:()=> "R-CH=CH₂ (Hofmann alkene, less-substituted) + R₂N-OH",
+    confidence:86 },
+
+  // ── GABRIEL SYNTHESIS (Phthalimide → Primary Amine) ──────────────────
+  { id:"gabriel_synthesis",
+    match:(r,rg,c)=>
+      /phthalimide|isoindole.*dione|gabriel/i.test(r+rg+c) &&
+      /koh|naoh|alkyl.*halide|n2h4|hydrazine|gabriel/i.test(rg+c),
+    product:()=> "Primary amine (RNH₂) — exclusively; Gabriel synthesis avoids over-alkylation issue of direct amine alkylation",
+    type:"Gabriel Synthesis — Phthalimide → Primary Amine",
+    mechanism:[
+      "Potassium phthalimide formed: phthalimide N–H deprotonated by KOH → K⁺ phthalimide⁻ salt",
+      "Alkylation: N-nucleophile displaces halide of R-X (SN2) → N-alkylphthalimide",
+      "Deprotection: hydrazine (N₂H₄) cleaves both C=N bonds of phthalimide → primary amine R-NH₂ + phthalhydrazide",
+      "Alternatively: aqueous NaOH hydrolysis of N-alkylphthalimide → primary amine + phthalate",
+      "Key advantage: phthalimide N has only ONE N–H, so only one alkylation possible → pure primary amine guaranteed"
+    ],
+    smiles:()=> "R-NH₂ (primary amine exclusively — no secondary/tertiary amine contamination)",
+    confidence:90 },
+
+  // ── CHICHIBABIN AMINATION OF PYRIDINE ────────────────────────────────
+  { id:"chichibabin_amination",
+    match:(r,rg,c)=>
+      /pyridine|pyridin/i.test(r) &&
+      /nanh2|sodamide|chichibabin/i.test(rg+c),
+    product:()=> "2-Aminopyridine (pyridin-2-amine) — Chichibabin amination; NaNH₂ substitutes H at C-2 of pyridine ring by SNAr-like mechanism",
+    type:"Chichibabin Amination — Pyridine + NaNH₂ → 2-Aminopyridine",
+    mechanism:[
+      "NaNH₂ (sodamide) adds nucleophilically to C-2 position of pyridine ring (ring nitrogen makes C-2 electrophilic)",
+      "Dihydropyridine intermediate forms: NH₂ on C-2, H still present (σ-complex)",
+      "Hydride (H⁻) expelled from C-2 → absorbed by another NaNH₂ → NaH + NH₃",
+      "Restoration of aromaticity: 2-aminopyridine product",
+      "Position selectivity: C-2 (ortho to N) most electrophilic; C-4 also possible but C-2 preferred"
+    ],
+    smiles:()=> "2-NH₂-C₅H₄N (pyridin-2-amine)",
+    confidence:86 },
+
+  // ── DIAZOMETHANE CYCLOPROPANATION (Carbene Addition) ─────────────────
+  { id:"carbene_cyclopropanation",
+    match:(r,rg,c)=>
+      /alkene|c=c|=ch|ch=/i.test(r) &&
+      /ch2n2|diazomethane|carbene|chcl3.*t-buok|dichlorocarbene/i.test(rg+c),
+    product:(r,rg)=>
+      /chcl3|ccl2|dichloro/i.test(rg)
+        ? "gem-Dichlorocyclopropane — dichlorocarbene (from CHCl₃/t-BuOK) adds syn to both carbons of alkene"
+        : "Cyclopropane — carbene (from CH₂N₂) adds across C=C; syn addition; stereospecific",
+    type:"Carbene / Carbenoid Cyclopropanation of Alkene",
+    mechanism:[
+      "Carbene generation: CH₂N₂ → :CH₂ + N₂ (photolysis or Cu catalyst); CHCl₃ + t-BuOK → :CCl₂ (α-elimination)",
+      "Singlet carbene (:CH₂, paired spins): concerted syn addition to alkene → cyclopropane; stereospecific",
+      "Both new C–C bonds form simultaneously → geometry of alkene retained in cyclopropane stereochemistry",
+      "Dichlorocarbene (:CCl₂): adds to any alkene → gem-1,1-dichlorocyclopropane",
+      "Simmons-Smith (carbenoid): IZnCH₂I is not a free carbene but gives same syn cyclopropanation product"
+    ],
+    smiles:()=> "cyclopropyl ring (3-membered carbocycle, syn addition)",
+    confidence:88 },
+
+  // ── ROSENMUND REDUCTION (Acid Chloride → Aldehyde) ───────────────────
+  { id:"rosenmund_reduction",
+    match:(r,rg,c)=>
+      /acid.*chloride|acyl.*chloride|cocl|rcoci/i.test(r) &&
+      /h2.*pd.*baso4|pd.*baso4.*quinoline|rosenmund|pd-baso4/i.test(rg+c),
+    product:()=> "Aldehyde (RCHO) — selective reduction of acid chloride stops at aldehyde; Pd/BaSO₄ catalyst poisoned with quinoline prevents further reduction",
+    type:"Rosenmund Reduction — Acid Chloride → Aldehyde (Selective)",
+    mechanism:[
+      "Pd on BaSO₄ (not Pd/C): BaSO₄ support reduces Pd activity; quinoline/thiourea poison further lowers reactivity",
+      "H₂ reductively cleaves C–Cl bond of acyl chloride on catalyst surface → acyl–Pd complex",
+      "H from surface protonates acyl → aldehyde desorbs from catalyst",
+      "Poisoning prevents over-reduction: aldehyde cannot be further reduced to primary alcohol under these conditions",
+      "Alternative to DIBAL at −78°C for making aromatic aldehydes from acid chlorides"
+    ],
+    smiles:()=> "R-CHO (aldehyde — stopped at aldehyde stage by catalyst poisoning)",
+    confidence:90 },
+
+  // ── SHARPLESS ASYMMETRIC EPOXIDATION ─────────────────────────────────
+  { id:"sharpless_epoxidation",
+    match:(r,rg,c)=>
+      /allylic.*alcohol|allyl.*alcohol|ch.*oh.*c=c|homoallylic/i.test(r) &&
+      /ti.*tartrate|tartrate.*ti|tbhp.*ti|sharpless.*epox|sharpless.*ae|ae.*sharpless/i.test(rg+c),
+    product:()=> "Chiral 2,3-epoxy alcohol — Sharpless asymmetric epoxidation delivers O to specific face of allylic alcohol; >90% ee with D- or L-tartrate",
+    type:"Sharpless Asymmetric Epoxidation (SAE) of Allylic Alcohol",
+    mechanism:[
+      "Ti(OiPr)₄ + tartrate ester + TBHP form a chiral titanium complex at reaction temp (−20°C)",
+      "Allylic alcohol coordinates to Ti through OH → defines orientation in chiral Ti complex",
+      "Mnemonic: draw alkene flat; L-(+)-tartrate delivers O from β face (top); D-(−)-tartrate delivers O from α face (bottom)",
+      "TBHP (tert-butyl hydroperoxide) acts as stoichiometric oxidant — O-O bond cleaved; O transfers to alkene",
+      "Predictable face selectivity: >90% ee; functional group (OH) required to direct delivery — only works for allylic alcohols"
+    ],
+    smiles:()=> "chiral epoxy alcohol (2,3-epoxyalcohol with defined stereochemistry)",
+    confidence:93 },
+
+  // ── RING-CLOSING METATHESIS (RCM) ────────────────────────────────────
+  { id:"ring_closing_metathesis",
+    match:(r,rg,c)=>
+      /diene|1,6-diene|1,7-diene|di-terminal.*alkene/i.test(r) &&
+      /grubbs|hoveyda|metathesis|rcm|ru.*carbene/i.test(rg+c),
+    product:()=> "Cyclic alkene + ethylene (C₂H₄ expelled) — ring-closing metathesis; Grubbs Ru-carbene catalyst; forms 5–8 membered rings efficiently",
+    type:"Ring-Closing Metathesis (RCM) — Diene → Cyclic Alkene + Ethylene",
+    mechanism:[
+      "Grubbs catalyst: Ru=CH₂ carbene species; initiates by reacting with one terminal alkene of diene",
+      "First [2+2] cycloaddition: Ru=CH₂ + alkene₁ → metallacyclobutane → retro-[2+2] → new Ru=C (chain-end alkylidene)",
+      "Intramolecular: second terminal alkene of same molecule reacts with Ru=C → metallacyclobutane",
+      "Retro-[2+2]: ring closes → cyclic alkene released; Ru=CH₂ regenerated (catalyst turnover)",
+      "Expels ethylene (C₂H₄) as volatile byproduct — drives equilibrium toward ring closure"
+    ],
+    smiles:()=> "cyclic alkene (5–8 membered ring with internal double bond) + CH₂=CH₂",
+    confidence:91 },
+
+  // ── HYDROFORMYLATION (OXOSYNTHESIS) ──────────────────────────────────
+  { id:"hydroformylation",
+    match:(r,rg,c)=>
+      /alkene|propene|hexene|terminal.*alkene|c=c/i.test(r) &&
+      /co.*h2|h2.*co|oxo|hydroformyl|rh.*co|rh.*cat|cobalt.*co/i.test(rg+c),
+    product:()=> "Aldehyde (one carbon longer) — hydroformylation (oxo process): adds CO and H₂ across C=C; linear (anti-Markovnikov) or branched aldehyde; Rh catalyst favours linear",
+    type:"Hydroformylation (Oxo Synthesis) — Alkene + CO + H₂ → Aldehyde",
+    mechanism:[
+      "Rh-H complex (HRh(CO)₂L₂) coordinates alkene → insertion into Rh–H bond (anti-Markovnikov preferred with Rh)",
+      "CO insertion into Rh–C bond → acyl–Rh complex",
+      "H₂ oxidative addition to Rh → reductive elimination → aldehyde product + Rh catalyst regenerated",
+      "Rh gives mainly linear (normal) aldehyde (n/iso ≈ 10:1 with bulky phosphine ligands)",
+      "Co-based (older Oxo process): lower selectivity, higher T/P required; Rh more active at mild conditions"
+    ],
+    smiles:()=> "R-CH₂-CHO (linear aldehyde, one C longer than starting alkene)",
+    confidence:90 },
+
+  // ── DCC PEPTIDE COUPLING ──────────────────────────────────────────────
+  { id:"dcc_peptide_coupling",
+    match:(r,rg,c)=>
+      /carboxylic.*acid|rcooh|amino.*acid|peptide/i.test(r) &&
+      /dcc|dcc.*dmap|dicyclohexylcarbodiimide|hatu|hobt|peptide.*coupl/i.test(rg+c),
+    product:()=> "Amide bond (peptide bond, RCONH-R') + DCU (dicyclohexylurea byproduct) — DCC activates carboxylic acid toward amide formation with amine; DMAP catalyses",
+    type:"DCC Peptide Coupling — Carboxylic Acid + Amine → Amide",
+    mechanism:[
+      "DCC (N,N'-dicyclohexylcarbodiimide) activates carboxylic acid: C=N electrophile attacked by RCOOH → O-acyl isourea (active ester intermediate)",
+      "O-Acyl isourea is highly reactive — amine nucleophile attacks carbonyl → tetrahedral intermediate",
+      "DCU (dicyclohexylurea) expelled as stable byproduct → amide bond forms",
+      "HOBt or DMAP added to prevent racemisation and accelerate coupling: forms active ester in situ",
+      "Standard method in solid-phase peptide synthesis (SPPS); also HATU, HBTU, EDC as modern alternatives"
+    ],
+    smiles:()=> "R-CO-NH-R' (amide/peptide bond) + DCU (dicyclohexylurea)",
+    confidence:93 },
+
+  // ── BOC PROTECTION / DEPROTECTION ────────────────────────────────────
+  { id:"boc_protection",
+    match:(r,rg,c)=>
+      /amine|nh2|amino|rnh2/i.test(r) &&
+      /boc2o|di-tert-butyl.*dicarbonate|boc.*protect|boc.*deprotect|tfa.*boc|hcl.*boc/i.test(rg+c),
+    product:(r,rg)=>
+      /tfa|hcl|acid.*deprotect/i.test(rg+c)
+        ? "Free amine (RNH₂) + CO₂ + isobutylene — Boc deprotection with TFA or HCl is rapid; orthogonal to Cbz and Fmoc"
+        : "Boc-protected amine (RNH-Boc) — stable to base, nucleophiles, Grignard; removed by TFA or HCl",
+    type:"Boc Amine Protection / Deprotection (tert-Butoxycarbonyl)",
+    mechanism:[
+      "Protection: Boc₂O (di-tert-butyl dicarbonate) reacts with amine N → Boc-NH-R (urethane/carbamate); Et₃N neutralises CO₂ byproduct",
+      "Boc group stable to: base (NaOH, Et₃N), nucleophiles, Grignard reagents, LiAlH₄ in mild conditions",
+      "Deprotection (TFA/DCM): TFA protonates Boc C=O; tert-butyl cation released; carbamate → carbamic acid → CO₂ + amine",
+      "Deprotection (HCl/dioxane): similar acid-mediated cleavage → amine·HCl salt",
+      "Orthogonality: Boc (acid-labile) is orthogonal to Cbz (H₂/Pd-labile) and Fmoc (base-labile) in SPPS"
+    ],
+    smiles:(r,rg)=>
+      /tfa|hcl|deprotect/i.test(rg) ? "R-NH₂ (free amine after Boc removal)" : "R-NH-CO₂-C(CH₃)₃ (Boc-protected amine)",
+    confidence:93 },
+
+  // ── SILYL ETHER PROTECTION OF ALCOHOL (TBS, TMS, TIPS) ───────────────
+  { id:"silyl_protection",
+    match:(r,rg,c)=>
+      /alcohol|roh|ol\b/i.test(r) &&
+      /tbscl|tmscl|tipscl|tbso|tms|silyl|imidazole.*si|si.*imidazole/i.test(rg+c),
+    product:(r,rg)=>
+      /tbscl|tbs/i.test(rg)
+        ? "TBS ether (R-OTBS, tert-butyldimethylsilyl ether) — robust silyl protection; stable to mild acid/base; removed by TBAF or HF"
+        : "Silyl ether (R-OSiR₃) — alcohol oxygen protected as silyl ether; orthogonal to other protecting groups",
+    type:"Silyl Ether Protection of Alcohol (TBS / TMS / TIPS)",
+    mechanism:[
+      "Base (imidazole, Et₃N) deprotonates or activates alcohol OH",
+      "Silyl electrophile (R₃SiCl) reacts with alcohol O via SN2 at silicon → silyl ether R-O-SiR₃ + HCl",
+      "TMS (trimethylsilyl): easily removed; TBS (tert-butyldimethylsilyl): stable to many conditions; TIPS: most bulky/stable",
+      "Stability: silyl ether stable to base, organolithium, Grignard, LiAlH₄ (with care), neutral conditions",
+      "Deprotection: TBAF (fluoride, very strong Si–F bond drives deprotection); mild HF/Py; HCl/MeOH"
+    ],
+    smiles:()=> "R-O-Si(CH₃)₂C(CH₃)₃ (TBS ether) or R-O-Si(CH₃)₃ (TMS ether)",
+    confidence:92 },
+
+  // ── BENZYL (BN) PROTECTION OF ALCOHOL ────────────────────────────────
+  { id:"benzyl_protection",
+    match:(r,rg,c)=>
+      /alcohol|roh|ol\b|diol/i.test(r) &&
+      /bnbr|bnci|benzyl.*chloride.*nah|nah.*bnbr|bnbr.*nah|benzyl.*protect/i.test(rg+c),
+    product:()=> "Benzyl ether (R-O-Bn, R-O-CH₂Ph) — stable to acid, base, organometallics; removed cleanly by H₂/Pd-C (hydrogenolysis)",
+    type:"Benzyl Protection of Alcohol → Benzyl Ether",
+    mechanism:[
+      "NaH deprotonates alcohol → alkoxide (R-O⁻ Na⁺) — powerful nucleophile",
+      "Alkoxide undergoes SN2 on benzyl bromide/chloride (PhCH₂-X) → benzyl ether (R-O-CH₂Ph) + X⁻",
+      "Benzyl ether stable to: acid (H₃O⁺, TFA), base (NaOH, LDA), Grignard, organolithium",
+      "Deprotection: H₂ gas + Pd/C → hydrogenolysis of O-CH₂-Ph bond → R-OH + toluene",
+      "Complementary to silyl (TBAF-labile) and Boc (acid-labile) — useful in multi-step synthesis"
+    ],
+    smiles:()=> "R-O-CH₂-Ph (benzyl ether) → R-OH on H₂/Pd-C",
+    confidence:92 },
+
+  // ── ACETONIDE PROTECTION OF 1,2- OR 1,3-DIOL ─────────────────────────
+  { id:"acetonide_protection",
+    match:(r,rg,c)=>
+      /diol|1,2-diol|1,3-diol|vicinal.*diol|sugar|glycol/i.test(r) &&
+      /2,2-dimethoxypropane|acetone.*tsoh|acetonide|cyclic.*ketal|dmp.*tsoh/i.test(rg+c),
+    product:()=> "Cyclic acetonide ketal (1,3-dioxolane or 1,3-dioxane) — both OH groups of diol locked into 5- or 6-membered ring; deprotected by aqueous acid",
+    type:"Acetonide Protection of Diol → Cyclic Ketal",
+    mechanism:[
+      "Acid catalyst activates 2,2-dimethoxypropane (or acetone) → trimethyloxocarbenium ion",
+      "First diol OH attacks → hemi-ketal + MeOH expelled",
+      "Second diol OH attacks same carbon → cyclic ketal (1,3-dioxolane for 1,2-diol; 1,3-dioxane for 1,3-diol) + MeOH",
+      "Thermodynamically favoured: 5-membered ring (1,2-diol) and 6-membered ring (1,3-diol) both stable",
+      "Deprotection: aqueous acid (H₃O⁺) reverses — highly useful in carbohydrate chemistry and polyol natural products"
+    ],
+    smiles:()=> "cyclic ketal: O-C(CH₃)₂-O in 5- or 6-membered ring (dioxolane or dioxane)",
+    confidence:91 },
+
 ];
 
 /* ════════════════════════════════════════════
