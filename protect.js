@@ -196,10 +196,13 @@
     /* ==============================
        10. INIT
     ============================== */
+    window._PROTECT_INIT = function(){
     setTimeout(()=>{
         _ASK();
         setInterval(_ENF, 2500);
     }, 1200);
+};
 
+window._PROTECT_INIT();
 
 })();
