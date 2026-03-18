@@ -265,6 +265,84 @@ document.addEventListener("DOMContentLoaded", function() {
     script.defer = true;
     document.head.appendChild(script);
 })();
+
+
+
+/* ==============================
+   🔒 GLOBAL FOOTER PROTECTION
+   (Non-breaking, works with your system)
+============================== */
+
+(function(){
+
+    const FOOTER_ID = "sn-footer";
+    const FOOTER_URL = "https://chemistrytools.sudhirnama.in/footer.html"; // adjust if needed
+    const DOMAIN = "sudhirnama.in"; // optional
+
+    /* 1. DOMAIN LOCK (safe) */
+    try{
+        if(DOMAIN && location.hostname !== DOMAIN){
+            document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>Unauthorized Copy</h2>";
+            return;
+        }
+    }catch(e){}
+
+    /* 2. LOAD FOOTER */
+    async function loadFooter(){
+        try{
+            let existing = document.getElementById(FOOTER_ID);
+
+            if(!existing){
+                const res = await fetch(FOOTER_URL + "?v=" + Date.now());
+                const html = await res.text();
+
+                const container = document.createElement("div");
+                container.id = FOOTER_ID;
+                container.innerHTML = html;
+
+                container.style.position = "fixed";
+                container.style.bottom = "0";
+                container.style.left = "0";
+                container.style.width = "100%";
+                container.style.zIndex = "999999";
+
+                document.body.appendChild(container);
+            }
+        }catch(e){
+            console.warn("Footer load failed");
+        }
+    }
+
+    /* 3. AUTO-RESTORE */
+    function ensureFooter(){
+        if(!document.getElementById(FOOTER_ID)){
+            loadFooter();
+        }
+    }
+
+    /* 4. OBSERVER (ANTI-REMOVE) */
+    function protect(){
+        const observer = new MutationObserver(() => {
+            if (!document.getElementById(FOOTER_ID)) {
+                loadFooter();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    /* 5. INIT (delayed to avoid clash with your UI) */
+    setTimeout(() => {
+        loadFooter();
+        protect();
+        setInterval(ensureFooter, 1500);
+    }, 500);
+
+})();
+    
 });
 
 
