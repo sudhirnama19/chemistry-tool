@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Advanced Molecular Mass Calculator by Chemistry Spark — Calculate molecular weight of any compound with detailed breakdowns, formulas, solved examples, and scientific applications.">
+  <meta name="keywords" content="molecular mass calculator, molecular weight, molar mass, chemistry calculator, atomic mass, formula mass, sudhir nama, chemistry spark">
+  <meta name="author" content="Sudhir Nama">
+  <meta name="robots" content="index, follow">
+  <title>Molecular Mass Calculator | Chemistry Spark — Sudhir Nama</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       DARK GLASSMORPHISM TOKENS
+    ============================================================ */
+    :root {
+      --bg:             #070b14;
+      --bg-1:           #0d1424;
+      --bg-2:           #111827;
+      --glass:          rgba(255,255,255,0.04);
+      --glass-hover:    rgba(255,255,255,0.07);
+      --glass-border:   rgba(255,255,255,0.08);
+      --primary:        #3b82f6;
+      --primary-2:      #06b6d4;
+      --primary-glow:   rgba(59,130,246,0.18);
+      --purple:         #8b5cf6;
+      --pink:           #ec4899;
+      --success:        #10b981;
+      --success-glow:   rgba(16,185,129,0.12);
+      --text:           #f1f5f9;
+      --text-soft:      rgba(241,245,249,0.72);
+      --text-muted:     rgba(241,245,249,0.42);
+      --font:           'Inter', system-ui, sans-serif;
+      --font-head:      'Space Grotesk', system-ui, sans-serif;
+      --radius:         18px;
+      --radius-sm:      10px;
+      --tr:             0.3s cubic-bezier(0.4,0,0.2,1);
+      --shadow:         0 8px 32px rgba(0,0,0,0.45);
+      --glow:           0 0 40px rgba(59,130,246,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    h1,h2,h3,h4,h5 { font-family: var(--font-head); line-height: 1.2; }
+    img { display: block; max-width: 100%; }
+    a   { color: inherit; text-decoration: none; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-1); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+    /* ── Animated BG ── */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      overflow: hidden; pointer-events: none;
+    }
+    .bg-layer::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 20%, rgba(59,130,246,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 75%, rgba(139,92,246,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(6,182,212,0.07) 0%, transparent 60%);
+      animation: bgPulse 12s ease-in-out infinite alternate;
+    }
+    .bg-layer::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    @keyframes bgPulse {
+      0%   { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 1;   transform: scale(1.06); }
+    }
+
+    /* ── Layout ── */
+    .page-wrap { position: relative; z-index: 1; }
+    .container  { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Glass Card ── */
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+      transition: border-color var(--tr), box-shadow var(--tr);
+    }
+    .glass-card:hover {
+      border-color: rgba(59,130,246,0.22);
+      box-shadow: var(--shadow), var(--glow);
+    }
+
+    /* ── Hero ── */
+    .hero { padding: 72px 0 56px; text-align: center; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--primary); background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25); padding: 6px 18px;
+      border-radius: 999px; margin-bottom: 28px;
+    }
+    .hero-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800; color: var(--text); margin-bottom: 18px; letter-spacing: -0.5px;
+    }
+    .grad {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p {
+      font-size: 1.05rem; color: var(--text-soft);
+      max-width: 680px; margin: 0 auto; font-weight: 300; line-height: 1.85;
+    }
+
+    /* ── Section titles ── */
+    .sec-title {
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem); font-weight: 700;
+      color: var(--text); margin-bottom: 22px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sec-title::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--glass-border), transparent); }
+    .sec-icon { font-size: 1.15rem; flex-shrink: 0; }
+
+    /* ── Definition boxes ── */
+    .def-box {
+      background: rgba(59,130,246,0.06); border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 20px 22px; margin-bottom: 18px;
+    }
+    .def-box h3 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+    .def-box p  { font-size: 0.92rem; color: var(--text-soft); font-weight: 300; line-height: 1.85; }
+
+    /* ── Formula grid ── */
+    .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 14px; margin-top: 18px; }
+    .formula-card {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 20px; text-align: center; transition: all var(--tr);
+    }
+    .formula-card:hover { border-color: var(--primary); background: rgba(59,130,246,0.08); }
+    .formula-eq   { font-size: 1.25rem; font-weight: 700; color: var(--primary-2); font-family: 'Times New Roman', serif; letter-spacing: 1px; margin-bottom: 8px; }
+    .formula-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 300; }
+
+    /* ── Calculator card ── */
+    .calc-card {
+      background: rgba(0,0,0,0.35); border: 2px solid rgba(59,130,246,0.4);
+      border-radius: var(--radius); padding: 30px; position: relative; overflow: hidden;
+    }
+    .calc-card::before {
+      content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 65%);
+      animation: calcGlow 5s ease-in-out infinite; pointer-events:none;
+    }
+    @keyframes calcGlow { 0%,100%{opacity:0.5;transform:scale(0.95)} 50%{opacity:1;transform:scale(1.05)} }
+
+    .input-group { margin-bottom: 20px; position: relative; z-index: 1; }
+    .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-soft); font-size: 0.9rem; }
+    .input-group input,
+    .input-group select {
+      width: 100%; padding: 13px 18px; background: rgba(0,0,0,0.4);
+      border: 1.5px solid var(--glass-border); border-radius: var(--radius-sm);
+      color: var(--text); font-size: 1rem; font-family: var(--font); outline: none; transition: all var(--tr);
+    }
+    .input-group input::placeholder { color: var(--text-muted); }
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: var(--primary); background: rgba(59,130,246,0.06);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+    .input-group select option { background: var(--bg-2); color: var(--text); }
+
+    .btn-calculate {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      border: none; padding: 14px 32px; border-radius: var(--radius-sm);
+      color: #fff; font-size: 1rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font); transition: all var(--tr);
+      position: relative; z-index: 1; box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+      overflow: hidden; letter-spacing: 0.3px;
+    }
+    .btn-calculate::before {
+      content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-calculate:hover::before { left: 100%; }
+    .btn-calculate:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(59,130,246,0.55); }
+
+    /* Result */
+    .result-display {
+      margin-top: 24px; padding: 24px; background: var(--success-glow);
+      border: 2px solid var(--success); border-radius: var(--radius-sm);
+      text-align: center; display: none; animation: slideUp 0.4s ease;
+      position: relative; z-index: 1;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+    .result-display.show { display: block; }
+    .result-value { font-family: var(--font-head); font-size: 3rem; font-weight: 800; color: var(--success); line-height: 1; }
+    .result-unit  { font-size: 1rem; color: var(--text-soft); margin-top: 6px; }
+    .result-breakdown {
+      margin-top: 18px; padding: 16px; background: rgba(0,0,0,0.3);
+      border-radius: 8px; text-align: left; border: 1px solid var(--glass-border);
+    }
+    .breakdown-item {
+      display: flex; justify-content: space-between; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.88rem; color: var(--text-soft);
+    }
+    .breakdown-item:last-child { border-bottom: none; }
+
+    /* Element grid */
+    .elements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px,1fr)); gap: 8px; margin-top: 14px; }
+    .element-btn {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+      border-radius: 7px; padding: 8px; text-align: center; cursor: pointer; transition: all var(--tr);
+    }
+    .element-btn:hover { background: rgba(59,130,246,0.15); border-color: var(--primary); transform: scale(1.05); }
+    .element-btn .symbol { font-size: 1rem; font-weight: 700; color: var(--text); display: block; }
+    .element-btn .mass   { font-size: 0.65rem; color: var(--text-muted); display: block; margin-top: 2px; }
+
+    /* ── Step cards ── */
+    .step-card {
+      display: flex; gap: 18px; align-items: flex-start; margin-bottom: 14px;
+      padding: 18px 20px; background: rgba(0,0,0,0.2);
+      border-radius: var(--radius-sm); border-left: 3px solid var(--primary-2); transition: all var(--tr);
+    }
+    .step-card:hover { background: rgba(59,130,246,0.06); border-left-color: var(--primary); }
+    .step-number {
+      width: 40px; height: 40px; min-width: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem; color: #fff; flex-shrink: 0;
+      font-family: var(--font); box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+    }
+    .step-content { flex: 1; min-width: 0; }
+    .step-content h4 { color: var(--text); margin-bottom: 6px; font-size: 0.97rem; font-weight: 600; }
+    .step-content p  { color: var(--text-soft); font-size: 0.88rem; font-weight: 300; line-height: 1.75; }
+
+    /* ── Example box ── */
+    .example-box {
+      background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.2);
+      border-radius: var(--radius-sm); padding: 20px 22px; margin: 16px 0;
+    }
+    .example-box h4 { color: var(--primary-2); margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .example-box p  { color: var(--text-soft); font-size: 0.88rem; font-weight: 300; line-height: 1.75; }
+    .example-box li { color: var(--text-soft); font-size: 0.88rem; font-weight: 300; margin-bottom: 4px; }
+    .example-box ul { margin: 8px 0 8px 18px; }
+    .formula-highlight {
+      display: inline-block; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);
+      padding: 1px 8px; border-radius: 4px; font-family: 'Courier New', monospace;
+      color: var(--primary); font-weight: 600; font-size: 0.87rem;
+    }
+
+    /* ── Aspects grid ── */
+    .aspects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 16px; }
+    .aspect-card {
+      background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 20px 22px; transition: all var(--tr);
+    }
+    .aspect-card:hover {
+      background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.3);
+      transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .aspect-icon { font-size: 1.5rem; display: block; margin-bottom: 12px; line-height: 1; }
+    .aspect-card h4 { color: var(--text); margin-bottom: 8px; font-size: 0.95rem; font-weight: 600; }
+    .aspect-card p  { color: var(--text-soft); font-size: 0.85rem; font-weight: 300; line-height: 1.7; }
+
+    /* ── Rules list ── */
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .rules-list li {
+      padding: 13px 18px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+      border-radius: 8px; color: var(--text-soft); display: flex; align-items: flex-start; gap: 12px;
+      font-size: 0.88rem; font-weight: 300; transition: all var(--tr);
+    }
+    .rules-list li:hover { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.25); }
+    .rules-list li strong { color: var(--text); font-weight: 600; }
+    .rules-icon { flex-shrink: 0; margin-top: 1px; font-size: 0.95rem; }
+
+    /* ── Data table ── */
+    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; }
+    .data-table th {
+      background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(6,182,212,0.3));
+      padding: 12px 16px; text-align: left; font-weight: 600;
+      color: var(--text); font-size: 0.85rem; font-family: var(--font);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .data-table td {
+      padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-soft); font-size: 0.85rem; font-weight: 300; background: rgba(0,0,0,0.2);
+    }
+    .data-table tr:hover td { background: rgba(59,130,246,0.08); color: var(--text); }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    /* ── Process timeline ── */
+    .process-timeline { position: relative; padding-left: 28px; }
+    .process-timeline::before {
+      content:''; position:absolute; left:7px; top:0; bottom:0; width:2px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-2), var(--purple));
+    }
+    .process-step { position: relative; padding: 16px 0 16px 28px; }
+    .process-step::before {
+      content:''; position:absolute; left:-22px; top:22px; width:10px; height:10px;
+      background: var(--primary); border-radius: 50%; border: 2px solid var(--bg);
+      box-shadow: 0 0 8px rgba(59,130,246,0.6);
+    }
+    .process-step h4 { color: var(--primary); margin-bottom: 6px; font-size: 0.95rem; font-weight: 600; }
+    .process-step p  { color: var(--text-soft); font-size: 0.88rem; font-weight: 300; line-height: 1.75; }
+
+    /* ── Research cards ── */
+    .research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 18px; }
+    .research-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 22px; transition: all var(--tr);
+    }
+    .research-card:hover {
+      border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05);
+      transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .research-card h4 { color: var(--pink); margin-bottom: 10px; font-size: 1rem; font-weight: 600; }
+    .research-card p  { color: var(--text-soft); font-size: 0.87rem; font-weight: 300; margin-bottom: 14px; line-height: 1.75; }
+    .application-example {
+      background: rgba(0,0,0,0.3); padding: 12px 14px; border-radius: 7px;
+      font-size: 0.82rem; color: var(--text-muted); font-weight: 300;
+      border: 1px solid rgba(255,255,255,0.05); line-height: 1.65;
+    }
+    .application-example strong { color: var(--text-soft); }
+
+    /* ── FAQ ── */
+    .faq-container { display: flex; flex-direction: column; gap: 10px; }
+    .faq-card {
+      background: rgba(0,0,0,0.25); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); overflow: hidden; transition: border-color var(--tr);
+    }
+    .faq-card:hover  { border-color: rgba(59,130,246,0.25); }
+    .faq-card.active { border-color: var(--primary); }
+    .faq-question {
+      padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.03); transition: background var(--tr);
+    }
+    .faq-question:hover { background: rgba(59,130,246,0.07); }
+    .faq-question h4 { color: var(--text); font-weight: 600; font-size: 0.92rem; margin: 0; flex: 1; padding-right: 14px; }
+    .faq-chevron { color: var(--primary); font-style: normal; flex-shrink: 0; font-size: 1.1rem; transition: transform 0.3s ease; line-height: 1; }
+    .faq-card.active .faq-chevron { transform: rotate(180deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.45s ease; }
+    .faq-card.active .faq-answer { max-height: 600px; }
+    .faq-answer-content {
+      padding: 16px 20px; color: var(--text-soft); font-size: 0.88rem;
+      font-weight: 300; line-height: 1.85; border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── Scroll to Top — Modern Floating Pill ── */
+    #scroll-top {
+      position: fixed;
+      bottom: 32px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Starts hidden */
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(16px) scale(0.85);
+      transition: opacity 0.35s ease, visibility 0.35s ease,
+                  transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.3s ease;
+      box-shadow:
+        0 4px 20px rgba(59,130,246,0.45),
+        0 0 0 0 rgba(59,130,246,0);
+      z-index: 500;         /* lower than content cards to avoid overlap */
+      pointer-events: none;
+    }
+
+    /* Shown state */
+    #scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse {
+      0%   { box-shadow: 0 4px 20px rgba(59,130,246,0.45), 0 0 0 0   rgba(59,130,246,0.4); }
+      60%  { box-shadow: 0 4px 20px rgba(59,130,246,0.45), 0 0 0 10px rgba(59,130,246,0);   }
+      100% { box-shadow: 0 4px 20px rgba(59,130,246,0.45), 0 0 0 0   rgba(59,130,246,0);   }
+    }
+
+    #scroll-top:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.65), 0 0 0 0 rgba(59,130,246,0);
+      animation: none;
+    }
+
+    #scroll-top:active {
+      transform: scale(0.94);
+    }
+
+    /* ── Reveal ── */
+    .reveal { opacity:0; transform:translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .stagger > * { opacity:0; transform:translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .stagger.visible > *:nth-child(1){opacity:1;transform:translateY(0);transition-delay:0.04s}
+    .stagger.visible > *:nth-child(2){opacity:1;transform:translateY(0);transition-delay:0.09s}
+    .stagger.visible > *:nth-child(3){opacity:1;transform:translateY(0);transition-delay:0.14s}
+    .stagger.visible > *:nth-child(4){opacity:1;transform:translateY(0);transition-delay:0.19s}
+    .stagger.visible > *:nth-child(5){opacity:1;transform:translateY(0);transition-delay:0.24s}
+    .stagger.visible > *:nth-child(6){opacity:1;transform:translateY(0);transition-delay:0.29s}
+
+    /* ── Utilities ── */
+    .mt-16{margin-top:16px} .mt-20{margin-top:20px}
+    .text-soft{color:var(--text-soft);font-weight:300;font-size:0.93rem;line-height:1.8;margin-bottom:16px}
+
+    /* ── Responsive ── */
+    @media (max-width:768px){
+      .glass-card,.calc-card{padding:20px 16px}
+      .hero{padding:44px 0 36px}
+      .aspects-grid,.research-grid{grid-template-columns:1fr}
+      .formula-grid{grid-template-columns:1fr 1fr}
+      .step-card{flex-direction:column}
+      .data-table th,.data-table td{padding:9px;font-size:0.78rem}
+    }
+    @media(max-width:480px){
+      .formula-grid{grid-template-columns:1fr}
+      .hero h1{font-size:1.9rem}
+      .result-value{font-size:2.4rem}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-layer"></div>
+
+  <div class="page-wrap">
+
+    <!-- Header from header.js -->
+    <div class="header-space" style="height:40px;"></div>
+    <div id="header-container"></div>
+    <script src="header.js"></script>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="container">
+        <div class="hero-badge"><span class="hero-dot"></span> Chemistry Spark Tools</div>
+        <h1>Advanced <span class="grad">Molecular Mass</span> Calculator</h1>
+        <p>Calculate the molecular weight of any chemical compound with precision. Understand the science behind molecular mass with detailed breakdowns, formulas, and real-world applications.</p>
+      </div>
+    </header>
+
+    <div class="container" style="padding-bottom:80px;">
+
+      <!-- Definition & Formulas -->
+      <div class="glass-card reveal" id="definition">
+        <h2 class="sec-title"><span class="sec-icon">📖</span> Definition and Formulas</h2>
+
+        <div class="def-box">
+          <h3>What is Molecular Mass?</h3>
+          <p>Molecular mass, also known as molecular weight, is the sum of the atomic masses of all atoms in a molecule. It represents the mass of a single molecule expressed in atomic mass units (amu) or Daltons (Da) — a fundamental property essential for stoichiometric calculations, reaction yield analysis, and compound characterisation across scientific applications.</p>
+        </div>
+
+        <div class="def-box">
+          <h3>Understanding Molar Mass</h3>
+          <p>Molar mass is the mass of one mole of a substance in g/mol. While molecular mass refers to a single molecule, molar mass relates to Avogadro's number (6.022 × 10²³) of molecules. Numerically they are identical — a relationship crucial for converting between mass and moles in chemical calculations.</p>
+        </div>
+
+        <h3 style="color:var(--text);margin:22px 0 14px;font-size:1rem;font-weight:600;">Core Formulas</h3>
+        <div class="formula-grid stagger">
+          <div class="formula-card">
+            <div class="formula-eq">M = Σ(n<sub>i</sub> × A<sub>i</sub>)</div>
+            <span class="formula-label">Molecular Mass = Sum of (atoms × atomic mass)</span>
+          </div>
+          <div class="formula-card">
+            <div class="formula-eq">% = (n × A / M) × 100</div>
+            <span class="formula-label">Percentage composition of each element</span>
+          </div>
+          <div class="formula-card">
+            <div class="formula-eq">n = m / M</div>
+            <span class="formula-label">Moles = Mass ÷ Molar Mass</span>
+          </div>
+          <div class="formula-card">
+            <div class="formula-eq">N = n × N<sub>A</sub></div>
+            <span class="formula-label">Molecules = moles × Avogadro's number</span>
+          </div>
+        </div>
+
+        <div class="example-box mt-16">
+          <h4>💡 Formula Breakdown — Glucose (C₆H₁₂O₆)</h4>
+          <p><strong>M</strong> = (6 × 12.011) + (12 × 1.008) + (6 × 15.999) = <strong style="color:var(--success);">180.156 g/mol</strong></p>
+        </div>
+      </div>
+
+      <!-- Calculator -->
+      <div class="glass-card reveal" id="calculator">
+        <h2 class="sec-title"><span class="sec-icon">🧮</span> Molecular Mass Calculator</h2>
+        <div class="calc-card">
+          <div class="input-group">
+            <label for="compound-formula">Enter Chemical Formula</label>
+            <input type="text" id="compound-formula" placeholder="e.g., H2O, NaCl, C6H12O6, Ca(OH)2, CuSO4.5H2O" autocomplete="off">
+          </div>
+          <div class="input-group">
+            <label for="calculation-mode">Calculation Mode</label>
+            <select id="calculation-mode">
+              <option value="molecular">Molecular Mass (amu / Da)</option>
+              <option value="molar">Molar Mass (g/mol)</option>
+              <option value="both">Both Values</option>
+            </select>
+          </div>
+          <button class="btn-calculate" onclick="calculateMolecularMass()">⚛️ &nbsp;Calculate Mass</button>
+          <div id="result-display" class="result-display">
+            <div class="result-value" id="mass-value">0.000</div>
+            <div class="result-unit" id="mass-unit">g/mol</div>
+            <div class="result-breakdown" id="breakdown"></div>
+          </div>
+          <div class="mt-20">
+            <h4 style="color:var(--text-soft);margin-bottom:12px;font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Quick Element Selection</h4>
+            <div class="elements-grid" id="elements-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to Use -->
+      <div class="glass-card reveal" id="how-to-use">
+        <h2 class="sec-title"><span class="sec-icon">ℹ️</span> How to Use the Calculator</h2>
+        <p class="text-soft">Follow the steps below to accurately calculate the molecular mass of any compound.</p>
+
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Enter the Chemical Formula</h4>
+            <p>Type the molecular formula using standard notation. Water is <span class="formula-highlight">H2O</span>, carbon dioxide is <span class="formula-highlight">CO2</span>, and glucose is <span class="formula-highlight">C6H12O6</span>.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Handle Parentheses and Groups</h4>
+            <p>For polyatomic ions use parentheses: <span class="formula-highlight">Ca(OH)2</span> or <span class="formula-highlight">Al2(SO4)3</span>. All atoms within are multiplied by the outer subscript.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Understanding Hydrates</h4>
+            <p>Use dot notation: <span class="formula-highlight">CuSO4.5H2O</span> for copper(II) sulfate pentahydrate. Anhydrous and water masses are summed automatically.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Review the Results</h4>
+            <p>The breakdown shows each element's atomic mass, atom count, and subtotal — helping you verify and understand elemental composition.</p>
+          </div>
+        </div>
+
+        <div class="example-box">
+          <h4>🧪 Example — Sulfuric Acid (H₂SO₄)</h4>
+          <ul><li>H: 2 × 1.008 = 2.016</li><li>S: 1 × 32.065 = 32.065</li><li>O: 4 × 15.999 = 63.996</li></ul>
+          <p style="margin-top:10px;"><strong>Total = <span style="color:var(--success);">98.077 g/mol</span></strong></p>
+        </div>
+        <div class="example-box">
+          <h4>⚗️ Complex — Calcium Phosphate Ca₃(PO₄)₂</h4>
+          <ul><li>Ca: 3 × 40.078 = 120.234</li><li>P: 2 × 30.974 = 61.948</li><li>O: 8 × 15.999 = 127.992</li></ul>
+          <p style="margin-top:10px;"><strong>Total = <span style="color:var(--success);">310.174 g/mol</span></strong></p>
+        </div>
+      </div>
+
+      <!-- Key Aspects -->
+      <div class="glass-card reveal" id="aspects">
+        <h2 class="sec-title"><span class="sec-icon">🔬</span> Key Aspects of Molecular Mass</h2>
+        <div class="aspects-grid stagger">
+          <div class="aspect-card"><span class="aspect-icon">⚖️</span><h4>Stoichiometry</h4><p>Enables determination of exact reactant and product quantities, and conversion between mass, moles, and particles.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">%</span><h4>Percent Composition</h4><p>Determines the percentage by mass of each element — essential for verifying compound purity.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">⚛️</span><h4>Isotopic Variations</h4><p>Standard atomic weights are weighted averages based on natural isotopic abundance for most applications.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">📈</span><h4>Physical Properties</h4><p>Influences boiling point, melting point, and density — helping predict substance behaviour.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">💧</span><h4>Solution Chemistry</h4><p>Essential for preparing solutions of specific molarities and performing accurate titrations.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🧬</span><h4>Biological Systems</h4><p>Characterises proteins, DNA, and biomolecules. Mass spectrometry relies on precise molecular mass.</p></div>
+        </div>
+      </div>
+
+      <!-- Uses -->
+      <div class="glass-card reveal" id="applications">
+        <h2 class="sec-title"><span class="sec-icon">🏭</span> Uses and Applications</h2>
+        <p class="text-soft">From pharmaceuticals to environmental science — molecular mass is essential across all scientific fields.</p>
+        <div class="aspects-grid stagger">
+          <div class="aspect-card"><span class="aspect-icon">💊</span><h4>Pharmaceutical Industry</h4><p>Precise mass for dosage determination, metabolism analysis, and consistent drug manufacturing.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🧪</span><h4>Chemical Manufacturing</h4><p>Scaling reactions, calculating yields, and optimising industrial processes efficiently.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🌿</span><h4>Environmental Science</h4><p>Analysing pollutants, emission factors, and contaminant behaviour in ecosystems.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🍽️</span><h4>Food Science</h4><p>Nutritional labelling, caloric content determination, and additive analysis.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🛰️</span><h4>Materials Science</h4><p>Designing polymers and predicting molecular weight distributions for specific applications.</p></div>
+          <div class="aspect-card"><span class="aspect-icon">🔍</span><h4>Analytical Chemistry</h4><p>Mass spectrometry, chromatography, and spectroscopy all rely on molecular mass.</p></div>
+        </div>
+      </div>
+
+      <!-- Rules -->
+      <div class="glass-card reveal" id="rules">
+        <h2 class="sec-title"><span class="sec-icon">📋</span> Rules for Calculating Molecular Mass</h2>
+        <ul class="rules-list">
+          <li><span class="rules-icon">✅</span><span><strong>Rule 1: Identify All Elements</strong> — Each is represented by its chemical symbol (one or two letters, first capitalised).</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 2: Count Atoms Correctly</strong> — Subscripts indicate atom count; if absent, assume one atom.</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 3: Handle Parentheses</strong> — Multiply all atoms within parentheses by the outer subscript. In Mg(OH)₂: 2 oxygen + 2 hydrogen.</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 4: Use Accurate Atomic Masses</strong> — Use the latest IUPAC standard atomic weights based on natural isotopic abundance.</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 5: Significant Figures</strong> — Report with appropriate precision based on input values and application.</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 6: Hydrate Calculations</strong> — Add the mass of water molecules to the anhydrous compound mass.</span></li>
+          <li><span class="rules-icon">✅</span><span><strong>Rule 7: Verify Results</strong> — Check that individual contributions sum to the total and the formula makes chemical sense.</span></li>
+        </ul>
+      </div>
+
+      <!-- Examples Table -->
+      <div class="glass-card reveal" id="examples-table">
+        <h2 class="sec-title"><span class="sec-icon">📊</span> Common Molecular Mass Examples</h2>
+        <p class="text-soft">Molecular masses of commonly encountered compounds with their primary applications.</p>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Compound Name</th><th>Formula</th><th>Molecular Mass (g/mol)</th><th>Primary Application</th></tr></thead>
+            <tbody>
+              <tr><td>Water</td><td>H₂O</td><td>18.015</td><td>Universal solvent, biological processes</td></tr>
+              <tr><td>Carbon Dioxide</td><td>CO₂</td><td>44.009</td><td>Photosynthesis, fire extinguishers</td></tr>
+              <tr><td>Sodium Chloride</td><td>NaCl</td><td>58.443</td><td>Table salt, food preservation</td></tr>
+              <tr><td>Glucose</td><td>C₆H₁₂O₆</td><td>180.156</td><td>Energy source, diabetes monitoring</td></tr>
+              <tr><td>Sulfuric Acid</td><td>H₂SO₄</td><td>98.077</td><td>Battery acid, industrial synthesis</td></tr>
+              <tr><td>Ethanol</td><td>C₂H₅OH</td><td>46.069</td><td>Fuel, solvent, antiseptic</td></tr>
+              <tr><td>Calcium Carbonate</td><td>CaCO₃</td><td>100.087</td><td>Chalk, dietary supplement</td></tr>
+              <tr><td>Ammonia</td><td>NH₃</td><td>17.031</td><td>Fertiliser, refrigerant</td></tr>
+              <tr><td>Methane</td><td>CH₄</td><td>16.043</td><td>Natural gas, fuel</td></tr>
+              <tr><td>Aspirin</td><td>C₉H₈O₄</td><td>180.157</td><td>Pain reliever, anti-inflammatory</td></tr>
+              <tr><td>Caffeine</td><td>C₈H₁₀N₄O₂</td><td>194.193</td><td>Stimulant, beverages</td></tr>
+              <tr><td>Ascorbic Acid (Vitamin C)</td><td>C₆H₈O₆</td><td>176.124</td><td>Dietary supplement, antioxidant</td></tr>
+              <tr><td>Sodium Hydroxide</td><td>NaOH</td><td>39.997</td><td>Soap making, drain cleaner</td></tr>
+              <tr><td>Hydrochloric Acid</td><td>HCl</td><td>36.461</td><td>Digestive aid, industrial cleaner</td></tr>
+              <tr><td>Benzene</td><td>C₆H₆</td><td>78.114</td><td>Industrial solvent, chemical precursor</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- How It Works -->
+      <div class="glass-card reveal" id="how-it-works">
+        <h2 class="sec-title"><span class="sec-icon">⚙️</span> How Molecular Mass Calculation Works</h2>
+        <p class="text-soft">Step-by-step methodology from formula interpretation to final result.</p>
+        <div class="process-timeline">
+          <div class="process-step"><h4>Step 1 — Formula Parsing</h4><p>The calculator identifies each element symbol and its subscript count. Parentheses are treated as groups multiplied by the outer subscript.</p></div>
+          <div class="process-step"><h4>Step 2 — Element Identification</h4><p>Each symbol is matched against the IUPAC atomic masses database — weighted averages of naturally occurring isotopes.</p></div>
+          <div class="process-step"><h4>Step 3 — Atom Counting</h4><p>Total atoms per element are summed. In C₂H₅OH, hydrogen appears in two positions — total 6 hydrogen atoms.</p></div>
+          <div class="process-step"><h4>Step 4 — Mass Calculation</h4><p>Each element's atomic mass is multiplied by its atom count. All contributions are summed for the total molecular mass.</p></div>
+          <div class="process-step"><h4>Step 5 — Result Presentation</h4><p>Results appear with the appropriate unit plus a full element-by-element breakdown for easy verification.</p></div>
+        </div>
+        <div class="example-box mt-20">
+          <h4>🧮 Worked Example — Sodium Bicarbonate (NaHCO₃)</h4>
+          <ul><li>Na: 1 × 22.990</li><li>H: 1 × 1.008</li><li>C: 1 × 12.011</li><li>O: 3 × 15.999 = 47.997</li></ul>
+          <p style="margin-top:10px;"><strong>Total = <span style="color:var(--success);">84.006 g/mol</span></strong></p>
+        </div>
+      </div>
+
+      <!-- Research Applications -->
+      <div class="glass-card reveal" id="research">
+        <h2 class="sec-title"><span class="sec-icon">🧪</span> Applications in Scientific Research</h2>
+        <p class="text-soft">Molecular mass plays a crucial role in modern research across multiple disciplines.</p>
+        <div class="research-grid stagger">
+          <div class="research-card"><h4>Drug Discovery &amp; Development</h4><p>Essential for drug design, dosage calculations, and pharmacokinetic predictions in pharmaceutical research.</p><div class="application-example"><strong>Example:</strong> For a compound with mass 450 g/mol, a 500 mg dose = 1.11 millimoles of active ingredient.</div></div>
+          <div class="research-card"><h4>Proteomics &amp; Biomarker Discovery</h4><p>Mass spectrometry-based proteomics uses precise molecular mass to identify proteins and disease biomarkers.</p><div class="application-example"><strong>Example:</strong> A protein with mass 45,000 Da may indicate specific cancer types in clinical research.</div></div>
+          <div class="research-card"><h4>Environmental Monitoring</h4><p>Analysing pollutants and calculating emission factors for regulatory compliance monitoring.</p><div class="application-example"><strong>Example:</strong> VOC molecular mass converts ppm to mg/m³ for air quality compliance.</div></div>
+          <div class="research-card"><h4>Materials Science &amp; Engineering</h4><p>Polymer molecular mass determines strength, flexibility, and thermal behaviour for material design.</p><div class="application-example"><strong>Example:</strong> Mn 50,000 g/mol vs 100,000 g/mol gives very different mechanical properties.</div></div>
+          <div class="research-card"><h4>Metabolomics Research</h4><p>Fundamental for identifying and quantifying small-molecule metabolites in biological systems.</p><div class="application-example"><strong>Example:</strong> Tracking glucose (180.156 g/mol) helps understand diabetes progression.</div></div>
+          <div class="research-card"><h4>Nanotechnology</h4><p>Precise mass calculations for synthesis of quantum dots, nanoparticles, and molecular machines.</p><div class="application-example"><strong>Example:</strong> Ligand molecular mass achieves desired surface coverage on gold nanoparticles.</div></div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="glass-card reveal" id="faq">
+        <h2 class="sec-title"><span class="sec-icon">❓</span> Frequently Asked Questions</h2>
+        <div class="faq-container">
+
+          <div class="faq-card"><div class="faq-question"><h4>What is the difference between molecular mass and molar mass?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Molecular mass is the mass of a single molecule in amu or Daltons. Molar mass is the mass of one mole (6.022 × 10²³ molecules) in g/mol. Numerically they are identical but represent different scales — molecular is microscopic, molar is macroscopic. Chemists often use both terms interchangeably in practice.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>How do I calculate molecular mass for a formula with parentheses?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">The subscript outside parentheses multiplies all elements within. In Ca(OH)₂: Ca (40.078) + O×2 (31.998) + H×2 (2.016) = 74.092 g/mol. For nested cases like Al₂(SO₄)₃, calculate the SO₄ group mass, multiply by 3, then add the aluminium contribution.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>Why do atomic masses have decimal values?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Most elements exist as isotope mixtures and the standard atomic weight is a weighted average based on natural abundance. Chlorine has Cl-35 (75.78%) and Cl-37 (24.22%), giving 35.45. The atomic mass unit is defined relative to carbon-12, making all other masses non-integer.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>How do I handle hydrates in calculations?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Add the anhydrous mass to the water mass. CuSO₄·5H₂O = CuSO₄ (159.609 g/mol) + 5 × H₂O (90.075 g/mol) = 249.684 g/mol. In this calculator, enter hydrates using a period: CuSO4.5H2O.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>Can molecular mass help identify unknown compounds?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Yes — the molecular ion peak in mass spectrometry provides the exact molecular mass, compared against compound databases. Combined with NMR, IR, and UV-Vis data, it confirms compound identity. High-resolution MS determines molecular formulas to four+ decimal places.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>How is molecular mass used in solution preparation?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">To prepare 500 mL of 0.5 M NaCl: mass = 0.5 L × 0.5 mol/L × 58.443 g/mol = 14.61 g. Molecular mass enables conversion between molarity, molality, and percent-by-mass concentration units.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>Why is molecular mass important in stoichiometry?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Molecular mass bridges measurable grams and countable moles. Balanced equations show reactions in mole ratios — molecular mass translates these to grams: 4.032 g H₂ + 31.998 g O₂ → 36.030 g H₂O.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>How do isotopes affect molecular mass calculations?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">Standard calculations use IUPAC weighted averages. For specialised work like mass spectrometry, exact isotope masses are used. Natural carbon is 12.011 amu (average C-12 + C-13), while pure C-12 is exactly 12.0000 amu.</div></div></div>
+
+          <div class="faq-card"><div class="faq-question"><h4>Can molecular mass predict physical properties?</h4><span class="faq-chevron">▾</span></div><div class="faq-answer"><div class="faq-answer-content">For gases, higher molecular mass means higher density and lower diffusion rate (Graham's law). For liquids, it typically correlates with higher boiling points. Within homologous series, boiling point and viscosity increase predictably. However, molecular shape, polarity, and hydrogen bonding are equally important.</div></div></div>
+
+        </div>
+      </div>
+
+    </div><!-- /container -->
+
+    <!-- Footer from footer.html -->
+    <div style="height:40px;"></div>
+    <div id="footer-container"></div>
+
+  </div><!-- /page-wrap -->
+
+  <!-- Scroll to Top — floats safely above footer -->
+  <button id="scroll-top" aria-label="Scroll back to top" title="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <script>
+    // Reveal
+    const ro = new IntersectionObserver(es => {
+      es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); }});
+    }, {threshold:0.07, rootMargin:'0px 0px -30px 0px'});
+    document.querySelectorAll('.reveal,.stagger').forEach(el => ro.observe(el));
+
+    // Scroll top
+    const stb = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => stb.classList.toggle('visible', scrollY > 400), {passive:true});
+    stb.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+    // FAQ
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', () => q.parentElement.classList.toggle('active'));
+    });
+
+    // Atomic masses (IUPAC 2021)
+    const AM = {
+      H:1.008,He:4.003,Li:6.94,Be:9.012,B:10.81,C:12.011,N:14.007,O:15.999,F:18.998,Ne:20.180,
+      Na:22.990,Mg:24.305,Al:26.982,Si:28.085,P:30.974,S:32.06,Cl:35.45,Ar:39.948,K:39.098,Ca:40.078,
+      Sc:44.956,Ti:47.867,V:50.942,Cr:51.996,Mn:54.938,Fe:55.845,Co:58.933,Ni:58.693,Cu:63.546,Zn:65.38,
+      Ga:69.723,Ge:72.630,As:74.922,Se:78.971,Br:79.904,Kr:83.798,Rb:85.468,Sr:87.62,Y:88.906,Zr:91.224,
+      Nb:92.906,Mo:95.95,Tc:97.907,Ru:101.07,Rh:102.91,Pd:106.42,Ag:107.87,Cd:112.41,In:114.82,Sn:118.71,
+      Sb:121.76,Te:127.60,I:126.90,Xe:131.29,Cs:132.91,Ba:137.33,La:138.91,Ce:140.12,Pr:140.91,Nd:144.24,
+      Pm:144.91,Sm:150.36,Eu:151.96,Gd:157.25,Tb:158.93,Dy:162.50,Ho:164.93,Er:167.26,Tm:168.93,Yb:173.05,
+      Lu:174.97,Hf:178.49,Ta:180.95,W:183.84,Re:186.21,Os:190.23,Ir:192.22,Pt:195.08,Au:196.97,Hg:200.59,
+      Tl:204.38,Pb:207.2,Bi:208.98,Th:232.04,Pa:231.04,U:238.03
+    };
+
+    const COMMON = ['H','C','N','O','Na','Mg','Al','Si','P','S','Cl','K','Ca','Fe','Cu','Zn','Ag','Au','Pb','Hg'];
+
+    function populateElementGrid() {
+      const g = document.getElementById('elements-grid');
+      COMMON.forEach(s => {
+        const b = document.createElement('div');
+        b.className = 'element-btn';
+        b.innerHTML = `<span class="symbol">${s}</span><span class="mass">${AM[s].toFixed(3)}</span>`;
+        b.onclick = () => { document.getElementById('compound-formula').value += s; document.getElementById('compound-formula').focus(); };
+        g.appendChild(b);
+      });
+    }
+
+    function parseFormula(f) {
+      let i = 0;
+      function group() {
+        const g = {};
+        while (i < f.length) {
+          const c = f[i];
+          if (c === '(') {
+            i++;
+            const sub = group(), m = num();
+            for (const [el,n] of Object.entries(sub)) g[el] = (g[el]||0) + n*m;
+          } else if (c === ')') {
+            i++; return g;
+          } else if (c === '.') {
+            i++;
+            const h = group();
+            for (const [el,n] of Object.entries(h)) g[el] = (g[el]||0) + n;
+          } else if (c.match(/[A-Z]/)) {
+            let el = c; i++;
+            if (i < f.length && f[i].match(/[a-z]/)) { el += f[i]; i++; }
+            const n = num();
+            g[el] = (g[el]||0) + n;
+          } else { i++; }
+        }
+        return g;
+      }
+      function num() {
+        let s = '';
+        while (i < f.length && f[i].match(/\d/)) { s += f[i]; i++; }
+        return s ? parseInt(s) : 1;
+      }
+      return group();
+    }
+
+    function calculateMolecularMass() {
+      const input = document.getElementById('compound-formula').value.trim();
+      const mode  = document.getElementById('calculation-mode').value;
+      if (!input) { alert('Please enter a chemical formula'); return; }
+      try {
+        const els = parseFormula(input);
+        let total = 0, breakdown = '';
+        for (const [el, cnt] of Object.entries(els)) {
+          if (!AM[el]) throw new Error(`Unknown element: ${el}`);
+          const m = AM[el] * cnt;
+          total += m;
+          breakdown += `<div class="breakdown-item"><span>${el} (${cnt} × ${AM[el].toFixed(3)})</span><span>${m.toFixed(3)} g/mol</span></div>`;
+        }
+        document.getElementById('mass-value').textContent = total.toFixed(3);
+        document.getElementById('mass-unit').textContent  = mode === 'molecular' ? 'amu (Da)' : 'g/mol';
+        document.getElementById('breakdown').innerHTML = breakdown +
+          `<div class="breakdown-item" style="border-top:2px solid var(--success);padding-top:10px;margin-top:8px;">
+            <span><strong>Total Molecular Mass</strong></span>
+            <span><strong>${total.toFixed(3)} ${mode === 'molecular' ? 'amu' : 'g/mol'}</strong></span>
+          </div>`;
+        document.getElementById('result-display').classList.add('show');
+      } catch(e) { alert('Invalid formula: ' + e.message); }
+    }
+
+    document.getElementById('compound-formula').addEventListener('keypress', e => {
+      if (e.key === 'Enter') calculateMolecularMass();
+    });
+
+    populateElementGrid();
+
+    // Load footer — only insert if server returns OK (prevents 404 HTML appearing as content)
+    fetch('footer.html')
+      .then(r => { if (r.ok) return r.text(); throw new Error('not found'); })
+      .then(d => { document.getElementById('footer-container').innerHTML = d; })
+      .catch(() => { /* footer.html not available — silent fail */ });
+  </script>
+</body>
+</html>

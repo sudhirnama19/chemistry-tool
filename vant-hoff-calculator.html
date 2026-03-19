@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Van't Hoff Equation Calculator | Colligative Properties & Equilibrium</title>
+<meta name="description" content="Advanced Van't Hoff Equation Calculator — compute osmotic pressure, boiling point elevation, freezing point depression, equilibrium constants, and enthalpy changes with step-by-step solutions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Syne:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --accent: #00f2ff;
+  --glass: rgba(15, 23, 42, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --bg: #0a1120;
+  --success: #00ff88;
+  --error: #ff4d4d;
+  --info: #a855f7;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --gold: #f59e0b;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Syne', sans-serif; line-height: 1.7; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% 10%, rgba(0,242,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 85% 80%, rgba(168,85,247,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 45%, rgba(0,255,136,0.03) 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ─── GLASS CARD ─── */
+.glass-card {
+  background: var(--glass); backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border); border-radius: 24px;
+  padding: 35px; margin-bottom: 25px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  position: relative; overflow: hidden; transition: box-shadow .3s, border-color .3s;
+}
+.glass-card:hover { border-color: rgba(0,242,255,.3); box-shadow: 0 24px 70px rgba(0,0,0,.7), 0 0 0 1px rgba(0,242,255,.1); }
+.glass-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,242,255,.4), transparent);
+}
+
+/* ─── LAYOUT ─── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+main { padding: 70px 0 60px; }
+
+/* ─── HERO ─── */
+.hero-card {
+  background: linear-gradient(135deg, rgba(0,242,255,.08) 0%, rgba(168,85,247,.08) 100%);
+  border: 1px solid rgba(0,242,255,.25); border-radius: 28px;
+  padding: 50px 40px 40px; margin-bottom: 25px; position: relative; overflow: hidden;
+}
+.hero-card::after { content: 'π'; position: absolute; right: 40px; top: 20px; font-size: 100px; opacity: .05; color: var(--accent); }
+.page-tag {
+  display: inline-block; background: rgba(0,242,255,.1); border: 1px solid rgba(0,242,255,.3);
+  color: var(--accent); font-family: 'Orbitron', monospace;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
+}
+.page-title {
+  font-family: 'Orbitron', monospace; font-size: clamp(24px,5vw,42px); font-weight: 800; line-height: 1.2;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--info) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
+}
+.page-subtitle { color: var(--text-dim); font-size: 16px; max-width: 720px; }
+
+/* ─── HEADINGS ─── */
+.sec-heading {
+  font-family: 'Orbitron', monospace; font-size: clamp(16px,3vw,21px); font-weight: 700;
+  color: var(--accent); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+}
+.sec-heading::before {
+  content: ''; display: inline-block; width: 4px; height: 22px;
+  background: linear-gradient(180deg, var(--accent), var(--info)); border-radius: 3px;
+}
+.sub-heading { font-size: 15px; font-weight: 700; color: #cbd5e1; margin: 18px 0 8px; }
+.divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(0,242,255,.2),transparent); margin: 10px 0 22px; }
+
+/* ─── FORMULA GRID ─── */
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 14px; margin: 18px 0; }
+.formula-box {
+  background: rgba(0,0,0,.35); border: 1px solid rgba(0,242,255,.2);
+  border-radius: 14px; padding: 18px; font-family: 'JetBrains Mono', monospace; position: relative;
+}
+.formula-box .label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; font-family: 'Syne',sans-serif; }
+.formula-box .eq { font-size: clamp(13px,2.2vw,17px); color: #fff; line-height: 1.6; }
+.formula-box .eq .sym { color: var(--accent); }
+.formula-box .eq .num { color: var(--success); }
+.formula-box .eq .note { color: var(--info); }
+.formula-desc { font-size: 13px; color: var(--text-dim); margin-top: 7px; font-family: 'Syne',sans-serif; }
+
+/* ─── CALC WRAPPER ─── */
+.calc-wrapper {
+  background: linear-gradient(135deg, rgba(0,242,255,.06) 0%, rgba(168,85,247,.06) 100%);
+  border: 1px solid rgba(0,242,255,.3); border-radius: 24px; padding: 38px; margin-bottom: 25px;
+}
+.calc-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+.calc-tab {
+  padding: 9px 20px; border-radius: 30px; cursor: pointer; font-size: 12px;
+  font-family: 'Orbitron',monospace; font-weight: 600; letter-spacing: .8px;
+  border: 1px solid var(--glass-border); background: transparent; color: var(--text-dim); transition: all .25s;
+}
+.calc-tab.active {
+  background: linear-gradient(135deg, var(--accent), var(--info));
+  color: #0a1120; border-color: transparent; box-shadow: 0 4px 20px rgba(0,242,255,.35);
+}
+.calc-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+.calc-panel { display: none; }
+.calc-panel.active { display: block; }
+
+/* ─── INPUTS ─── */
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 16px; margin-bottom: 22px; }
+.input-group label {
+  display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 6px; font-weight: 600;
+}
+.input-group input, .input-group select {
+  width: 100%; padding: 12px 15px;
+  background: rgba(0,0,0,.4); border: 1px solid var(--glass-border);
+  border-radius: 12px; color: #fff; font-family: 'JetBrains Mono',monospace;
+  font-size: 14px; transition: border-color .2s, box-shadow .2s; outline: none; appearance: none;
+}
+.input-group input:focus, .input-group select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,242,255,.15);
+}
+.input-group select option { background: #0a1120; }
+.input-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+.expr-syntax { display: flex; gap: 7px; flex-wrap: wrap; margin: 6px 0 3px; }
+.expr-tag {
+  font-family: 'JetBrains Mono',monospace; font-size: 11px; padding: 2px 9px; border-radius: 6px;
+  background: rgba(0,242,255,.08); border: 1px solid rgba(0,242,255,.2); color: var(--accent); cursor: default;
+}
+.input-preview {
+  font-family: 'JetBrains Mono',monospace; font-size: 12px; margin-top: 5px; padding: 5px 11px;
+  border-radius: 8px; background: rgba(0,0,0,.35); min-height: 24px; transition: all .2s; display: none;
+}
+.input-preview.ok  { display: block; color: var(--success); border: 1px solid rgba(0,255,136,.2); }
+.input-preview.bad { display: block; color: var(--error);   border: 1px solid rgba(255,77,77,.2); }
+
+.calc-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
+  color: #0a1120; font-family: 'Orbitron',monospace; font-weight: 700;
+  font-size: 13px; letter-spacing: 2px; border: none; border-radius: 14px;
+  cursor: pointer; transition: all .3s; box-shadow: 0 6px 25px rgba(0,242,255,.3);
+}
+.calc-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(0,242,255,.45); }
+.calc-btn:active { transform: translateY(0); }
+
+/* ─── RESULTS ─── */
+.result-box {
+  margin-top: 22px; background: rgba(0,0,0,.4);
+  border: 1px solid rgba(0,242,255,.25); border-radius: 16px; padding: 22px; display: none;
+}
+.result-box.show { display: block; animation: slideUp .3s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+.result-value { font-family: 'Orbitron',monospace; font-size: clamp(26px,5vw,44px); font-weight: 800; margin: 6px 0; }
+.result-value.positive { color: var(--success); }
+.result-value.negative { color: var(--error); }
+.result-value.neutral   { color: var(--accent); }
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-bottom: 14px; }
+.result-chip {
+  text-align: center; padding: 14px; background: rgba(0,0,0,.35);
+  border: 1px solid var(--glass-border); border-radius: 12px;
+}
+.result-chip .rc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 5px; }
+.result-chip .rc-val { font-family: 'Orbitron',monospace; font-size: 20px; font-weight: 700; color: var(--accent); }
+.result-interpretation {
+  margin-top: 12px; padding: 13px; background: rgba(0,242,255,.06); border-radius: 10px;
+  font-size: 13px; color: var(--text-dim); border-left: 3px solid var(--accent);
+}
+.result-steps { margin-top: 14px; background: rgba(0,0,0,.3); border-radius: 10px; padding: 15px; }
+.result-steps h4 { font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.step-item { display: flex; gap: 10px; margin-bottom: 7px; font-size: 13px; color: var(--text-dim); font-family: 'JetBrains Mono',monospace; }
+.step-num { color: var(--info); font-weight: 700; min-width: 20px; }
+.error-msg { color: var(--error); font-size: 13px; margin-top: 10px; display: none; }
+
+/* ─── CARDS ─── */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 16px; margin: 16px 0; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; margin: 16px 0; }
+.mini-card {
+  background: rgba(0,0,0,.3); border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 20px; transition: all .25s;
+}
+.mini-card:hover { border-color: rgba(0,242,255,.3); transform: translateY(-2px); }
+.mini-card .mc-icon { font-size: 26px; margin-bottom: 9px; }
+.mini-card .mc-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.mini-card .mc-text  { font-size: 13px; color: var(--text-dim); }
+.purple-card { background: rgba(168,85,247,.05); border: 1px solid rgba(168,85,247,.2); }
+.purple-card:hover { border-color: rgba(168,85,247,.4); }
+.gold-card { border-left: 3px solid var(--gold); border-radius: 0 14px 14px 0; background: rgba(0,0,0,.3); padding: 18px; }
+.gold-card:hover { border-left-color: var(--accent); }
+.gold-card .gc-icon { font-size: 20px; margin-bottom: 7px; }
+.gold-card .gc-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.gold-card .gc-text  { font-size: 14px; color: var(--text-dim); }
+
+/* ─── HOW STEPS ─── */
+.how-num { font-family: 'Orbitron',monospace; font-size: 26px; font-weight: 800; color: var(--accent); opacity: .4; margin-bottom: 9px; }
+
+/* ─── PROCESS STEPS ─── */
+.process-steps { counter-reset: step-c; }
+.process-step {
+  display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start; padding: 18px;
+  background: rgba(0,0,0,.25); border: 1px solid var(--glass-border); border-radius: 14px;
+  counter-increment: step-c; transition: border-color .2s;
+}
+.process-step:hover { border-color: rgba(0,242,255,.25); }
+.process-step::before {
+  content: counter(step-c, decimal-leading-zero); font-family: 'Orbitron',monospace;
+  font-size: 18px; font-weight: 800; color: var(--accent); opacity: .5; min-width: 34px; line-height: 1.3;
+}
+.ps-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.ps-body  { font-size: 13px; color: var(--text-dim); }
+
+/* ─── EXAMPLE BOX ─── */
+.example-box {
+  background: rgba(0,255,136,.04); border: 1px solid rgba(0,255,136,.2);
+  border-radius: 14px; padding: 20px; margin: 13px 0;
+}
+.example-box .ex-title { font-family: 'Orbitron',monospace; font-size: 11px; color: var(--success); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.example-box p { font-size: 13px; color: var(--text-dim); margin-bottom: 7px; }
+.eq-line { font-family: 'JetBrains Mono',monospace; font-size: 13px; color: #fff; margin: 5px 0; padding: 7px 11px; background: rgba(0,0,0,.3); border-radius: 8px; }
+.answer { color: var(--success); font-weight: 700; }
+
+/* ─── RULES ─── */
+.rule-card { background: rgba(168,85,247,.05); border: 1px solid rgba(168,85,247,.2); border-radius: 14px; padding: 18px; transition: border-color .25s; }
+.rule-card:hover { border-color: rgba(168,85,247,.4); }
+.rule-badge { display: inline-block; padding: 2px 10px; background: rgba(168,85,247,.15); border-radius: 20px; font-size: 10px; color: var(--info); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 9px; font-weight: 700; }
+.rule-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 7px; }
+.rule-text  { font-size: 13px; color: var(--text-dim); }
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; margin: 14px 0; border-radius: 14px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: rgba(0,242,255,.1); }
+thead th { padding: 13px 14px; text-align: left; font-family: 'Orbitron',monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,.05); transition: background .15s; }
+tbody tr:hover { background: rgba(0,242,255,.04); }
+tbody td { padding: 12px 14px; color: var(--text-dim); font-family: 'JetBrains Mono',monospace; }
+tbody td:first-child { color: #fff; font-family: 'Syne',sans-serif; }
+.pos { color: var(--success); } .neg { color: var(--error); } .neu { color: var(--accent); }
+
+/* ─── FAQ ─── */
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 16px; margin: 16px 0; }
+.faq-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 18px; padding: 22px; cursor: pointer; transition: all .25s;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+.faq-card:hover { border-color: rgba(0,242,255,.3); }
+.faq-card.open { border-color: rgba(0,242,255,.4); background: rgba(0,242,255,.04); }
+.faq-q { font-size: 14px; font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.faq-icon { color: var(--accent); font-size: 18px; transition: transform .3s; flex-shrink: 0; }
+.faq-card.open .faq-icon { transform: rotate(45deg); }
+.faq-a { font-size: 13px; color: var(--text-dim); margin-top: 11px; display: none; line-height: 1.7; }
+.faq-card.open .faq-a { display: block; }
+
+/* ─── BADGES ─── */
+.badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.badge-s { background: rgba(0,255,136,.12); color: var(--success); border: 1px solid rgba(0,255,136,.25); }
+.badge-e { background: rgba(255,77,77,.12); color: var(--error);   border: 1px solid rgba(255,77,77,.25); }
+.badge-i { background: rgba(168,85,247,.12); color: var(--info);   border: 1px solid rgba(168,85,247,.25); }
+.badge-a { background: rgba(0,242,255,.1);  color: var(--accent);  border: 1px solid rgba(0,242,255,.25); }
+.hl  { color: var(--accent); font-weight: 700; }
+.hlg { color: var(--success); font-weight: 700; }
+.hlp { color: var(--info); font-weight: 700; }
+
+/* ─── FADE IN ─── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width:640px) {
+  .hero-card { padding: 28px 18px; }
+  .glass-card, .calc-wrapper { padding: 20px 16px; }
+  .input-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<script src="header.js"></script>
+
+<main>
+<div class="container">
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero-card fade-in">
+  <div class="page-tag">🧪 Physical Chemistry Tools</div>
+  <h1 class="page-title">Van't Hoff Equation Calculator</h1>
+  <p class="page-subtitle">
+    Calculate osmotic pressure, boiling point elevation, freezing point depression,
+    Van't Hoff factor <em>i</em>, and equilibrium constant temperature dependence —
+    all powered by a smart expression parser supporting scientific notation like <strong>20*10^-9</strong>.
+  </p>
+</div>
+
+
+<!-- ══════════════ CALCULATOR ══════════════ -->
+<div class="calc-wrapper fade-in" id="calculator">
+  <div class="page-tag">⚙️ Interactive Tool</div>
+  <h2 class="sec-heading" style="margin-top:12px;">Van't Hoff Calculator</h2>
+
+  <div class="calc-tabs">
+    <button class="calc-tab active" onclick="switchTab('osmotic',this)">Osmotic Pressure</button>
+    <button class="calc-tab" onclick="switchTab('boiling',this)">Boiling Point ↑</button>
+    <button class="calc-tab" onclick="switchTab('freezing',this)">Freezing Point ↓</button>
+    <button class="calc-tab" onclick="switchTab('equil',this)">K vs Temperature</button>
+    <button class="calc-tab" onclick="switchTab('factor',this)">Find Factor i</button>
+  </div>
+
+  <!-- TAB 1: Osmotic -->
+  <div id="tab-osmotic" class="calc-panel active">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Calculate osmotic pressure using π = i·M·R·T. Supports expressions like <strong style="color:var(--accent)">1.5*10^-3</strong> for molarity.</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Van't Hoff Factor (i)</label>
+        <select id="o-i-preset" onchange="loadFactorPreset('o-i')">
+          <option value="">— Common presets —</option>
+          <option value="1">Glucose / Sucrose → i = 1</option>
+          <option value="2">NaCl / KCl → i = 2</option>
+          <option value="3">CaCl₂ / Na₂SO₄ → i = 3</option>
+          <option value="4">AlCl₃ / FeCl₃ → i = 4</option>
+          <option value="5">Al₂(SO₄)₃ → i = 5</option>
+        </select>
+        <input type="text" id="o-i" placeholder="e.g. 2 or 1.8*10^0" oninput="livePreview(this,'prev-o-i')" style="margin-top:8px;" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1</span><span class="expr-tag">2</span><span class="expr-tag">3</span><span class="expr-tag">1.8*10^0</span></div>
+        <div class="input-preview" id="prev-o-i"></div>
+        <div class="input-hint">1 = non-electrolyte, >1 = electrolyte</div>
+      </div>
+      <div class="input-group">
+        <label>Molarity M (mol/L)</label>
+        <input type="text" id="o-M" placeholder="e.g. 0.1 or 1*10^-1" oninput="livePreview(this,'prev-o-M')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">0.1</span><span class="expr-tag">1*10^-1</span><span class="expr-tag">2.5*10^-3</span></div>
+        <div class="input-preview" id="prev-o-M"></div>
+        <div class="input-hint">Molar concentration of solute</div>
+      </div>
+      <div class="input-group">
+        <label>Temperature T (K)</label>
+        <input type="text" id="o-T" placeholder="298.15 or 2.98*10^2" oninput="livePreview(this,'prev-o-T')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">298.15</span><span class="expr-tag">310</span><span class="expr-tag">2.98*10^2</span></div>
+        <div class="input-preview" id="prev-o-T"></div>
+        <div class="input-hint">Default: 298.15 K (25°C)</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcOsmotic()">🧪 CALCULATE OSMOTIC PRESSURE</button>
+    <div class="error-msg" id="err-osmotic"></div>
+    <div class="result-box" id="res-osmotic">
+      <div class="result-label">Osmotic Pressure (π)</div>
+      <div class="result-value neutral" id="res-osmotic-val"></div>
+      <div class="result-interpretation" id="res-osmotic-interp"></div>
+      <div class="result-steps" id="res-osmotic-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Boiling -->
+  <div id="tab-boiling" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Calculate boiling point elevation: ΔT<sub>b</sub> = i·K<sub>b</sub>·m</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Van't Hoff Factor (i)</label>
+        <select id="b-i-preset" onchange="loadFactorPreset('b-i')">
+          <option value="">— Common presets —</option>
+          <option value="1">Non-electrolyte → i = 1</option>
+          <option value="2">NaCl → i = 2</option>
+          <option value="3">CaCl₂ → i = 3</option>
+          <option value="4">AlCl₃ → i = 4</option>
+        </select>
+        <input type="text" id="b-i" placeholder="e.g. 2" oninput="livePreview(this,'prev-b-i')" style="margin-top:8px;" autocomplete="off">
+        <div class="input-preview" id="prev-b-i"></div>
+        <div class="input-hint">Van't Hoff factor</div>
+      </div>
+      <div class="input-group">
+        <label>K<sub>b</sub> — Ebullioscopic Constant</label>
+        <select id="b-kb-preset" onchange="loadKbPreset()">
+          <option value="">— Select solvent —</option>
+          <option value="0.512">Water → 0.512 °C·kg/mol</option>
+          <option value="2.53">Benzene → 2.53 °C·kg/mol</option>
+          <option value="5.03">Chloroform → 5.03 °C·kg/mol</option>
+          <option value="3.63">Acetic acid → 3.63 °C·kg/mol</option>
+          <option value="2.02">Ethanol → 2.02 °C·kg/mol</option>
+          <option value="1.99">Acetone → 1.99 °C·kg/mol</option>
+        </select>
+        <input type="text" id="b-kb" placeholder="e.g. 0.512" oninput="livePreview(this,'prev-b-kb')" style="margin-top:8px;" autocomplete="off">
+        <div class="input-preview" id="prev-b-kb"></div>
+        <div class="input-hint">°C·kg/mol (or K·kg/mol)</div>
+      </div>
+      <div class="input-group">
+        <label>Molality m (mol/kg)</label>
+        <input type="text" id="b-m" placeholder="e.g. 0.5 or 5*10^-1" oninput="livePreview(this,'prev-b-m')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">0.5</span><span class="expr-tag">5*10^-1</span><span class="expr-tag">1.2*10^-2</span></div>
+        <div class="input-preview" id="prev-b-m"></div>
+        <div class="input-hint">mol of solute per kg of solvent</div>
+      </div>
+      <div class="input-group">
+        <label>Normal Boiling Point (°C)</label>
+        <input type="text" id="b-bp" placeholder="e.g. 100 (water)" oninput="livePreview(this,'prev-b-bp')" autocomplete="off">
+        <div class="input-preview" id="prev-b-bp"></div>
+        <div class="input-hint">Pure solvent boiling point (optional)</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcBoiling()">🌡️ CALCULATE ΔT<sub>b</sub></button>
+    <div class="error-msg" id="err-boiling"></div>
+    <div class="result-box" id="res-boiling">
+      <div class="result-grid" id="res-boiling-grid"></div>
+      <div class="result-interpretation" id="res-boiling-interp"></div>
+      <div class="result-steps" id="res-boiling-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Freezing -->
+  <div id="tab-freezing" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Calculate freezing point depression: ΔT<sub>f</sub> = i·K<sub>f</sub>·m</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Van't Hoff Factor (i)</label>
+        <select id="f-i-preset" onchange="loadFactorPreset('f-i')">
+          <option value="">— Common presets —</option>
+          <option value="1">Non-electrolyte → i = 1</option>
+          <option value="2">NaCl → i = 2</option>
+          <option value="3">CaCl₂ → i = 3</option>
+          <option value="4">AlCl₃ → i = 4</option>
+        </select>
+        <input type="text" id="f-i" placeholder="e.g. 3" oninput="livePreview(this,'prev-f-i')" style="margin-top:8px;" autocomplete="off">
+        <div class="input-preview" id="prev-f-i"></div>
+        <div class="input-hint">Van't Hoff factor</div>
+      </div>
+      <div class="input-group">
+        <label>K<sub>f</sub> — Cryoscopic Constant</label>
+        <select id="f-kf-preset" onchange="loadKfPreset()">
+          <option value="">— Select solvent —</option>
+          <option value="1.86">Water → 1.86 °C·kg/mol</option>
+          <option value="5.12">Benzene → 5.12 °C·kg/mol</option>
+          <option value="4.68">Acetic acid → 4.68 °C·kg/mol</option>
+          <option value="39.7">Camphor → 39.7 °C·kg/mol</option>
+          <option value="20.2">Cyclohexane → 20.2 °C·kg/mol</option>
+          <option value="7.40">Naphthalene → 7.40 °C·kg/mol</option>
+        </select>
+        <input type="text" id="f-kf" placeholder="e.g. 1.86" oninput="livePreview(this,'prev-f-kf')" style="margin-top:8px;" autocomplete="off">
+        <div class="input-preview" id="prev-f-kf"></div>
+        <div class="input-hint">°C·kg/mol (or K·kg/mol)</div>
+      </div>
+      <div class="input-group">
+        <label>Molality m (mol/kg)</label>
+        <input type="text" id="f-m" placeholder="e.g. 1.0 or 1*10^0" oninput="livePreview(this,'prev-f-m')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.0</span><span class="expr-tag">5*10^-1</span><span class="expr-tag">2.5*10^-3</span></div>
+        <div class="input-preview" id="prev-f-m"></div>
+        <div class="input-hint">mol of solute per kg of solvent</div>
+      </div>
+      <div class="input-group">
+        <label>Normal Freezing Point (°C)</label>
+        <input type="text" id="f-fp" placeholder="e.g. 0 (water)" oninput="livePreview(this,'prev-f-fp')" autocomplete="off">
+        <div class="input-preview" id="prev-f-fp"></div>
+        <div class="input-hint">Pure solvent freezing point (optional)</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcFreezing()">❄️ CALCULATE ΔT<sub>f</sub></button>
+    <div class="error-msg" id="err-freezing"></div>
+    <div class="result-box" id="res-freezing">
+      <div class="result-grid" id="res-freezing-grid"></div>
+      <div class="result-interpretation" id="res-freezing-interp"></div>
+      <div class="result-steps" id="res-freezing-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 4: K vs T -->
+  <div id="tab-equil" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Find K at a new temperature using ln(K₂/K₁) = −ΔH°/R × (1/T₂ − 1/T₁). Ideal for Van't Hoff plots.</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>K₁ (at T₁)</label>
+        <input type="text" id="e-k1" placeholder="e.g. 1.5*10^-3 or 0.0015" oninput="livePreview(this,'prev-e-k1')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.5*10^-3</span><span class="expr-tag">0.0015</span><span class="expr-tag">10^-4</span></div>
+        <div class="input-preview" id="prev-e-k1"></div>
+        <div class="input-hint">Known equilibrium constant at T₁</div>
+      </div>
+      <div class="input-group">
+        <label>T₁ (K)</label>
+        <input type="text" id="e-T1" placeholder="e.g. 298 or 2.98*10^2" oninput="livePreview(this,'prev-e-T1')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">298</span><span class="expr-tag">2.98*10^2</span></div>
+        <div class="input-preview" id="prev-e-T1"></div>
+        <div class="input-hint">Reference temperature (Kelvin)</div>
+      </div>
+      <div class="input-group">
+        <label>T₂ (K)</label>
+        <input type="text" id="e-T2" placeholder="e.g. 350 or 3.5*10^2" oninput="livePreview(this,'prev-e-T2')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">350</span><span class="expr-tag">3.5*10^2</span></div>
+        <div class="input-preview" id="prev-e-T2"></div>
+        <div class="input-hint">Target temperature (Kelvin)</div>
+      </div>
+      <div class="input-group">
+        <label>ΔH° (J/mol)</label>
+        <input type="text" id="e-dH" placeholder="e.g. -57000 or -5.7*10^4" oninput="livePreview(this,'prev-e-dH')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">-57000</span><span class="expr-tag">-5.7*10^4</span><span class="expr-tag">3.2*10^4</span></div>
+        <div class="input-preview" id="prev-e-dH"></div>
+        <div class="input-hint">Standard enthalpy of reaction (negative = exothermic)</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcEquil()">📈 CALCULATE K₂</button>
+    <div class="error-msg" id="err-equil"></div>
+    <div class="result-box" id="res-equil">
+      <div class="result-grid" id="res-equil-grid"></div>
+      <div class="result-interpretation" id="res-equil-interp"></div>
+      <div class="result-steps" id="res-equil-steps"></div>
+    </div>
+  </div>
+
+  <!-- TAB 5: Find i -->
+  <div id="tab-factor" class="calc-panel">
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Determine the Van't Hoff factor <em>i</em> from measured vs theoretical colligative property change.</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Property Type</label>
+        <select id="fi-type">
+          <option value="fp">Freezing Point Depression</option>
+          <option value="bp">Boiling Point Elevation</option>
+          <option value="os">Osmotic Pressure</option>
+        </select>
+        <div class="input-hint">Which colligative property was measured?</div>
+      </div>
+      <div class="input-group">
+        <label>Observed ΔT or π (measured)</label>
+        <input type="text" id="fi-obs" placeholder="e.g. 3.72 or 3.72*10^0" oninput="livePreview(this,'prev-fi-obs')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">3.72</span><span class="expr-tag">3.72*10^0</span></div>
+        <div class="input-preview" id="prev-fi-obs"></div>
+        <div class="input-hint">Experimentally measured value (°C or atm)</div>
+      </div>
+      <div class="input-group">
+        <label>K (K<sub>f</sub> or K<sub>b</sub>) or R·T</label>
+        <input type="text" id="fi-K" placeholder="e.g. 1.86 or 0.512" oninput="livePreview(this,'prev-fi-K')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.86</span><span class="expr-tag">0.512</span><span class="expr-tag">24.47</span></div>
+        <div class="input-preview" id="prev-fi-K"></div>
+        <div class="input-hint">K<sub>f</sub>, K<sub>b</sub>, or R×T value</div>
+      </div>
+      <div class="input-group">
+        <label>Concentration (m or M)</label>
+        <input type="text" id="fi-c" placeholder="e.g. 1.0 or 1*10^0" oninput="livePreview(this,'prev-fi-c')" autocomplete="off">
+        <div class="expr-syntax"><span class="expr-tag">1.0</span><span class="expr-tag">5*10^-1</span></div>
+        <div class="input-preview" id="prev-fi-c"></div>
+        <div class="input-hint">Molality or molarity of solution</div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calcFactor()">🔬 CALCULATE FACTOR i</button>
+    <div class="error-msg" id="err-factor"></div>
+    <div class="result-box" id="res-factor">
+      <div class="result-label">Van't Hoff Factor (i)</div>
+      <div class="result-value neutral" id="res-factor-val"></div>
+      <div class="result-interpretation" id="res-factor-interp"></div>
+      <div class="result-steps" id="res-factor-steps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ HOW TO USE ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How to Use This Calculator</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:18px;">Master every tab with these step-by-step instructions and real worked examples.</p>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="how-num">01</div>
+      <div class="mc-title">Choose the Right Tab</div>
+      <div class="mc-text">Use <em>Osmotic Pressure</em> for membrane/cell biology, <em>Boiling/Freezing</em> for antifreeze/road salt problems, <em>K vs T</em> for equilibrium thermodynamics, and <em>Find i</em> to reverse-calculate the Van't Hoff factor from experimental data.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">02</div>
+      <div class="mc-title">Use Preset Dropdowns</div>
+      <div class="mc-text">For the Van't Hoff factor, click the dropdown to select common electrolytes (NaCl → i=2, CaCl₂ → i=3). For solvents, preloaded K<sub>b</sub> and K<sub>f</sub> values fill automatically. You can always override with a manual entry.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">03</div>
+      <div class="mc-title">Scientific Notation Input</div>
+      <div class="mc-text">For tiny concentrations, type expressions directly: <code style="color:var(--accent)">1.5*10^-3</code> means 1.5 × 10⁻³ M. The green preview instantly shows the computed value so you can verify before calculating.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">04</div>
+      <div class="mc-title">Temperature Always in Kelvin</div>
+      <div class="mc-text">All temperature inputs must be in Kelvin. Convert: K = °C + 273.15. Body temperature 37°C = 310.15 K. Room temperature 25°C = 298.15 K. Tip: type <code style="color:var(--accent)">3.1015*10^2</code> for 310.15 K.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">05</div>
+      <div class="mc-title">K vs T Tab — ΔH° Sign</div>
+      <div class="mc-text">Enter ΔH° in J/mol (not kJ). Exothermic reactions have negative ΔH° (e.g. <code style="color:var(--accent)">-57000</code> or <code style="color:var(--accent)">-5.7*10^4</code>). Endothermic = positive. The result tells you whether K increases or decreases with temperature.</div>
+    </div>
+    <div class="mini-card">
+      <div class="how-num">06</div>
+      <div class="mc-title">Worked Example — Osmotic</div>
+      <div class="mc-text">Blood plasma: i=1 (proteins), M=7.4×10⁻³ mol/L, T=310 K. Type <code style="color:var(--accent)">7.4*10^-3</code> for M. Result: π = 1 × 7.4×10⁻³ × 0.08206 × 310 ≈ <span class="hlg">0.188 atm</span>.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sub-heading">Detailed Worked Example — K vs Temperature</h3>
+  <div class="example-box">
+    <div class="ex-title">📘 Example: N₂ + 3H₂ ⇌ 2NH₃ (Haber Process)</div>
+    <p><strong>Given:</strong> K₁ = 977 at T₁ = 298 K, ΔH° = −92,000 J/mol (exothermic). Find K₂ at T₂ = 500 K.</p>
+    <div class="eq-line">ln(K₂/K₁) = −ΔH°/R × (1/T₂ − 1/T₁)</div>
+    <div class="eq-line">= −(−92000)/8.314 × (1/500 − 1/298)</div>
+    <div class="eq-line">= 11065.7 × (0.002 − 0.003356)</div>
+    <div class="eq-line">= 11065.7 × (−0.001356) = −15.01</div>
+    <div class="eq-line">K₂ = 977 × e^(−15.01) = 977 × 3.01×10⁻⁷ = <span class="answer">2.94×10⁻⁴</span></div>
+    <p><strong>Conclusion:</strong> K drops dramatically at higher T (exothermic reaction disfavoured by Le Chatelier). Industrial Haber process uses moderate T (~450°C) to balance rate and yield.</p>
+  </div>
+</div>
+
+
+
+<!-- ══════════════ DEFINITION & FORMULAS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">What is the Van't Hoff Equation?</h2>
+  <p style="color:var(--text-dim);font-size:15px;margin-bottom:14px;">
+    The <strong style="color:#fff;">Van't Hoff Equation</strong>, formulated by Jacobus Henricus van't Hoff in 1884
+    (Nobel Prize in Chemistry, 1901), describes two distinct but related phenomena:
+  </p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px;">
+    <div style="padding:18px;background:rgba(0,242,255,.06);border:1px solid rgba(0,242,255,.2);border-radius:14px;">
+      <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:2px;margin-bottom:8px;">APPLICATION 1</div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Colligative Properties</div>
+      <p style="font-size:13px;color:var(--text-dim);">The Van't Hoff factor <span class="hl">i</span> modifies colligative property equations (osmotic pressure, boiling point elevation, freezing point depression) to account for electrolyte dissociation or solute association in solution.</p>
+    </div>
+    <div style="padding:18px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:14px;">
+      <div style="font-size:12px;color:var(--info);font-weight:700;letter-spacing:2px;margin-bottom:8px;">APPLICATION 2</div>
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Equilibrium Thermodynamics</div>
+      <p style="font-size:13px;color:var(--text-dim);">The Van't Hoff equation relates how the equilibrium constant <span class="hlp">K</span> changes with temperature <span class="hl">T</span> through the standard enthalpy change <span class="hlg">ΔH°</span> — the thermodynamic Van't Hoff equation.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sec-heading">Core Formulas</h3>
+  <div class="formula-grid">
+    <div class="formula-box">
+      <div class="label">Osmotic Pressure</div>
+      <div class="eq"><span class="sym">π</span> = <span class="note">i</span> × <span class="num">M</span> × <span class="sym">R</span> × <span class="sym">T</span></div>
+      <div class="formula-desc">π=osmotic pressure (atm), i=Van't Hoff factor, M=molarity (mol/L), R=0.08206 L·atm/mol·K, T=temperature (K)</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Boiling Point Elevation</div>
+      <div class="eq"><span class="sym">ΔT<sub>b</sub></span> = <span class="note">i</span> × <span class="num">K<sub>b</sub></span> × <span class="sym">m</span></div>
+      <div class="formula-desc">K<sub>b</sub>=ebullioscopic constant (°C·kg/mol), m=molality (mol/kg)</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Freezing Point Depression</div>
+      <div class="eq"><span class="sym">ΔT<sub>f</sub></span> = <span class="note">i</span> × <span class="num">K<sub>f</sub></span> × <span class="sym">m</span></div>
+      <div class="formula-desc">K<sub>f</sub>=cryoscopic constant (°C·kg/mol), m=molality (mol/kg)</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Thermodynamic Van't Hoff</div>
+      <div class="eq">ln(<span class="sym">K<sub>2</sub></span>/<span class="sym">K<sub>1</sub></span>) = <span class="num">−ΔH°/R</span> × (<span class="num">1/T<sub>2</sub></span> − <span class="num">1/T<sub>1</sub></span>)</div>
+      <div class="formula-desc">Relates K at two temperatures via standard enthalpy change ΔH°</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Van't Hoff Factor (i)</div>
+      <div class="eq"><span class="note">i</span> = <span class="sym">ΔT<sub>observed</sub></span> / <span class="num">ΔT<sub>theoretical</sub></span></div>
+      <div class="formula-desc">i = actual particles / formula units dissolved. Electrolytes: i > 1. Non-electrolytes: i = 1. Associating solutes: i < 1.</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Degree of Dissociation</div>
+      <div class="eq"><span class="note">α</span> = (<span class="sym">i</span> − <span class="num">1</span>) / (<span class="sym">n</span> − <span class="num">1</span>)</div>
+      <div class="formula-desc">α=degree of dissociation, n=number of particles if fully dissociated</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3 class="sec-heading">Symbol Reference</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px;margin-top:10px;">
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">i</span> — Van't Hoff factor (dimensionless)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">π</span> — Osmotic pressure (atm)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">M</span> — Molarity (mol/L)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">m</span> — Molality (mol/kg)</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">R</span> — 0.08206 L·atm/mol·K</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">T</span> — Temperature in Kelvin</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">K<sub>b</sub></span> — Ebullioscopic constant</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">K<sub>f</sub></span> — Cryoscopic constant</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">ΔH°</span> — Standard enthalpy change</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">α</span> — Degree of dissociation</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">n</span> — Ions per formula unit</div>
+    <div style="font-size:12px;color:var(--text-dim);padding:9px;background:rgba(0,0,0,.3);border-radius:9px;"><span class="hl">K</span> — Equilibrium constant</div>
+  </div>
+</div>
+
+
+
+
+<!-- ══════════════ ASPECTS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Key Aspects of the Van't Hoff Equation</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mc-icon">🔬</div>
+      <div class="mc-title">Colligative Nature</div>
+      <div class="mc-text">Colligative properties depend only on the <em>number</em> of solute particles, not their identity. The Van't Hoff factor <em>i</em> precisely accounts for this by scaling theoretical values to reflect actual particle counts in solution.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">⚡</div>
+      <div class="mc-title">Electrolyte Dissociation</div>
+      <div class="mc-text">Strong electrolytes like NaCl dissociate completely: NaCl → Na⁺ + Cl⁻, giving i≈2. Weak electrolytes partially dissociate, so 1 < i < theoretical max. The degree of dissociation α links observed i to partial dissociation.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">🌡️</div>
+      <div class="mc-title">Temperature Sensitivity</div>
+      <div class="mc-text">The thermodynamic Van't Hoff equation shows that ln K is linear with 1/T — the Van't Hoff plot. The slope equals −ΔH°/R, and the intercept equals ΔS°/R, providing both thermodynamic quantities from K measurements at different temperatures.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">📉</div>
+      <div class="mc-title">Le Chatelier Quantification</div>
+      <div class="mc-text">The Van't Hoff equation quantifies Le Chatelier's principle mathematically: exothermic reactions (ΔH°<0) have K decreasing with T; endothermic reactions (ΔH°>0) have K increasing with T.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">💧</div>
+      <div class="mc-title">Association of Solutes</div>
+      <div class="mc-text">Some solutes associate in solution (e.g. acetic acid dimerises in benzene), giving i < 1. This is the opposite of electrolytic dissociation and results in smaller-than-expected colligative property changes.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">⚗️</div>
+      <div class="mc-title">Ideal Dilute Solution Limit</div>
+      <div class="mc-text">Van't Hoff equations assume ideally dilute solutions. At higher concentrations, ion-ion interactions cause activity coefficients to deviate from unity, and measured i will differ from the ideal theoretical value.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ USES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Applications & Uses</h2>
+  <div class="grid-2">
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🧬</div>
+      <div class="mc-title">Biological Osmosis & Cell Biology</div>
+      <div class="mc-text">Osmotic pressure determines nutrient transport across cell membranes. Red blood cells burst (lysis) in hypotonic solutions and shrink (crenation) in hypertonic ones. The Van't Hoff equation quantifies exactly which saline concentration (0.9% NaCl) is isotonic with blood.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🚗</div>
+      <div class="mc-title">Antifreeze & De-icing</div>
+      <div class="mc-text">Ethylene glycol (i=1) added to car coolant depresses freezing by ΔT<sub>f</sub> = 1×1.86×m. Road salt (CaCl₂, i=3) provides 3× the depression per mole, melting ice at −30°C — calculated directly from the Van't Hoff freezing point equation.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">💊</div>
+      <div class="mc-title">Pharmaceutical Formulations</div>
+      <div class="mc-text">IV solutions must match blood osmotic pressure (~7.7 atm at 37°C). Pharmacists use π = iMRT to calculate exact drug concentrations. Hypertonic solutions cause dehydration; hypotonic solutions cause cell bursting.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🏭</div>
+      <div class="mc-title">Industrial Chemical Equilibria</div>
+      <div class="mc-text">The thermodynamic Van't Hoff equation guides reactor design. For the Haber process, Contact process (SO₂→SO₃), and Fischer-Tropsch synthesis, engineers use ΔH° data to predict optimal temperature ranges for maximum K.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🌊</div>
+      <div class="mc-title">Reverse Osmosis & Desalination</div>
+      <div class="mc-text">Seawater osmotic pressure (~27 atm, calculated via iMRT) must be exceeded for reverse osmosis desalination. Van't Hoff equation determines minimum pump pressure needed to purify water in coastal desalination plants.</div>
+    </div>
+    <div class="mini-card purple-card">
+      <div class="mc-icon">🧪</div>
+      <div class="mc-title">Molar Mass Determination</div>
+      <div class="mc-text">For unknown compounds, measuring osmotic pressure or freezing point depression and dividing by the Van't Hoff factor (i=1 for non-electrolytes) allows precise molar mass calculation — historically used to characterise polymers.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP-BY-STEP PROCESS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Van't Hoff Calculation — Step-by-Step</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px;">Follow this systematic approach for any Van't Hoff colligative property problem.</p>
+  <div class="process-steps">
+    <div class="process-step">
+      <div><div class="ps-title">Identify the Solute Type</div>
+      <div class="ps-body">Determine whether the solute is a non-electrolyte (i=1, e.g. glucose, urea), a strong electrolyte (i = number of ions, e.g. NaCl i=2, CaCl₂ i=3), or a weak electrolyte (1 &lt; i &lt; n, use degree of dissociation α).<br><em>Example: CaCl₂ → Ca²⁺ + 2Cl⁻ → n=3 ions, i≈3 at dilute concentration.</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Choose the Correct Formula</div>
+      <div class="ps-body">Osmotic pressure: π = iMRT (use molarity M). Boiling/freezing: ΔT = i·K·m (use molality m). Equilibrium K: use ln(K₂/K₁) = −ΔH°/R·(1/T₂−1/T₁).<br><em>Key distinction: π uses MOLARITY; ΔT<sub>b</sub> and ΔT<sub>f</sub> use MOLALITY.</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Convert All Units Correctly</div>
+      <div class="ps-body">Temperature → Kelvin (T = °C + 273.15). ΔH° in J/mol (not kJ). Concentration in mol/L (molarity) for osmotic, mol/kg (molality) for boiling/freezing.<br><em>Example: 25°C = 298.15 K; ΔH° = −57 kJ/mol = −57,000 J/mol.</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Determine Theoretical ΔT (no dissociation)</div>
+      <div class="ps-body">Calculate ΔT<sub>theoretical</sub> = K × m (with i=1). This is the baseline for a completely non-dissociating solute at the same concentration.<br><em>Example: 0.1 mol/kg NaCl in water: ΔT<sub>theoretical</sub> = 1.86 × 0.1 = 0.186°C</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Apply the Van't Hoff Factor</div>
+      <div class="ps-body">Multiply by i to get the actual observed change: ΔT<sub>actual</sub> = i × K × m.<br><em>For NaCl (i=2): ΔT<sub>f</sub> = 2 × 1.86 × 0.1 = 0.372°C. New freezing point = 0 − 0.372 = −0.372°C</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Calculate Degree of Dissociation (if needed)</div>
+      <div class="ps-body">If i is between 1 and n, calculate α = (i−1)/(n−1). For weak acid HA partially dissociating into H⁺ + A⁻ (n=2): α = (i−1)/1 = i−1.<br><em>Example: i=1.4 for weak electrolyte with n=2: α = 0.4 = 40% dissociation.</em></div></div>
+    </div>
+    <div class="process-step">
+      <div><div class="ps-title">Interpret the Result</div>
+      <div class="ps-body">For colligative: state the actual freezing/boiling point. For osmotic: compare to biological osmotic pressure (~7.7 atm for blood). For K vs T: state whether the equilibrium shifts right (K increases) or left (K decreases) with temperature increase.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SOLVED EXAMPLES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Solved Examples</h2>
+  <div class="example-box">
+    <div class="ex-title">📗 Example 1 — Osmotic Pressure of NaCl Solution</div>
+    <p><strong>Given:</strong> 0.15 M NaCl solution at 37°C (body temperature). Calculate osmotic pressure.</p>
+    <p>i = 2 (NaCl → Na⁺ + Cl⁻), M = 0.15 mol/L, T = 310.15 K, R = 0.08206 L·atm/mol·K</p>
+    <div class="eq-line">π = i × M × R × T = 2 × 0.15 × 0.08206 × 310.15</div>
+    <div class="eq-line">π = <span class="answer">7.63 atm ≈ 7.7 atm (matches blood osmotic pressure ✓)</span></div>
+    <p><strong>Conclusion:</strong> 0.9% NaCl (normal saline) is isotonic with blood — this is why it's used in IV fluids.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📘 Example 2 — Freezing Point of Antifreeze</div>
+    <p><strong>Given:</strong> 3.0 mol/kg ethylene glycol (C₂H₆O₂, non-electrolyte) in water. Find new freezing point.</p>
+    <div class="eq-line">ΔT<sub>f</sub> = i × K<sub>f</sub> × m = 1 × 1.86 × 3.0 = 5.58°C</div>
+    <div class="eq-line">New freezing point = 0 − 5.58 = <span class="answer">−5.58°C</span></div>
+    <p><strong>Conclusion:</strong> A 3 m solution of ethylene glycol protects engine coolant down to −5.58°C. Commercial antifreeze uses ~10 m solutions for protection below −18°C.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📙 Example 3 — Boiling Point with CaCl₂</div>
+    <p><strong>Given:</strong> 0.5 mol/kg CaCl₂ in water. K<sub>b</sub>(water) = 0.512°C·kg/mol, i=3.</p>
+    <div class="eq-line">ΔT<sub>b</sub> = 3 × 0.512 × 0.5 = <span class="answer">+0.768°C</span></div>
+    <div class="eq-line">New boiling point = 100 + 0.768 = <span class="answer">100.768°C</span></div>
+    <p><strong>Note:</strong> CaCl₂ provides 3× the elevation compared to a non-electrolyte at the same molality — this is why CaCl₂ is more effective than glucose for food preservation at high temperatures.</p>
+  </div>
+
+  <div class="example-box">
+    <div class="ex-title">📕 Example 4 — Finding i from Experiment</div>
+    <p><strong>Given:</strong> 1.0 mol/kg NaCl in water shows ΔT<sub>f</sub> = 3.37°C (experimental). K<sub>f</sub>=1.86. Find i and α.</p>
+    <div class="eq-line">i = ΔT<sub>f,observed</sub> / (K<sub>f</sub> × m) = 3.37 / (1.86 × 1.0) = <span class="answer">1.81</span></div>
+    <div class="eq-line">α = (i−1)/(n−1) = (1.81−1)/(2−1) = <span class="answer">0.81 = 81% dissociation</span></div>
+    <p><strong>Conclusion:</strong> At 1.0 mol/kg, NaCl is 81% dissociated (not 100%) due to ion-pair formation. At infinite dilution, i would approach exactly 2.</p>
+  </div>
+</div>
+
+<!-- ══════════════ RULES ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Rules & Principles</h2>
+  <div class="grid-2">
+    <div class="rule-card">
+      <div class="rule-badge">Rule 01</div>
+      <div class="rule-title">i ≥ 1 for Dissociation, i &lt; 1 for Association</div>
+      <div class="rule-text">Electrolytes that dissociate always produce i > 1. Solutes that associate (dimerize) give i < 1. Non-electrolytes always give i = 1 in ideal solution. This rule determines whether colligative effects are amplified or reduced.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 02</div>
+      <div class="rule-title">Osmotic Pressure Uses Molarity; ΔT Uses Molality</div>
+      <div class="rule-text">This is the most common source of error. π = iMRT requires molarity (mol/L, temperature-dependent). ΔT<sub>b</sub> and ΔT<sub>f</sub> = iKm require molality (mol/kg solvent, temperature-independent).</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 03</div>
+      <div class="rule-title">Exothermic K Decreases with Temperature</div>
+      <div class="rule-text">For ΔH° < 0 (exothermic): as T increases, K decreases — equilibrium shifts left. For ΔH° > 0 (endothermic): K increases with T. This directly follows from the slope of the Van't Hoff plot (slope = −ΔH°/R).</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 04</div>
+      <div class="rule-title">Van't Hoff Plot is Linear in 1/T</div>
+      <div class="rule-text">Plotting ln K vs 1/T gives a straight line with slope = −ΔH°/R and intercept = ΔS°/R. Non-linearity indicates a temperature-dependent ΔH°, which may signal a phase transition or significant heat capacity change.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 05</div>
+      <div class="rule-title">Concentration Affects Apparent i</div>
+      <div class="rule-text">The experimental Van't Hoff factor is concentration-dependent: at infinite dilution, strong electrolytes approach their theoretical i value. At high concentrations, ion-ion interactions reduce the effective number of particles.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-badge">Rule 06</div>
+      <div class="rule-title">ΔH° Must Be in J/mol for the Equation</div>
+      <div class="rule-text">The gas constant R = 8.314 J/mol·K. If ΔH° is given in kJ/mol, multiply by 1000 before substituting. A common mistake is mixing kJ and J, leading to answers off by a factor of 1000.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TABLE ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Van't Hoff Factor & Solvent Constants — Reference Table</h2>
+  <h3 class="sub-heading">Common Solutes & Their Van't Hoff Factors</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Solute</th><th>Formula</th><th>Theoretical i</th><th>Actual i (0.1 M)</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>Glucose</td><td>C₆H₁₂O₆</td><td class="neu">1</td><td class="neu">1.00</td><td><span class="badge badge-a">Non-electrolyte</span></td></tr>
+        <tr><td>Sucrose</td><td>C₁₂H₂₂O₁₁</td><td class="neu">1</td><td class="neu">1.00</td><td><span class="badge badge-a">Non-electrolyte</span></td></tr>
+        <tr><td>Urea</td><td>CO(NH₂)₂</td><td class="neu">1</td><td class="neu">1.00</td><td><span class="badge badge-a">Non-electrolyte</span></td></tr>
+        <tr><td>Sodium chloride</td><td>NaCl</td><td class="pos">2</td><td class="pos">1.87</td><td><span class="badge badge-s">Strong electrolyte</span></td></tr>
+        <tr><td>Potassium chloride</td><td>KCl</td><td class="pos">2</td><td class="pos">1.85</td><td><span class="badge badge-s">Strong electrolyte</span></td></tr>
+        <tr><td>HCl (aq)</td><td>HCl</td><td class="pos">2</td><td class="pos">1.98</td><td><span class="badge badge-s">Strong acid</span></td></tr>
+        <tr><td>Calcium chloride</td><td>CaCl₂</td><td class="pos">3</td><td class="pos">2.63</td><td><span class="badge badge-s">Strong electrolyte</span></td></tr>
+        <tr><td>Sodium sulfate</td><td>Na₂SO₄</td><td class="pos">3</td><td class="pos">2.70</td><td><span class="badge badge-s">Strong electrolyte</span></td></tr>
+        <tr><td>Aluminium chloride</td><td>AlCl₃</td><td class="pos">4</td><td class="pos">3.10</td><td><span class="badge badge-s">Strong electrolyte</span></td></tr>
+        <tr><td>Acetic acid (dilute)</td><td>CH₃COOH</td><td class="neu">2 (max)</td><td class="neu">1.01</td><td><span class="badge badge-i">Weak acid</span></td></tr>
+        <tr><td>Acetic acid in benzene</td><td>(CH₃COOH)₂</td><td class="neg">&lt;1</td><td class="neg">0.51</td><td><span class="badge badge-e">Association</span></td></tr>
+        <tr><td>MgSO₄</td><td>MgSO₄</td><td class="pos">2</td><td class="pos">1.21</td><td><span class="badge badge-s">Ion pairing</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-heading" style="margin-top:22px;">Solvent Constants K<sub>b</sub> and K<sub>f</sub></h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Solvent</th><th>BP (°C)</th><th>K<sub>b</sub> (°C·kg/mol)</th><th>FP (°C)</th><th>K<sub>f</sub> (°C·kg/mol)</th><th>Common Use</th></tr></thead>
+      <tbody>
+        <tr><td>Water</td><td>100</td><td class="neu">0.512</td><td>0.00</td><td class="pos">1.860</td><td>Biology, food, medicine</td></tr>
+        <tr><td>Benzene</td><td>80.1</td><td class="neu">2.530</td><td>5.50</td><td class="pos">5.120</td><td>Organic chemistry</td></tr>
+        <tr><td>Acetic acid</td><td>117.9</td><td class="neu">3.630</td><td>16.6</td><td class="pos">4.680</td><td>Biochemistry</td></tr>
+        <tr><td>Chloroform</td><td>61.2</td><td class="neu">5.030</td><td>−63.5</td><td class="pos">4.700</td><td>Organic synthesis</td></tr>
+        <tr><td>Ethanol</td><td>78.4</td><td class="neu">2.020</td><td>−114.1</td><td class="pos">2.000</td><td>Industrial</td></tr>
+        <tr><td>Camphor</td><td>204</td><td class="neu">5.950</td><td>179.8</td><td class="pos">39.70</td><td>Molar mass determination</td></tr>
+        <tr><td>Cyclohexane</td><td>80.7</td><td class="neu">2.790</td><td>6.50</td><td class="pos">20.20</td><td>Organic synthesis</td></tr>
+        <tr><td>Naphthalene</td><td>218</td><td class="neu">5.800</td><td>80.2</td><td class="pos">7.400</td><td>Molar mass determination</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════ HOW IT WORKS ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">How Van't Hoff Equations Work — Mechanism</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:16px;">Understanding the physical chemistry behind the equations deepens intuition for real-world problems.</p>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div style="background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--success);font-weight:700;letter-spacing:2px;margin-bottom:8px;">OSMOTIC PRESSURE MECHANISM</div>
+      <p style="font-size:13px;color:var(--text-dim);">Dissolved particles lower the chemical potential of the solvent. To equalise potential across a semipermeable membrane, solvent flows from low solute (high μ) to high solute (low μ) side. Osmotic pressure is the minimum pressure to stop this flow — directly proportional to particle count <em>i×M</em>.</p>
+    </div>
+    <div style="background:rgba(0,242,255,.05);border:1px solid rgba(0,242,255,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:2px;margin-bottom:8px;">FREEZING/BOILING MECHANISM</div>
+      <p style="font-size:13px;color:var(--text-dim);">Solute particles disrupt the ordered solvent lattice, lowering vapour pressure (Raoult's law). A lower vapour pressure means: (1) higher temperature needed to reach 1 atm → boiling point rises; (2) lower temperature before solid and liquid vapour pressures match → freezing point drops.</p>
+    </div>
+    <div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--info);font-weight:700;letter-spacing:2px;margin-bottom:8px;">THERMODYNAMIC Van't HOFF</div>
+      <p style="font-size:13px;color:var(--text-dim);">Derived from ΔG° = −RT ln K and the Gibbs-Helmholtz equation. Since ΔG° = ΔH° − TΔS°, differentiating ln K = −ΔG°/RT with respect to T gives d(ln K)/dT = ΔH°/RT². Integrating between T₁ and T₂ produces the classic integrated Van't Hoff form.</p>
+    </div>
+    <div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:18px;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:2px;margin-bottom:8px;">THE Van't HOFF PLOT</div>
+      <p style="font-size:13px;color:var(--text-dim);">Plotting ln K (y-axis) vs 1/T (x-axis) yields a straight line: slope = −ΔH°/R, intercept = ΔS°/R. This allows both ΔH° and ΔS° to be extracted from equilibrium data alone — without a calorimeter. Curvature in the plot signals a temperature-dependent ΔCp.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCIENTIFIC RESEARCH ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Van't Hoff in Scientific Research</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:14px 0;">
+    <div class="gold-card">
+      <div class="gc-icon">🧬</div>
+      <div class="gc-title">Protein Folding Thermodynamics</div>
+      <div class="gc-text">Researchers use Van't Hoff plots of protein unfolding equilibria (measured by CD spectroscopy or fluorescence vs T) to extract ΔH° and ΔS° of unfolding. For single-domain proteins, the slope gives the enthalpy of the folding transition without calorimetry.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">💉</div>
+      <div class="gc-title">Osmometry in Drug Delivery</div>
+      <div class="gc-text">Nanoparticle drug delivery systems are characterised by osmometry using π = iMRT. Scientists measure osmotic pressure of nanoparticle suspensions to determine particle number concentration and effective molar mass — critical for dosage precision.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🔋</div>
+      <div class="gc-title">Electrochemistry & K Determination</div>
+      <div class="gc-text">The Van't Hoff equation connects to Nernst equation via ΔG° = −nFE° = −RT ln K. Measuring E° at multiple temperatures allows precise ΔH° and ΔS° determination for electrode reactions — used in fuel cell and battery research.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🌡️</div>
+      <div class="gc-title">Cryobiology & Cryopreservation</div>
+      <div class="gc-text">Cryoprotectant concentration for cell preservation is calculated using Van't Hoff freezing point depression. DMSO (i≈1) at 10% v/v in cell media provides ΔT<sub>f</sub> ≈ −7°C, preventing ice crystal formation during liquid nitrogen storage.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🌊</div>
+      <div class="gc-title">Marine Chemistry & Salinity</div>
+      <div class="gc-text">Ocean salinity measurements and their effect on seawater density are modelled using Van't Hoff colligative equations. The osmotic pressure of seawater (~27 atm) calculated via iMRT determines the minimum energy for desalination — critical for energy-efficient water treatment research.</div>
+    </div>
+    <div class="gold-card">
+      <div class="gc-icon">🧫</div>
+      <div class="gc-title">Enzyme Kinetics & Temperature</div>
+      <div class="gc-text">Enzyme-substrate binding constants K<sub>M</sub> measured at different temperatures follow Van't Hoff behaviour. Plotting ln(1/K<sub>M</sub>) vs 1/T gives ΔH° and ΔS° of binding — used to design inhibitors that bind more tightly at physiological temperature.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<div class="glass-card fade-in">
+  <h2 class="sec-heading">Frequently Asked Questions</h2>
+  <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px;">Comprehensive answers covering theory, calculation, and real-world application of Van't Hoff equations.</p>
+  <div class="faq-grid">
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What exactly is the Van't Hoff factor i?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The Van't Hoff factor i represents the ratio of actual moles of particles in solution to the moles of solute dissolved. For NaCl: one formula unit produces 2 ions, so i = 2. For a completely non-dissociating solute like glucose, i = 1. For an associating solute (e.g. acetic acid dimerising in benzene), i < 1. In real solutions, i is always slightly less than the theoretical integer value due to ion-ion interactions.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why is the Van't Hoff factor for NaCl about 1.87, not 2.00?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Theoretical i = 2 assumes complete dissociation with no interaction between Na⁺ and Cl⁻ ions. In reality, at finite concentrations, electrostatic attraction forms transient ion pairs — a Na⁺ surrounded by Cl⁻ ions behaves partially as a single unit. This reduces the effective particle count. At infinite dilution, i approaches exactly 2.00. This concentration dependence is quantified by the Debye-Hückel theory.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What is the difference between molarity and molality? Which does Van't Hoff use?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Molarity (M) = moles of solute / litres of solution (temperature-dependent, as liquid volume changes with T). Molality (m) = moles of solute / kilograms of solvent (temperature-independent). Osmotic pressure uses molarity (π = iMRT). Boiling point elevation and freezing point depression use molality (ΔT = iKm) because they involve phase changes where temperature independence of concentration is important.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How is the Van't Hoff equation derived from thermodynamics?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Starting from ΔG° = −RT ln K and ΔG° = ΔH° − TΔS°: setting them equal gives ln K = −ΔH°/RT + ΔS°/R. Differentiating with respect to T: d(ln K)/dT = ΔH°/RT². This is the differential Van't Hoff equation. Integrating between T₁ and T₂ (assuming ΔH° is constant, i.e. ΔCp ≈ 0) gives the integrated form: ln(K₂/K₁) = −(ΔH°/R)(1/T₂ − 1/T₁).</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What does a Van't Hoff plot tell us and what does its slope mean?<span class="faq-icon">+</span></div>
+      <div class="faq-a">A Van't Hoff plot graphs ln K (y-axis) vs 1/T (x-axis). The slope of the straight line equals −ΔH°/R, and the y-intercept equals ΔS°/R. A negative slope indicates an exothermic reaction (K decreases with T). A positive slope indicates endothermic. Curvature in the plot means ΔH° itself varies with temperature, often due to a significant heat capacity change (ΔCp ≠ 0).</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you calculate the degree of dissociation from i?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Use α = (i − 1) / (n − 1), where n is the total number of ions per formula unit if fully dissociated. For NaCl (n = 2): α = (i − 1)/1. For CaCl₂ (n = 3): α = (i − 1)/2. For Al₂(SO₄)₃ (n = 5): α = (i − 1)/4. If i = 1.8 for NaCl, then α = 0.8 = 80% dissociated. At high dilution, strong electrolytes approach α → 1 (100% dissociation).</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Why does freezing point depression use K<sub>f</sub> and not a gas constant?<span class="faq-icon">+</span></div>
+      <div class="faq-a">K<sub>f</sub> is the cryoscopic constant, derived thermodynamically from K<sub>f</sub> = RT<sub>f</sub>²M₁ / (1000 × ΔH<sub>fus</sub>), where T<sub>f</sub> is the pure solvent freezing point, M₁ is molar mass of solvent, and ΔH<sub>fus</sub> is enthalpy of fusion. The gas constant R is embedded inside K<sub>f</sub> — so it's not absent, just incorporated. K<sub>f</sub> for water = 1.86 comes from these solvent-specific properties.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Can the Van't Hoff equation be used for gases as well as solutions?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Yes — the thermodynamic Van't Hoff equation applies to any equilibrium regardless of phase, since K is defined from ΔG° = −RT ln K which has universal applicability. For gas-phase reactions, K<sub>p</sub> or K<sub>c</sub> are used. The colligative Van't Hoff equations (osmotic, ΔT<sub>b</sub>, ΔT<sub>f</sub>) apply specifically to solutions. The equation π = nRT/V for osmotic pressure is structurally identical to the ideal gas law PV = nRT.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How does CaCl₂ melt ice more effectively than NaCl?<span class="faq-icon">+</span></div>
+      <div class="faq-a">CaCl₂ → Ca²⁺ + 2Cl⁻ gives i = 3; NaCl gives i = 2. From ΔT<sub>f</sub> = i·K<sub>f</sub>·m, at equal molality, CaCl₂ provides 3/2 = 1.5× more freezing point depression than NaCl. Additionally, CaCl₂ dissolution is exothermic (releases heat), which actively melts ice, while NaCl dissolution is slightly endothermic. This makes CaCl₂ effective even below −20°C where NaCl fails.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What are the limitations of the Van't Hoff equations?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Key limitations: (1) Assumes ideal dilute solutions — breaks down above ~0.1 M for electrolytes; (2) Assumes ΔH° is temperature-independent in the integrated thermodynamic form — valid only over narrow temperature ranges or when ΔCp ≈ 0; (3) i is concentration-dependent, not constant; (4) Assumes complete or simple dissociation — fails for complex speciation; (5) Osmotic pressure equation assumes ideal semipermeable membrane with no solute transport.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How is osmotic pressure used to determine molar mass?<span class="faq-icon">+</span></div>
+      <div class="faq-a">For a non-electrolyte (i = 1): π = MRT = (n/V)RT. Rearranging: M = π/(RT) = (mass/molar mass)/V. Therefore molar mass = (mass × RT)/(π × V). This method is especially useful for large molecules (polymers, proteins) where small amounts give measurable osmotic pressure but negligible boiling/freezing changes. Historically used to determine molar masses of haemoglobin and other proteins.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What does it mean when i &lt; 1 for a solute?<span class="faq-icon">+</span></div>
+      <div class="faq-a">i < 1 means the solute is associating (forming dimers or larger aggregates) in solution, producing fewer particles than formula units dissolved. Classic example: acetic acid in benzene forms dimers (CH₃COOH)₂ via hydrogen bonding, so 1 mole of acetic acid produces ~0.5 moles of particles, giving i ≈ 0.5. This results in smaller-than-expected colligative effects. Association is most common in non-polar solvents.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How is the Van't Hoff equation applied to kidney function?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Kidney tubule cells maintain osmotic gradients using active transport to concentrate urine. The osmotic pressure of urine can range from ~100 mOsm/L (dilute) to 1200 mOsm/L (concentrated). Using π = iMRT, at 37°C (310 K): a 300 mOsm/L plasma has π ≈ 7.7 atm. If urine is hyperosmotic relative to blood, water reabsorption is driven by osmosis — a process quantified by the Van't Hoff osmotic pressure equation.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">What happens to K when ΔH° = 0?<span class="faq-icon">+</span></div>
+      <div class="faq-a">If ΔH° = 0 (thermoneutral reaction), the Van't Hoff equation gives ln(K₂/K₁) = 0, so K₂ = K₁. The equilibrium constant is completely temperature-independent. This is rare but occurs in some acid-base reactions and isotope exchange reactions. The equilibrium is driven entirely by entropy (ΔS°), and the Van't Hoff plot would be a horizontal line with slope = 0.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">How do you convert between osmotic pressure units?<span class="faq-icon">+</span></div>
+      <div class="faq-a">The Van't Hoff equation π = iMRT with R = 0.08206 L·atm/mol·K gives π in atmospheres. To convert: 1 atm = 101,325 Pa = 101.325 kPa = 760 mmHg = 1.01325 bar. Biological contexts often use osmolarity (Osm/L = i×M) and osmotic pressure in mmHg or kPa. Blood osmolarity ≈ 290 mOsm/L → π ≈ 5,500 mmHg ≈ 7.3 atm. Always check units of R to match your pressure unit.</div>
+    </div>
+
+    <div class="faq-card" onclick="toggleFaq(this)">
+      <div class="faq-q">Can Van't Hoff equations predict behaviour of ionic liquids?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Standard Van't Hoff colligative equations assume dilute aqueous solutions and break down severely for ionic liquids, which are composed entirely of ions (no neutral solvent in the classical sense). However, the thermodynamic Van't Hoff equation (ln K vs 1/T) remains valid for any equilibrium reaction including those in ionic liquids, as it derives from universal thermodynamic principles. Activity coefficients and modified equations (Pitzer model) are needed for concentrated ionic systems.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+</main>
+
+<div id="footer-container"></div>
+<script>fetch('footer.html').then(r=>r.text()).then(h=>{document.getElementById('footer-container').innerHTML=h;}).catch(()=>{});</script>
+
+<script>
+// ══════════════════════════════════════════
+// SMART EXPRESSION PARSER
+// Supports: 1.5*10^-3 | 20*10^-9 | 10^5 | 20*5 | -0.76 | plain numbers
+// ══════════════════════════════════════════
+function parseExpr(raw) {
+  if (!raw && raw !== 0) return NaN;
+  let s = raw.toString().trim();
+  if (!s) return NaN;
+
+  // Direct plain number
+  if (/^[+-]?\d+\.?\d*([eE][+-]?\d+)?$/.test(s)) return parseFloat(s);
+
+  // Pattern: (±coeff) [* (base)] [^ (±exp)]
+  const re = /^([+-]?\s*\d+\.?\d*(?:[eE][+-]?\d+)?)\s*(?:\*\s*([+-]?\d+\.?\d*(?:[eE][+-]?\d+)?))?\s*(?:\^\s*([+-]?\d+))?$/;
+  const m = s.match(re);
+  if (m) {
+    const coeff = parseFloat(m[1]);
+    const base  = m[2] ? parseFloat(m[2]) : 1;
+    const exp   = m[3] ? parseInt(m[3])   : 0;
+    if (isNaN(coeff)) return NaN;
+    if (m[2] && !m[3]) return coeff * base;               // a*b only
+    if (!m[2] && m[3]) return Math.pow(coeff, exp);        // a^c only
+    return coeff * Math.pow(base, exp);                    // a*b^c
+  }
+  return parseFloat(s);
+}
+
+function prettyNum(v, dp=6) {
+  if (isNaN(v)) return '—';
+  const a = Math.abs(v);
+  if (a !== 0 && (a < 0.001 || a >= 1e6)) {
+    const e = Math.floor(Math.log10(a));
+    const man = parseFloat((v / Math.pow(10, e)).toPrecision(5));
+    const sup = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+    const se = String(e).split('').map(c=>sup[c]||c).join('');
+    return `${man} × 10${se}`;
+  }
+  return parseFloat(v.toPrecision(7)).toString();
+}
+
+function livePreview(input, previewId) {
+  const el = document.getElementById(previewId);
+  if (!el) return;
+  const raw = input.value.trim();
+  if (!raw) { el.className = 'input-preview'; el.textContent = ''; return; }
+  const val = parseExpr(raw);
+  if (isNaN(val)) { el.className = 'input-preview bad'; el.textContent = '✗ Invalid expression'; }
+  else            { el.className = 'input-preview ok';  el.textContent = '= ' + prettyNum(val); }
+}
+
+// ─── Tab ───
+function switchTab(name, btn) {
+  document.querySelectorAll('.calc-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  ['osmotic','boiling','freezing','equil','factor'].forEach(id=>{
+    const r=document.getElementById('res-'+id); if(r) r.classList.remove('show');
+    const e=document.getElementById('err-'+id); if(e) e.style.display='none';
+  });
+}
+
+// ─── Preset Loaders ───
+function loadFactorPreset(id) {
+  const sel = document.getElementById(id+'-preset');
+  const inp = document.getElementById(id);
+  if(sel && inp && sel.value) inp.value = sel.value;
+  if(inp) livePreview(inp, 'prev-'+id);
+}
+function loadKbPreset() {
+  const s=document.getElementById('b-kb-preset'), i=document.getElementById('b-kb');
+  if(s.value){ i.value=s.value; livePreview(i,'prev-b-kb'); }
+}
+function loadKfPreset() {
+  const s=document.getElementById('f-kf-preset'), i=document.getElementById('f-kf');
+  if(s.value){ i.value=s.value; livePreview(i,'prev-f-kf'); }
+}
+
+// ─── Helpers ───
+function fmt(n,d=4){ return parseFloat(n.toFixed(d)); }
+function showErr(id,msg){ const e=document.getElementById('err-'+id); e.textContent='⚠ '+msg; e.style.display='block'; }
+function showRes(id){ document.getElementById('res-'+id).classList.add('show'); }
+function chip(label, val, unit='') {
+  return `<div class="result-chip"><div class="rc-label">${label}</div><div class="rc-val">${val} ${unit}</div></div>`;
+}
+function stepsHtml(steps) {
+  return '<h4>Step-by-Step Solution</h4>'+steps.map((s,i)=>`<div class="step-item"><span class="step-num">${String(i+1).padStart(2,'0')}.</span>${s}</div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// TAB 1: OSMOTIC PRESSURE  π = iMRT
+// ══════════════════════════════════════════
+function calcOsmotic() {
+  const i = parseExpr(document.getElementById('o-i').value);
+  const M = parseExpr(document.getElementById('o-M').value);
+  const T = parseExpr(document.getElementById('o-T').value) || 298.15;
+  document.getElementById('err-osmotic').style.display='none';
+  document.getElementById('res-osmotic').classList.remove('show');
+  if(isNaN(i)||isNaN(M)) return showErr('osmotic','Please enter Van\'t Hoff factor i and molarity M.');
+  if(i<=0) return showErr('osmotic','Factor i must be positive (≥1 for normal solutes).');
+  if(M<=0) return showErr('osmotic','Molarity must be positive.');
+  const R=0.08206;
+  const pi=fmt(i*M*R*T,4);
+  const pi_Pa=fmt(pi*101325,2);
+  const pi_kPa=fmt(pi*101.325,3);
+  const pi_mmHg=fmt(pi*760,2);
+  const pi_bar=fmt(pi*1.01325,4);
+  document.getElementById('res-osmotic-val').textContent=prettyNum(pi)+' atm';
+  document.getElementById('res-osmotic-interp').innerHTML=
+    `π = <strong>${prettyNum(pi)} atm</strong> = <strong>${prettyNum(pi_kPa)} kPa</strong> = <strong>${prettyNum(pi_mmHg)} mmHg</strong>.<br>
+    ${pi>7.5 && pi<8.0 ? '🩸 Close to blood osmotic pressure (~7.7 atm at 37°C) — approximately isotonic.' :
+      pi<7.5 ? '💧 Hypotonic relative to blood — water would flow <em>into</em> cells by osmosis.' :
+      '🔴 Hypertonic relative to blood — cells would lose water (crenation).'}`;
+  document.getElementById('res-osmotic-steps').innerHTML=stepsHtml([
+    `Formula: π = i × M × R × T`,
+    `i = ${i}, M = ${prettyNum(M)} mol/L, R = 0.08206 L·atm/mol·K, T = ${T} K`,
+    `π = ${i} × ${prettyNum(M)} × 0.08206 × ${T}`,
+    `π = ${prettyNum(i*M)} × 0.08206 × ${T}`,
+    `π = ${prettyNum(i*M*R)} × ${T}`,
+    `π = <strong>${prettyNum(pi)} atm</strong>`,
+    `In Pa: ${prettyNum(pi)} × 101325 = ${prettyNum(pi_Pa)} Pa = ${prettyNum(pi_kPa)} kPa`,
+    `In mmHg: ${prettyNum(pi)} × 760 = ${prettyNum(pi_mmHg)} mmHg`
+  ]);
+  showRes('osmotic');
+}
+
+// ══════════════════════════════════════════
+// TAB 2: BOILING POINT  ΔTb = i·Kb·m
+// ══════════════════════════════════════════
+function calcBoiling() {
+  const i  = parseExpr(document.getElementById('b-i').value);
+  const Kb = parseExpr(document.getElementById('b-kb').value);
+  const m  = parseExpr(document.getElementById('b-m').value);
+  const bp = parseExpr(document.getElementById('b-bp').value);
+  document.getElementById('err-boiling').style.display='none';
+  document.getElementById('res-boiling').classList.remove('show');
+  if(isNaN(i)||isNaN(Kb)||isNaN(m)) return showErr('boiling','Please fill in i, K<sub>b</sub>, and molality m.');
+  const dTb=fmt(i*Kb*m,4);
+  const newBP=isNaN(bp) ? null : fmt(bp+dTb,4);
+  document.getElementById('res-boiling-grid').innerHTML=
+    chip('ΔT<sub>b</sub> Elevation', prettyNum(dTb), '°C')+
+    (newBP!==null ? chip('New Boiling Point', prettyNum(newBP), '°C') : '');
+  document.getElementById('res-boiling-interp').innerHTML=
+    `Boiling point is raised by <strong>${prettyNum(dTb)}°C</strong>.
+    ${newBP!==null ? `New boiling point of solution: <strong>${prettyNum(newBP)}°C</strong>.` : ''}
+    ${i>1 ? `The electrolyte factor i = ${i} amplifies the effect ${i}× compared to a non-electrolyte.` : ''}`;
+  document.getElementById('res-boiling-steps').innerHTML=stepsHtml([
+    `Formula: ΔT<sub>b</sub> = i × K<sub>b</sub> × m`,
+    `i = ${i}, K<sub>b</sub> = ${Kb} °C·kg/mol, m = ${prettyNum(m)} mol/kg`,
+    `ΔT<sub>b</sub> = ${i} × ${Kb} × ${prettyNum(m)}`,
+    `ΔT<sub>b</sub> = ${fmt(i*Kb,4)} × ${prettyNum(m)}`,
+    `ΔT<sub>b</sub> = <strong>${prettyNum(dTb)} °C</strong>`,
+    ...(newBP!==null ? [`New BP = ${bp} + ${prettyNum(dTb)} = <strong>${prettyNum(newBP)}°C</strong>`] : [])
+  ]);
+  showRes('boiling');
+}
+
+// ══════════════════════════════════════════
+// TAB 3: FREEZING POINT  ΔTf = i·Kf·m
+// ══════════════════════════════════════════
+function calcFreezing() {
+  const i  = parseExpr(document.getElementById('f-i').value);
+  const Kf = parseExpr(document.getElementById('f-kf').value);
+  const m  = parseExpr(document.getElementById('f-m').value);
+  const fp = parseExpr(document.getElementById('f-fp').value);
+  document.getElementById('err-freezing').style.display='none';
+  document.getElementById('res-freezing').classList.remove('show');
+  if(isNaN(i)||isNaN(Kf)||isNaN(m)) return showErr('freezing','Please fill in i, K<sub>f</sub>, and molality m.');
+  const dTf=fmt(i*Kf*m,4);
+  const newFP=isNaN(fp) ? null : fmt(fp-dTf,4);
+  document.getElementById('res-freezing-grid').innerHTML=
+    chip('ΔT<sub>f</sub> Depression', prettyNum(dTf), '°C')+
+    (newFP!==null ? chip('New Freezing Point', prettyNum(newFP), '°C') : '');
+  document.getElementById('res-freezing-interp').innerHTML=
+    `Freezing point is <strong>depressed by ${prettyNum(dTf)}°C</strong>.
+    ${newFP!==null ? `New freezing point: <strong>${prettyNum(newFP)}°C</strong>.` : ''}
+    ${i>=3 ? `With i = ${i}, this electrolyte provides ${i}× depression vs non-electrolyte — highly effective for de-icing.` :
+      i===1 ? 'Non-electrolyte (i=1) — standard colligative depression.' : ''}`;
+  document.getElementById('res-freezing-steps').innerHTML=stepsHtml([
+    `Formula: ΔT<sub>f</sub> = i × K<sub>f</sub> × m`,
+    `i = ${i}, K<sub>f</sub> = ${Kf} °C·kg/mol, m = ${prettyNum(m)} mol/kg`,
+    `ΔT<sub>f</sub> = ${i} × ${Kf} × ${prettyNum(m)}`,
+    `ΔT<sub>f</sub> = ${fmt(i*Kf,4)} × ${prettyNum(m)}`,
+    `ΔT<sub>f</sub> = <strong>${prettyNum(dTf)} °C</strong>`,
+    ...(newFP!==null ? [`New FP = ${fp} − ${prettyNum(dTf)} = <strong>${prettyNum(newFP)}°C</strong>`] : [])
+  ]);
+  showRes('freezing');
+}
+
+// ══════════════════════════════════════════
+// TAB 4: K vs TEMPERATURE
+// ln(K2/K1) = −ΔH°/R × (1/T2 − 1/T1)
+// ══════════════════════════════════════════
+function calcEquil() {
+  const K1 = parseExpr(document.getElementById('e-k1').value);
+  const T1 = parseExpr(document.getElementById('e-T1').value);
+  const T2 = parseExpr(document.getElementById('e-T2').value);
+  const dH = parseExpr(document.getElementById('e-dH').value);
+  document.getElementById('err-equil').style.display='none';
+  document.getElementById('res-equil').classList.remove('show');
+  if(isNaN(K1)||isNaN(T1)||isNaN(T2)||isNaN(dH)) return showErr('equil','Please fill in all four fields.');
+  if(K1<=0) return showErr('equil','K₁ must be a positive number.');
+  if(T1<=0||T2<=0) return showErr('equil','Temperatures must be in Kelvin (positive).');
+  const R=8.314;
+  const lnRatio=(-dH/R)*(1/T2-1/T1);
+  const K2=K1*Math.exp(lnRatio);
+  const exo=dH<0;
+  const Tinc=T2>T1;
+  document.getElementById('res-equil-grid').innerHTML=
+    chip('K₂', prettyNum(K2))+
+    chip('ln(K₂/K₁)', prettyNum(fmt(lnRatio,4)))+
+    chip('K₂/K₁ ratio', prettyNum(fmt(Math.exp(lnRatio),4)));
+  document.getElementById('res-equil-interp').innerHTML=
+    `K changes from <strong>${prettyNum(K1)}</strong> at ${T1} K to <strong>${prettyNum(K2)}</strong> at ${T2} K.<br>
+    Reaction is <strong>${exo?'exothermic (ΔH° < 0)':'endothermic (ΔH° > 0)'}</strong>.
+    ${exo&&Tinc ? '🔴 K decreased — equilibrium shifts LEFT as T increases (Le Chatelier).' :
+      exo&&!Tinc ? '🟢 K increased — equilibrium shifts RIGHT as T decreases.' :
+      !exo&&Tinc ? '🟢 K increased — equilibrium shifts RIGHT as T increases (endothermic favoured by heat).' :
+      '🔴 K decreased — equilibrium shifts LEFT as T decreases (endothermic reaction needs heat).'}`;
+  document.getElementById('res-equil-steps').innerHTML=stepsHtml([
+    `Formula: ln(K₂/K₁) = −ΔH°/R × (1/T₂ − 1/T₁)`,
+    `K₁ = ${prettyNum(K1)}, T₁ = ${T1} K, T₂ = ${T2} K, ΔH° = ${prettyNum(dH)} J/mol`,
+    `R = 8.314 J/mol·K`,
+    `1/T₂ − 1/T₁ = ${fmt(1/T2,8)} − ${fmt(1/T1,8)} = ${fmt(1/T2-1/T1,8)} K⁻¹`,
+    `−ΔH°/R = −(${prettyNum(dH)})/8.314 = ${fmt(-dH/R,4)}`,
+    `ln(K₂/K₁) = ${fmt(-dH/R,4)} × ${fmt(1/T2-1/T1,8)} = ${fmt(lnRatio,6)}`,
+    `K₂/K₁ = e^(${fmt(lnRatio,4)}) = ${prettyNum(Math.exp(lnRatio))}`,
+    `K₂ = ${prettyNum(K1)} × ${prettyNum(fmt(Math.exp(lnRatio),6))} = <strong>${prettyNum(K2)}</strong>`
+  ]);
+  showRes('equil');
+}
+
+// ══════════════════════════════════════════
+// TAB 5: FIND FACTOR i
+// ══════════════════════════════════════════
+function calcFactor() {
+  const obs = parseExpr(document.getElementById('fi-obs').value);
+  const K   = parseExpr(document.getElementById('fi-K').value);
+  const c   = parseExpr(document.getElementById('fi-c').value);
+  const type= document.getElementById('fi-type').value;
+  document.getElementById('err-factor').style.display='none';
+  document.getElementById('res-factor').classList.remove('show');
+  if(isNaN(obs)||isNaN(K)||isNaN(c)) return showErr('factor','Please fill in all three value fields.');
+  if(K<=0||c<=0) return showErr('factor','K and concentration must be positive.');
+  const theoretical=K*c;
+  const i=fmt(obs/theoretical,4);
+  const alpha2=fmt(i-1,4); // for n=2
+  const alpha3=fmt((i-1)/2,4); // for n=3
+  document.getElementById('res-factor-val').textContent=prettyNum(i);
+  document.getElementById('res-factor-val').className='result-value '+(i>0.9&&i<1.1?'neutral':i>=1.1?'positive':'negative');
+  document.getElementById('res-factor-interp').innerHTML=
+    `<strong>i = ${prettyNum(i)}</strong> → 
+    ${i>1.05 ? `<span class="badge badge-s">Dissociation</span> Solute dissociates into particles. For n=2: α = ${prettyNum(alpha2)} (${fmt(alpha2*100,1)}% dissociated). For n=3: α = ${prettyNum(alpha3)}.` :
+      i<0.95 ? `<span class="badge badge-e">Association</span> Solute associates in solution (dimers/aggregates). Each mole produces only ${prettyNum(i)} moles of effective particles.` :
+      `<span class="badge badge-a">Non-electrolyte</span> i ≈ 1 — solute does not dissociate or associate significantly in this solvent.`}`;
+  document.getElementById('res-factor-steps').innerHTML=stepsHtml([
+    `i = ΔT<sub>observed</sub> / ΔT<sub>theoretical</sub> = observed / (K × c)`,
+    `ΔT<sub>theoretical</sub> = K × c = ${prettyNum(K)} × ${prettyNum(c)} = ${prettyNum(theoretical)}`,
+    `i = ${prettyNum(obs)} / ${prettyNum(theoretical)} = <strong>${prettyNum(i)}</strong>`,
+    i>1.05 ? `Degree of dissociation (n=2): α = (i−1)/(n−1) = (${prettyNum(i)}−1)/1 = ${prettyNum(alpha2)}` :
+    i<0.95 ? `Degree of association: fraction associated = 1 − i = ${fmt(1-i,4)}` :
+    `i ≈ 1 → non-electrolyte behaviour confirmed`,
+    `Theoretical i (complete dissociation) would be n = ceil(i) or higher.`
+  ]);
+  showRes('factor');
+}
+
+// ─── FAQ toggle ───
+function toggleFaq(card){ card.classList.toggle('open'); }
+
+// ─── Scroll fade-in ───
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
