@@ -1,14 +1,19 @@
 """
 inject_protection.py
 --------------------
-Uses secret HTML comment markers that only you know:
+Uses gtag-style HTML comment markers:
 
-  <!-- CHEMISTRY-SPARK-START -->
+  <!-- gtag-inline-config-chemistry-spark -->
   <script>...</script>
-  <!-- CHEMISTRY-SPARK-END -->
+  <!-- gtag-inline-config-chemistry-spark-end -->
 
-Safe to re-run — cleans old protection before injecting fresh.
-Will NOT touch your CSS or any other code.
+Cleans ALL old marker versions before injecting fresh:
+  - <!-- CHEM-PROTECT-START/END -->
+  - <!-- CHEMISTRY-SPARK-START/END -->
+  - <!-- gtag-inline-config-chemistry-spark/end -->
+  - <script src="protect.js">
+
+Safe to re-run anytime. Will NOT touch CSS or any other code.
 """
 
 import os
@@ -16,8 +21,8 @@ import re
 
 FOLDER       = "."
 PROTECT_FILE = "protect.js"
-START_MARKER = "<!-- CHEMISTRY-SPARK-START -->"
-END_MARKER   = "<!-- CHEMISTRY-SPARK-END -->"
+START_MARKER = "<!-- gtag-inline-config-chemistry-spark -->"
+END_MARKER   = "<!-- gtag-inline-config-chemistry-spark-end -->"
 
 def get_protect_code():
     path = os.path.join(FOLDER, PROTECT_FILE)
@@ -28,33 +33,29 @@ def get_protect_code():
         return f.read().strip()
 
 def clean_old_protection(content):
-    # Remove only content between your secret HTML comment markers
-    content = re.sub(
+    # Remove ALL known old marker versions
+    patterns = [
+        r'\n?<!-- gtag-inline-config-chemistry-spark -->[\s\S]*?<!-- gtag-inline-config-chemistry-spark-end -->',
         r'\n?<!-- CHEMISTRY-SPARK-START -->[\s\S]*?<!-- CHEMISTRY-SPARK-END -->',
-        '', content, flags=re.IGNORECASE
-    )
-    # Also remove old plain <script src="protect.js"> if present
-    content = re.sub(
+        r'\n?<!-- CHEM-PROTECT-START -->[\s\S]*?<!-- CHEM-PROTECT-END -->',
         r'\n?<script[^>]*src=["\'][^"\']*protect\.js["\'][^>]*>\s*</script>',
-        '', content, flags=re.IGNORECASE
-    )
+    ]
+    for pattern in patterns:
+        content = re.sub(pattern, '', content, flags=re.IGNORECASE)
     return content
 
 def inject(filepath, inline_code):
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Step 1: Remove old protection safely
     cleaned = clean_old_protection(content)
 
-    # Step 2: Build injection block with your secret markers
     inject_block = (
         f"\n{START_MARKER}\n"
         f"<script>\n{inline_code}\n</script>\n"
         f"{END_MARKER}"
     )
 
-    # Step 3: Inject just before </head>
     if "</head>" in cleaned:
         new_content = cleaned.replace("</head>", f"{inject_block}\n</head>", 1)
     elif "<head>" in cleaned:
