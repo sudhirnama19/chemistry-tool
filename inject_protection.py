@@ -1,25 +1,18 @@
 """
 inject_protection.py
 --------------------
-Reads protect.js and inlines its full code directly into every HTML file.
-This is much stronger than <script src="protect.js"> because:
-  - Deleting protect.js does nothing
-  - The protection is hardcoded inside every HTML file
-  - Attacker must manually edit every single HTML file to remove it
+1. Removes ANY old protect.js references from all HTML files
+2. Inlines the full protect.js code fresh into every HTML file
 
-Usage:
-    python inject_protection.py
-
-Place this script in the SAME folder as your HTML files and protect.js
+This prevents conflicts from double injection.
 """
 
 import os
+import re
 
-# ── CONFIG ──────────────────────────────────────────────────────────────────
-FOLDER          = "."                  # folder containing your HTML files
-PROTECT_FILE    = "protect.js"         # your protect.js file
-INJECT_MARKER   = "sn_overlay"         # unique string inside protect.js to detect if already injected
-# ────────────────────────────────────────────────────────────────────────────
+FOLDER       = "."
+PROTECT_FILE = "protect.js"
+MARKER       = "sn_overlay"  # unique string inside protect.js to detect injection
 
 def get_protect_code():
     path = os.path.join(FOLDER, PROTECT_FILE)
@@ -29,19 +22,34 @@ def get_protect_code():
     with open(path, "r", encoding="utf-8") as f:
         return f.read().strip()
 
+def clean_old_protection(content):
+    # Remove <script src="protect.js"...></script> (old method)
+    content = re.sub(
+        r'<script[^>]*src=["\'][^"\']*protect\.js["\'][^>]*>\s*</script>',
+        '', content, flags=re.IGNORECASE
+    )
+    # Remove old inline protect.js block (between <script> and </script> containing our marker)
+    content = re.sub(
+        r'<script>\s*/\*[\s\S]*?CHEM PROTECT[\s\S]*?</script>',
+        '', content, flags=re.IGNORECASE
+    )
+    # Remove inline script blocks containing sn_overlay marker
+    content = re.sub(
+        r'<script>\s*[\s\S]*?sn_overlay[\s\S]*?</script>',
+        '', content, flags=re.IGNORECASE
+    )
+    return content
+
 def inject(filepath, inline_code):
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Skip if already injected
-    if INJECT_MARKER in content:
-        print(f"  [SKIP]     {filepath}  (already injected)")
-        return
+    # Step 1: Clean ALL old protection
+    content = clean_old_protection(content)
 
-    # Build the inline script tag
+    # Step 2: Inject fresh inline code
     inline_tag = f"\n<script>\n{inline_code}\n</script>"
 
-    # Inject just before </head>
     if "</head>" in content:
         new_content = content.replace("</head>", f"{inline_tag}\n</head>", 1)
     elif "<head>" in content:
@@ -52,7 +60,7 @@ def inject(filepath, inline_code):
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(new_content)
 
-    print(f"  [INJECTED] {filepath}")
+    print(f"  [DONE] {filepath}")
 
 def main():
     protect_code = get_protect_code()
@@ -63,16 +71,15 @@ def main():
     ]
 
     if not html_files:
-        print("No HTML files found in this folder.")
+        print("No HTML files found.")
         return
 
-    print(f"Found {len(html_files)} HTML file(s). Inlining protect.js...\n")
+    print(f"Found {len(html_files)} HTML files. Cleaning old protection and injecting fresh...\n")
 
     for filename in html_files:
         inject(os.path.join(FOLDER, filename), protect_code)
 
-    print(f"\nDone! protect.js is now inlined into all HTML files.")
-    print("Even if someone deletes protect.js, all calculators remain protected.")
+    print(f"\nDone! All {len(html_files)} files cleaned and re-injected successfully.")
 
 if __name__ == "__main__":
     main()
