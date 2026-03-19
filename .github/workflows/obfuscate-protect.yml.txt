@@ -1,0 +1,46 @@
+name: Obfuscate Protect.js
+
+on:
+  workflow_dispatch:  # Run manually from GitHub Actions tab
+
+jobs:
+  obfuscate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install javascript-obfuscator
+        run: npm install -g javascript-obfuscator
+
+      - name: Obfuscate protect.js
+        run: |
+          javascript-obfuscator protect.js \
+            --output protect.js \
+            --compact true \
+            --control-flow-flattening true \
+            --control-flow-flattening-threshold 0.75 \
+            --dead-code-injection true \
+            --dead-code-injection-threshold 0.4 \
+            --identifier-names-generator hexadecimal \
+            --rename-globals false \
+            --self-defending true \
+            --string-array true \
+            --string-array-encoding rc4 \
+            --string-array-threshold 0.75 \
+            --transform-object-keys true \
+            --unicode-escape-sequence false
+
+      - name: Commit obfuscated protect.js
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add protect.js
+          git diff --cached --quiet || git commit -m "🔐 Obfuscated protect.js"
+          git push
