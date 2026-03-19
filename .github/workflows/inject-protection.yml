@@ -2,7 +2,6 @@
 inject_protection.py
 --------------------
 Reads protect.js and inlines its full code directly into every HTML file.
-This is much stronger than <script src="protect.js"> because:
   - Deleting protect.js does nothing
   - The protection is hardcoded inside every HTML file
   - Attacker must manually edit every single HTML file to remove it
