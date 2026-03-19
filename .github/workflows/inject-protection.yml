@@ -13,6 +13,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Show files in repo
+        run: ls -la
       - name: Run Script
         run: python inject_protection.py
       - name: Commit
@@ -22,4 +24,3 @@ jobs:
           git add *.html
           git diff --cached --quiet || git commit -m "Injected protect.js"
           git push
-
