@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Advanced pH Calculator | Chemistry Spark Lab</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <script src="header.js"></script>
 <script>
   window.MathJax = {
     tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true },
@@ -452,7 +453,7 @@ select option { background: #0d1524; }
 <body>
 
 <nav class="navbar">
-  <a href="#" class="brand">Chemistry Spark Lab</a>
+  <a href="#" class="brand">Chemistry Calculators</a>
 </nav>
 
 <div class="container">
@@ -1366,6 +1367,11 @@ document.getElementById('s-nfactor').addEventListener('change', function() {
 window.onload = () => {
   updateChart(7);
 };
+</script>
+  <!-- FOOTER PLACEHOLDER -->
+<div id="footer-container"></div>
+<script>
+fetch('footer.html').then(r=>r.text()).then(h=>{document.getElementById('footer-container').innerHTML=h;}).catch(()=>{});
 </script>
 </body>
 </html>
